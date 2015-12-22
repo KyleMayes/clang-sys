@@ -1,4 +1,13 @@
 //! Rust bindings for `libclang`.
+//!
+//! ## Version Specific Documentation
+//!
+//! * 3.5.x - [Documentation](https://kylemayes.github.io/clang-sys/3_5/clang_sys)
+//! * 3.6.x - [Documentation](https://kylemayes.github.io/clang-sys/3_6/clang_sys)
+//! * 3.7.x - [Documentation](https://kylemayes.github.io/clang-sys/3_7/clang_sys)
+//!
+//! The documentation for the non-version specific API is
+//! [here](https://kylemayes.github.io/clang-sys/all/clang_sys).
 
 #![allow(missing_debug_implementations, missing_docs, non_upper_case_globals, non_snake_case)]
 
