@@ -1,6 +1,8 @@
 clang-sys
 =========
 
+[![crates.io](https://img.shields.io/crates/v/clang-sys.svg)](https://crates.io/crates/clang-sys)
+
 Rust bindings for libclang.
 
 Released under the MIT license.
