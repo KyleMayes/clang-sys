@@ -1,0 +1,31 @@
+[package]
+
+name = "clang-sys"
+authors = ["Kyle Mayes <kyle@mayeses.com>"]
+
+version = "0.0.1"
+
+readme = "README.md"
+license = "MIT"
+
+description = "Rust bindings for libclang."
+
+documentation = "https://kylemayes.github.io/clang-sys/all/clang"
+repository = "https://github.com/KyleMayes/clang-sys"
+
+build = "build.rs"
+
+[features]
+
+clang_3_5 = []
+clang_3_6 = []
+clang_3_7 = []
+
+[dependencies]
+
+bitflags = "0.3.3"
+libc = "0.2.4"
+
+[build-dependencies]
+
+rustc_version = "0.1.4"
