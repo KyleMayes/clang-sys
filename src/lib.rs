@@ -34,7 +34,7 @@ pub type CXInclusionVisitor = extern fn(CXFile, *mut CXSourceLocation, c_uint, C
 // Enums
 //================================================
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CXAvailabilityKind {
     Available = 0,
@@ -43,7 +43,7 @@ pub enum CXAvailabilityKind {
     NotAccessible = 3,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CXCallingConv {
     Default = 0,
@@ -63,7 +63,7 @@ pub enum CXCallingConv {
     Unexposed = 200,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CXChildVisitResult {
     Break = 0,
@@ -71,14 +71,14 @@ pub enum CXChildVisitResult {
     Recurse = 2,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CXCompilationDatabase_Error {
     NoError = 0,
     CanNotLoadDatabase = 1,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CXCompletionChunkKind {
     Optional = 0,
@@ -104,7 +104,7 @@ pub enum CXCompletionChunkKind {
     VerticalSpace = 20,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CXCursorKind {
     UnexposedDecl = 1,
@@ -304,7 +304,7 @@ pub enum CXCursorKind {
     OverloadCandidate = 700,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CXDiagnosticSeverity {
     Ignored = 0,
@@ -314,7 +314,7 @@ pub enum CXDiagnosticSeverity {
     Fatal = 4,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CXErrorCode {
     Success = 0,
@@ -324,7 +324,7 @@ pub enum CXErrorCode {
     ASTReadError = 4,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CXIdxAttrKind {
     Unexposed = 0,
@@ -333,7 +333,7 @@ pub enum CXIdxAttrKind {
     IBOutletCollection = 3,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CXIdxEntityCXXTemplateKind {
     NonTemplate = 0,
@@ -342,7 +342,7 @@ pub enum CXIdxEntityCXXTemplateKind {
     TemplateSpecialization = 3,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CXIdxEntityKind {
     Unexposed = 0,
@@ -374,7 +374,7 @@ pub enum CXIdxEntityKind {
     CXXInterface = 26,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CXIdxEntityLanguage {
     None = 0,
@@ -383,14 +383,14 @@ pub enum CXIdxEntityLanguage {
     CXX = 3,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CXIdxEntityRefKind {
     Direct = 1,
     Implicit = 2,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CXIdxObjCContainerKind {
     ForwardRef = 0,
@@ -398,7 +398,7 @@ pub enum CXIdxObjCContainerKind {
     Implementation = 2,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CXLanguageKind {
     Invalid = 0,
@@ -407,7 +407,7 @@ pub enum CXLanguageKind {
     CPlusPlus = 3,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CXLinkageKind {
     Invalid = 0,
@@ -417,7 +417,7 @@ pub enum CXLinkageKind {
     External = 4,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CXLoadDiag_Error {
     None = 0,
@@ -426,7 +426,7 @@ pub enum CXLoadDiag_Error {
     InvalidFile = 3,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CXRefQualifierKind {
     None = 0,
@@ -434,7 +434,7 @@ pub enum CXRefQualifierKind {
     RValue = 2,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CXResult {
     Success = 0,
@@ -442,7 +442,7 @@ pub enum CXResult {
     VisitBreak = 2,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CXSaveError {
     None = 0,
@@ -451,7 +451,7 @@ pub enum CXSaveError {
     InvalidTU = 3,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CXTUResourceUsageKind {
     AST = 1,
@@ -471,7 +471,7 @@ pub enum CXTUResourceUsageKind {
 }
 
 #[cfg(any(feature="clang_3_6", feature="clang_3_7"))]
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CXTemplateArgumentKind {
     Null = 0,
@@ -486,7 +486,7 @@ pub enum CXTemplateArgumentKind {
     Invalid = 9,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CXTokenKind {
     Punctuation = 0,
@@ -496,7 +496,7 @@ pub enum CXTokenKind {
     Comment = 4,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CXTypeKind {
     Invalid = 0,
@@ -549,7 +549,7 @@ pub enum CXTypeKind {
     MemberPointer = 117,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CXTypeLayoutError {
     Invalid = -1,
@@ -559,14 +559,14 @@ pub enum CXTypeLayoutError {
     InvalidFieldName = -5,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CXVisitorResult {
     Break = 0,
     Continue = 1,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CX_CXXAccessSpecifier {
     CXXInvalidAccessSpecifier = 0,
@@ -576,7 +576,7 @@ pub enum CX_CXXAccessSpecifier {
 }
 
 #[cfg(any(feature="clang_3_6", feature="clang_3_7"))]
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CX_StorageClass {
     Invalid = 0,
