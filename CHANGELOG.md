@@ -6,7 +6,7 @@
 ### Added
 - Added derivations of `PartialOrd` and `Ord` for FFI enums
 
-## [0.1.2] - UNRELEASED
+## [0.1.2] - 2015-12-29
 
 ### Added
 - Added derivation of `Debug` for FFI structs
