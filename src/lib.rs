@@ -9,7 +9,7 @@
 //! The documentation for the non-version specific API is
 //! [here](https://kylemayes.github.io/clang-sys/all/clang_sys).
 
-#![allow(missing_debug_implementations, missing_docs, non_upper_case_globals, non_snake_case)]
+#![allow(non_upper_case_globals, non_snake_case)]
 
 #![cfg_attr(lte_rustc_1_5, allow(raw_pointer_derive))]
 
