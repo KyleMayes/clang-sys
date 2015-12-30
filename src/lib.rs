@@ -779,21 +779,21 @@ opaque!(CXVirtualFileOverlay);
 
 // Transparent ___________________________________
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXCodeCompleteResults {
     pub Results: *mut CXCompletionResult,
     pub NumResults: c_uint,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXCompletionResult {
     pub CursorKind: CXCursorKind,
     pub CompletionString: CXCompletionString,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXCursor {
     pub kind: CXCursorKind,
@@ -801,20 +801,20 @@ pub struct CXCursor {
     pub data: [*const c_void; 3],
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXCursorAndRangeVisitor {
     pub context: *mut c_void,
     pub visit: extern fn(*mut c_void, CXCursor, CXSourceRange) -> CXVisitorResult,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXFileUniqueID {
     pub data: [c_ulonglong; 3],
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXIdxAttrInfo {
     pub kind: CXIdxAttrKind,
@@ -822,7 +822,7 @@ pub struct CXIdxAttrInfo {
     pub loc: CXIdxLoc,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXIdxBaseClassInfo {
     pub base: *const CXIdxEntityInfo,
@@ -830,7 +830,7 @@ pub struct CXIdxBaseClassInfo {
     pub loc: CXIdxLoc,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXIdxCXXClassDeclInfo {
     pub declInfo: *const CXIdxDeclInfo,
@@ -838,13 +838,13 @@ pub struct CXIdxCXXClassDeclInfo {
     pub numBases: c_uint,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXIdxContainerInfo {
     pub cursor: CXCursor,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXIdxDeclInfo {
     pub entityInfo: *const CXIdxEntityInfo,
@@ -862,7 +862,7 @@ pub struct CXIdxDeclInfo {
     pub flags: c_uint,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXIdxEntityInfo {
     pub kind: CXIdxEntityKind,
@@ -875,7 +875,7 @@ pub struct CXIdxEntityInfo {
     pub numAttributes: c_uint,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXIdxEntityRefInfo {
     pub kind: CXIdxEntityRefKind,
@@ -886,7 +886,7 @@ pub struct CXIdxEntityRefInfo {
     pub container: *const CXIdxContainerInfo,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXIdxIBOutletCollectionAttrInfo {
     pub attrInfo: *const CXIdxAttrInfo,
@@ -895,7 +895,7 @@ pub struct CXIdxIBOutletCollectionAttrInfo {
     pub classLoc: CXIdxLoc,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXIdxImportedASTFileInfo {
     pub file: CXFile,
@@ -904,7 +904,7 @@ pub struct CXIdxImportedASTFileInfo {
     pub isImplicit: c_int,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXIdxIncludedFileInfo {
     pub hashLoc: CXIdxLoc,
@@ -915,14 +915,14 @@ pub struct CXIdxIncludedFileInfo {
     pub isModuleImport: c_int,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXIdxLoc {
     pub ptr_data: [*mut c_void; 2],
     pub int_data: c_uint,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXIdxObjCCategoryDeclInfo {
     pub containerInfo: *const CXIdxObjCContainerDeclInfo,
@@ -932,14 +932,14 @@ pub struct CXIdxObjCCategoryDeclInfo {
     pub protocols: *const CXIdxObjCProtocolRefListInfo,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXIdxObjCContainerDeclInfo {
     pub declInfo: *const CXIdxDeclInfo,
     pub kind: CXIdxObjCContainerKind,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXIdxObjCInterfaceDeclInfo {
     pub containerInfo: *const CXIdxObjCContainerDeclInfo,
@@ -947,7 +947,7 @@ pub struct CXIdxObjCInterfaceDeclInfo {
     pub protocols: *const CXIdxObjCProtocolRefListInfo,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXIdxObjCPropertyDeclInfo {
     pub declInfo: *const CXIdxDeclInfo,
@@ -955,7 +955,7 @@ pub struct CXIdxObjCPropertyDeclInfo {
     pub setter: *const CXIdxEntityInfo,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXIdxObjCProtocolRefInfo {
     pub protocol: *const CXIdxEntityInfo,
@@ -963,14 +963,14 @@ pub struct CXIdxObjCProtocolRefInfo {
     pub loc: CXIdxLoc,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXIdxObjCProtocolRefListInfo {
     pub protocols: *const *const CXIdxObjCProtocolRefInfo,
     pub numProtocols: c_uint,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXPlatformAvailability {
     pub Platform: CXString,
@@ -981,14 +981,14 @@ pub struct CXPlatformAvailability {
     pub Message: CXString,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXSourceLocation {
     pub ptr_data: [*const c_void; 2],
     pub int_data: c_uint,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXSourceRange {
     pub ptr_data: [*const c_void; 2],
@@ -996,21 +996,21 @@ pub struct CXSourceRange {
     pub end_int_data: c_uint,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXSourceRangeList {
     pub count: c_uint,
     pub ranges: *mut CXSourceRange,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXString {
     pub data: *const c_void,
     pub private_flags: c_uint,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXTUResourceUsage {
     pub data: *mut c_void,
@@ -1018,28 +1018,28 @@ pub struct CXTUResourceUsage {
     pub entries: *mut CXTUResourceUsageEntry,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXTUResourceUsageEntry {
     pub kind: CXTUResourceUsageKind,
     pub amount: c_ulong,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXToken {
     pub int_data: [c_uint; 4],
     pub ptr_data: *mut c_void,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXType {
     pub kind: CXTypeKind,
     pub data: [*mut c_void; 2],
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXUnsavedFile {
     pub Filename: *const c_char,
@@ -1047,7 +1047,7 @@ pub struct CXUnsavedFile {
     pub Length: c_ulong,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXVersion {
     pub Major: c_int,
@@ -1055,7 +1055,7 @@ pub struct CXVersion {
     pub Subminor: c_int,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct IndexerCallbacks {
     pub abortQuery: extern fn(CXClientData, *mut c_void) -> c_int,
