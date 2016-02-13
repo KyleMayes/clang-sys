@@ -9,7 +9,7 @@
 ## [0.1.2] - 2015-12-29
 
 ### Added
-- Added derivation of `Debug` for FFI structs
+- Added derivations of `Debug` for FFI structs
 
 ## [0.2.0] - UNRELEASED
 
