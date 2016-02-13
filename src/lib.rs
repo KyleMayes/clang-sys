@@ -5,6 +5,7 @@
 //! * 3.5.x - [Documentation](https://kylemayes.github.io/clang-sys/3_5/clang_sys)
 //! * 3.6.x - [Documentation](https://kylemayes.github.io/clang-sys/3_6/clang_sys)
 //! * 3.7.x - [Documentation](https://kylemayes.github.io/clang-sys/3_7/clang_sys)
+//! * 3.8.x - [Documentation](https://kylemayes.github.io/clang-sys/3_8/clang_sys)
 //!
 //! The documentation for the non-version specific API is
 //! [here](https://kylemayes.github.io/clang-sys/all/clang_sys).
@@ -26,7 +27,7 @@ use libc::{c_char, c_int, c_longlong, c_uint, c_ulong, c_ulonglong, c_void, time
 
 pub type CXClientData = *mut c_void;
 pub type CXCursorVisitor = extern fn(CXCursor, CXCursor, CXClientData) -> CXChildVisitResult;
-#[cfg(feature="clang_3_7")]
+#[cfg(any(feature="clang_3_7", feature="clang_3_8"))]
 pub type CXFieldVisitor = extern fn(CXCursor, CXClientData) -> CXVisitorResult;
 pub type CXInclusionVisitor = extern fn(CXFile, *mut CXSourceLocation, c_uint, CXClientData);
 
@@ -57,7 +58,7 @@ pub enum CXCallingConv {
     IntelOclBicc = 9,
     X86_64Win64 = 10,
     X86_64SysV = 11,
-    #[cfg(any(feature="clang_3_6", feature="clang_3_7"))]
+    #[cfg(any(feature="clang_3_6", feature="clang_3_7", feature="clang_3_8"))]
     X86VectorCall = 12,
     Invalid = 100,
     Unexposed = 200,
@@ -208,6 +209,8 @@ pub enum CXCursorKind {
     LambdaExpr = 144,
     ObjCBoolLiteralExpr = 145,
     ObjCSelfExpr = 146,
+    #[cfg(feature="clang_3_8")]
+    OMPArraySectionExpr = 147,
     UnexposedStmt = 200,
     LabelStmt = 201,
     CompoundStmt = 202,
@@ -257,24 +260,32 @@ pub enum CXCursorKind {
     OMPTaskwaitDirective = 245,
     OMPFlushDirective = 246,
     SEHLeaveStmt = 247,
-    #[cfg(any(feature="clang_3_6", feature="clang_3_7"))]
+    #[cfg(any(feature="clang_3_6", feature="clang_3_7", feature="clang_3_8"))]
     OMPOrderedDirective = 248,
-    #[cfg(any(feature="clang_3_6", feature="clang_3_7"))]
+    #[cfg(any(feature="clang_3_6", feature="clang_3_7", feature="clang_3_8"))]
     OMPAtomicDirective = 249,
-    #[cfg(any(feature="clang_3_6", feature="clang_3_7"))]
+    #[cfg(any(feature="clang_3_6", feature="clang_3_7", feature="clang_3_8"))]
     OMPForSimdDirective = 250,
-    #[cfg(any(feature="clang_3_6", feature="clang_3_7"))]
+    #[cfg(any(feature="clang_3_6", feature="clang_3_7", feature="clang_3_8"))]
     OMPParallelForSimdDirective = 251,
-    #[cfg(any(feature="clang_3_6", feature="clang_3_7"))]
+    #[cfg(any(feature="clang_3_6", feature="clang_3_7", feature="clang_3_8"))]
     OMPTargetDirective = 252,
-    #[cfg(any(feature="clang_3_6", feature="clang_3_7"))]
+    #[cfg(any(feature="clang_3_6", feature="clang_3_7", feature="clang_3_8"))]
     OMPTeamsDirective = 253,
-    #[cfg(feature="clang_3_7")]
+    #[cfg(any(feature="clang_3_7", feature="clang_3_8"))]
     OMPTaskgroupDirective = 254,
-    #[cfg(feature="clang_3_7")]
+    #[cfg(any(feature="clang_3_7", feature="clang_3_8"))]
     OMPCancellationPointDirective = 255,
-    #[cfg(feature="clang_3_7")]
+    #[cfg(any(feature="clang_3_7", feature="clang_3_8"))]
     OMPCancelDirective = 256,
+    #[cfg(feature="clang_3_8")]
+    OMPTargetDataDirective = 257,
+    #[cfg(feature="clang_3_8")]
+    OMPTaskLoopDirective = 258,
+    #[cfg(feature="clang_3_8")]
+    OMPTaskLoopSimdDirective = 259,
+    #[cfg(feature="clang_3_8")]
+    OMPDistributeDirective = 260,
     TranslationUnit = 300,
     UnexposedAttr = 400,
     IBActionAttr = 401,
@@ -292,15 +303,23 @@ pub enum CXCursorKind {
     CUDADeviceAttr = 413,
     CUDAGlobalAttr = 414,
     CUDAHostAttr = 415,
-    #[cfg(any(feature="clang_3_6", feature="clang_3_7"))]
+    #[cfg(any(feature="clang_3_6", feature="clang_3_7", feature="clang_3_8"))]
     CUDASharedAttr = 416,
+    #[cfg(feature="clang_3_8")]
+    VisibilityAttr = 417,
+    #[cfg(feature="clang_3_8")]
+    DLLExport = 418,
+    #[cfg(feature="clang_3_8")]
+    DLLImport = 419,
     PreprocessingDirective = 500,
     MacroDefinition = 501,
     /// Duplicate of `MacroInstantiation`.
     MacroExpansion = 502,
     InclusionDirective = 503,
     ModuleImportDecl = 600,
-    #[cfg(feature="clang_3_7")]
+    #[cfg(feature="clang_3_8")]
+    TypeAliasTemplateDecl = 601,
+    #[cfg(any(feature="clang_3_7", feature="clang_3_8"))]
     OverloadCandidate = 700,
 }
 
@@ -470,7 +489,7 @@ pub enum CXTUResourceUsageKind {
     Preprocessor_HeaderSearch = 14,
 }
 
-#[cfg(any(feature="clang_3_6", feature="clang_3_7"))]
+#[cfg(any(feature="clang_3_6", feature="clang_3_7", feature="clang_3_8"))]
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CXTemplateArgumentKind {
@@ -547,6 +566,8 @@ pub enum CXTypeKind {
     VariableArray = 115,
     DependentSizedArray = 116,
     MemberPointer = 117,
+    #[cfg(feature="clang_3_8")]
+    Auto = 118,
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -557,6 +578,16 @@ pub enum CXTypeLayoutError {
     Dependent = -3,
     NotConstantSize = -4,
     InvalidFieldName = -5,
+}
+
+#[cfg(feature="clang_3_8")]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[repr(C)]
+pub enum CXVisibilityKind {
+    Invalid = 0,
+    Hidden = 1,
+    Protected = 2,
+    Default = 3,
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -575,7 +606,7 @@ pub enum CX_CXXAccessSpecifier {
     CXXPrivate = 3,
 }
 
-#[cfg(any(feature="clang_3_6", feature="clang_3_7"))]
+#[cfg(any(feature="clang_3_6", feature="clang_3_7", feature="clang_3_8"))]
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CX_StorageClass {
@@ -740,6 +771,8 @@ bitflags! {
         const CXTranslationUnit_CXXChainedPCH = 32,
         const CXTranslationUnit_SkipFunctionBodies = 64,
         const CXTranslationUnit_IncludeBriefCommentsInCodeCompletion = 128,
+        #[cfg(feature="clang_3_8")]
+        const CXTranslationUnit_CreatePreambleOnFirstParse = 256,
     }
 }
 
@@ -1010,6 +1043,14 @@ pub struct CXString {
     pub private_flags: c_uint,
 }
 
+#[cfg(feature="clang_3_8")]
+#[derive(Copy, Clone, Debug)]
+#[repr(C)]
+pub struct CXStringSet {
+    pub Strings: *mut CXString,
+    pub Count: c_uint,
+}
+
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXTUResourceUsage {
@@ -1078,6 +1119,8 @@ extern {
     pub fn clang_CXCursorSet_insert(set: CXCursorSet, cursor: CXCursor) -> c_uint;
     pub fn clang_CXIndex_getGlobalOptions(index: CXIndex) -> CXGlobalOptFlags;
     pub fn clang_CXIndex_setGlobalOptions(index: CXIndex, flags: CXGlobalOptFlags);
+    #[cfg(feature="clang_3_8")]
+    pub fn clang_CXXField_isMutable(cursor: CXCursor) -> c_uint;
     pub fn clang_CXXMethod_isConst(cursor: CXCursor) -> c_uint;
     pub fn clang_CXXMethod_isPureVirtual(cursor: CXCursor) -> c_uint;
     pub fn clang_CXXMethod_isStatic(cursor: CXCursor) -> c_uint;
@@ -1088,6 +1131,8 @@ extern {
     pub fn clang_CompilationDatabase_getCompileCommands(database: CXCompilationDatabase, filename: *const c_char) -> CXCompileCommands;
     pub fn clang_CompileCommand_getArg(command: CXCompileCommand, index: c_uint) -> CXString;
     pub fn clang_CompileCommand_getDirectory(command: CXCompileCommand) -> CXString;
+    #[cfg(feature="clang_3_8")]
+    pub fn clang_CompileCommand_getFilename(command: CXCompileCommand) -> CXString;
     pub fn clang_CompileCommand_getMappedSourceContent(command: CXCompileCommand, index: c_uint) -> CXString;
     pub fn clang_CompileCommand_getMappedSourcePath(command: CXCompileCommand, index: c_uint) -> CXString;
     pub fn clang_CompileCommand_getNumArgs(command: CXCompileCommand) -> c_uint;
@@ -1097,40 +1142,42 @@ extern {
     pub fn clang_CompileCommands_getSize(command: CXCompileCommands) -> c_uint;
     pub fn clang_Cursor_getArgument(cursor: CXCursor, index: c_uint) -> CXCursor;
     pub fn clang_Cursor_getBriefCommentText(cursor: CXCursor) -> CXString;
+    #[cfg(feature="clang_3_8")]
+    pub fn clang_Cursor_getCXXManglings(cursor: CXCursor) -> *mut CXStringSet;
     pub fn clang_Cursor_getCommentRange(cursor: CXCursor) -> CXSourceRange;
-    #[cfg(any(feature="clang_3_6", feature="clang_3_7"))]
+    #[cfg(any(feature="clang_3_6", feature="clang_3_7", feature="clang_3_8"))]
     pub fn clang_Cursor_getMangling(cursor: CXCursor) -> CXString;
     pub fn clang_Cursor_getModule(cursor: CXCursor) -> CXModule;
     pub fn clang_Cursor_getNumArguments(cursor: CXCursor) -> c_int;
-    #[cfg(any(feature="clang_3_6", feature="clang_3_7"))]
+    #[cfg(any(feature="clang_3_6", feature="clang_3_7", feature="clang_3_8"))]
     pub fn clang_Cursor_getNumTemplateArguments(cursor: CXCursor) -> c_int;
     pub fn clang_Cursor_getObjCDeclQualifiers(cursor: CXCursor) -> CXObjCDeclQualifierKind;
     pub fn clang_Cursor_getObjCPropertyAttributes(cursor: CXCursor, reserved: c_uint) -> CXObjCPropertyAttrKind;
     pub fn clang_Cursor_getObjCSelectorIndex(cursor: CXCursor) -> c_int;
-    #[cfg(feature="clang_3_7")]
+    #[cfg(any(feature="clang_3_7", feature="clang_3_8"))]
     pub fn clang_Cursor_getOffsetOfField(cursor: CXCursor) -> c_longlong;
     pub fn clang_Cursor_getRawCommentText(cursor: CXCursor) -> CXString;
     pub fn clang_Cursor_getReceiverType(cursor: CXCursor) -> CXType;
     pub fn clang_Cursor_getSpellingNameRange(cursor: CXCursor, index: c_uint, reserved: c_uint) -> CXSourceRange;
-    #[cfg(any(feature="clang_3_6", feature="clang_3_7"))]
+    #[cfg(any(feature="clang_3_6", feature="clang_3_7", feature="clang_3_8"))]
     pub fn clang_Cursor_getStorageClass(cursor: CXCursor) -> CX_StorageClass;
-    #[cfg(any(feature="clang_3_6", feature="clang_3_7"))]
+    #[cfg(any(feature="clang_3_6", feature="clang_3_7", feature="clang_3_8"))]
     pub fn clang_Cursor_getTemplateArgumentKind(cursor: CXCursor, index: c_uint) -> CXTemplateArgumentKind;
-    #[cfg(any(feature="clang_3_6", feature="clang_3_7"))]
+    #[cfg(any(feature="clang_3_6", feature="clang_3_7", feature="clang_3_8"))]
     pub fn clang_Cursor_getTemplateArgumentType(cursor: CXCursor, index: c_uint) -> CXType;
-    #[cfg(any(feature="clang_3_6", feature="clang_3_7"))]
+    #[cfg(any(feature="clang_3_6", feature="clang_3_7", feature="clang_3_8"))]
     pub fn clang_Cursor_getTemplateArgumentUnsignedValue(cursor: CXCursor, index: c_uint) -> c_ulonglong;
-    #[cfg(any(feature="clang_3_6", feature="clang_3_7"))]
+    #[cfg(any(feature="clang_3_6", feature="clang_3_7", feature="clang_3_8"))]
     pub fn clang_Cursor_getTemplateArgumentValue(cursor: CXCursor, index: c_uint) -> c_longlong;
     pub fn clang_Cursor_getTranslationUnit(cursor: CXCursor) -> CXTranslationUnit;
-    #[cfg(feature="clang_3_7")]
+    #[cfg(any(feature="clang_3_7", feature="clang_3_8"))]
     pub fn clang_Cursor_isAnonymous(cursor: CXCursor) -> c_uint;
     pub fn clang_Cursor_isBitField(cursor: CXCursor) -> c_uint;
     pub fn clang_Cursor_isDynamicCall(cursor: CXCursor) -> c_int;
     pub fn clang_Cursor_isNull(cursor: CXCursor) -> c_int;
     pub fn clang_Cursor_isObjCOptional(cursor: CXCursor) -> c_uint;
     pub fn clang_Cursor_isVariadic(cursor: CXCursor) -> c_uint;
-    #[cfg(any(feature="clang_3_6", feature="clang_3_7"))]
+    #[cfg(any(feature="clang_3_6", feature="clang_3_7", feature="clang_3_8"))]
     pub fn clang_File_isEqual(left: CXFile, right: CXFile) -> c_int;
     pub fn clang_IndexAction_create(index: CXIndex) -> CXIndexAction;
     pub fn clang_IndexAction_dispose(index: CXIndexAction);
@@ -1156,7 +1203,7 @@ extern {
     pub fn clang_Type_getOffsetOf(type_: CXType, field: *const c_char) -> c_longlong;
     pub fn clang_Type_getSizeOf(type_: CXType) -> c_longlong;
     pub fn clang_Type_getTemplateArgumentAsType(type_: CXType, index: c_uint) -> CXType;
-    #[cfg(feature="clang_3_7")]
+    #[cfg(any(feature="clang_3_7", feature="clang_3_8"))]
     pub fn clang_Type_visitFields(type_: CXType, visitor: CXFieldVisitor, data: CXClientData) -> CXVisitorResult;
     pub fn clang_VirtualFileOverlay_addFileMapping(overlay: CXVirtualFileOverlay, virtual_: *const c_char, real: *const c_char) -> CXErrorCode;
     pub fn clang_VirtualFileOverlay_create(reserved: c_uint) -> CXVirtualFileOverlay;
@@ -1197,6 +1244,8 @@ extern {
     pub fn clang_disposeOverriddenCursors(cursors: *mut CXCursor);
     pub fn clang_disposeSourceRangeList(list: *mut CXSourceRangeList);
     pub fn clang_disposeString(string: CXString);
+    #[cfg(feature="clang_3_8")]
+    pub fn clang_disposeStringSet(set: *mut CXStringSet);
     pub fn clang_disposeTokens(tu: CXTranslationUnit, tokens: *mut CXToken, n_tokens: c_uint);
     pub fn clang_disposeTranslationUnit(tu: CXTranslationUnit);
     pub fn clang_enableStackTraces();
@@ -1249,6 +1298,8 @@ extern {
     pub fn clang_getCursorSpelling(cursor: CXCursor) -> CXString;
     pub fn clang_getCursorType(cursor: CXCursor) -> CXType;
     pub fn clang_getCursorUSR(cursor: CXCursor) -> CXString;
+    #[cfg(feature="clang_3_8")]
+    pub fn clang_getCursorVisibility(cursor: CXCursor) -> CXVisibilityKind;
     pub fn clang_getDeclObjCTypeEncoding(cursor: CXCursor) -> CXString;
     pub fn clang_getDefinitionSpellingAndExtent(cursor: CXCursor, start: *mut *const c_char, end: *mut *const c_char, start_line: *mut c_uint, start_column: *mut c_uint, end_line: *mut c_uint, end_column: *mut c_uint);
     pub fn clang_getDiagnostic(tu: CXTranslationUnit, index: c_uint) -> CXDiagnostic;
@@ -1322,6 +1373,8 @@ extern {
     pub fn clang_indexLoc_getCXSourceLocation(location: CXIdxLoc) -> CXSourceLocation;
     pub fn clang_indexLoc_getFileLocation(location: CXIdxLoc, index_file: *mut CXIdxClientFile, file: *mut CXFile, line: *mut c_uint, column: *mut c_uint, offset: *mut c_uint);
     pub fn clang_indexSourceFile(index: CXIndexAction, data: CXClientData, callbacks: *mut IndexerCallbacks, n_callbacks: c_uint, index_flags: CXIndexOptFlags, file: *const c_char, arguments: *const *const c_char, n_arguments: c_int, unsaved: *mut CXUnsavedFile, n_unsaved: c_uint, tu: *mut CXTranslationUnit, tu_flags: CXTranslationUnit_Flags) -> CXErrorCode;
+    #[cfg(feature="clang_3_8")]
+    pub fn clang_indexSourceFileFullArgv(index: CXIndexAction, data: CXClientData, callbacks: *mut IndexerCallbacks, n_callbacks: c_uint, index_flags: CXIndexOptFlags, file: *const c_char, arguments: *const *const c_char, n_arguments: c_int, unsaved: *mut CXUnsavedFile, n_unsaved: c_uint, tu: *mut CXTranslationUnit, tu_flags: CXTranslationUnit_Flags) -> CXErrorCode;
     pub fn clang_indexTranslationUnit(index: CXIndexAction, data: CXClientData, callbacks: *mut IndexerCallbacks, n_callbacks: c_uint, flags: CXIndexOptFlags, tu: CXTranslationUnit) -> c_int;
     pub fn clang_index_getCXXClassDeclInfo(info: *const CXIdxDeclInfo) -> *const CXIdxCXXClassDeclInfo;
     pub fn clang_index_getClientContainer(info: *const CXIdxContainerInfo) -> CXIdxClientContainer;
@@ -1355,6 +1408,8 @@ extern {
     pub fn clang_loadDiagnostics(file: *const c_char, error: *mut CXLoadDiag_Error, message: *mut CXString) -> CXDiagnosticSet;
     pub fn clang_parseTranslationUnit(index: CXIndex, file: *const c_char, arguments: *const *const c_char, n_arguments: c_int, unsaved: *mut CXUnsavedFile, n_unsaved: c_uint, flags: CXTranslationUnit_Flags) -> CXTranslationUnit;
     pub fn clang_parseTranslationUnit2(index: CXIndex, file: *const c_char, arguments: *const *const c_char, n_arguments: c_int, unsaved: *mut CXUnsavedFile, n_unsaved: c_uint, flags: CXTranslationUnit_Flags, tu: *mut CXTranslationUnit) -> CXErrorCode;
+    #[cfg(feature="clang_3_8")]
+    pub fn clang_parseTranslationUnit2FullArgv(index: CXIndex, file: *const c_char, arguments: *const *const c_char, n_arguments: c_int, unsaved: *mut CXUnsavedFile, n_unsaved: c_uint, flags: CXTranslationUnit_Flags, tu: *mut CXTranslationUnit) -> CXErrorCode;
     pub fn clang_remap_dispose(remapping: CXRemapping);
     pub fn clang_remap_getFilenames(remapping: CXRemapping, index: c_uint, original: *mut CXString, transformed: *mut CXString);
     pub fn clang_remap_getNumFiles(remapping: CXRemapping) -> c_uint;

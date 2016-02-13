@@ -10,3 +10,8 @@
 
 ### Added
 - Added derivation of `Debug` for FFI structs
+
+## [0.2.0] - UNRELEASED
+
+### Added
+- Added support for `clang 3.8.x`
