@@ -20,3 +20,6 @@
 
 ### Changed
 - Simplified internal usage of conditional compilation
+- Bumped `bitflags` version
+- Bumped `libc` version
+- Bumped `rustc_version` version
