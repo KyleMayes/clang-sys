@@ -16,7 +16,7 @@
 ### Added
 - Added support for `clang` 3.8.x
 
-## [0.2.1] - UNRELEASED
+## [0.2.1] - 2016-2-13
 
 ### Changed
 - Simplified internal usage of conditional compilation
