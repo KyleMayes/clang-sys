@@ -805,10 +805,8 @@ opaque!(CXIdxClientFile);
 opaque!(CXIndex);
 opaque!(CXIndexAction);
 opaque!(CXModule);
-opaque!(CXModuleMapDescriptor);
 opaque!(CXRemapping);
 opaque!(CXTranslationUnit);
-opaque!(CXVirtualFileOverlay);
 
 // Transparent ___________________________________
 
@@ -1183,11 +1181,6 @@ extern {
     pub fn clang_IndexAction_dispose(index: CXIndexAction);
     pub fn clang_Location_isFromMainFile(location: CXSourceLocation) -> c_int;
     pub fn clang_Location_isInSystemHeader(location: CXSourceLocation) -> c_int;
-    pub fn clang_ModuleMapDescriptor_create(reserved: c_uint) -> CXModuleMapDescriptor;
-    pub fn clang_ModuleMapDescriptor_dispose(module: CXModuleMapDescriptor);
-    pub fn clang_ModuleMapDescriptor_setFrameworkModuleName(module: CXModuleMapDescriptor, name: *const c_char) -> CXErrorCode;
-    pub fn clang_ModuleMapDescriptor_setUmbrellaHeader(module: CXModuleMapDescriptor, name: *const c_char) -> CXErrorCode;
-    pub fn clang_ModuleMapDescriptor_writeToBuffer(module: CXModuleMapDescriptor, reserved: c_uint, buffer: *mut *mut c_char, n_buffer: *mut c_uint) -> CXErrorCode;
     pub fn clang_Module_getASTFile(module: CXModule) -> CXFile;
     pub fn clang_Module_getFullName(module: CXModule) -> CXString;
     pub fn clang_Module_getName(module: CXModule) -> CXString;
@@ -1205,11 +1198,6 @@ extern {
     pub fn clang_Type_getTemplateArgumentAsType(type_: CXType, index: c_uint) -> CXType;
     #[cfg(feature="gte_clang_3_7")]
     pub fn clang_Type_visitFields(type_: CXType, visitor: CXFieldVisitor, data: CXClientData) -> CXVisitorResult;
-    pub fn clang_VirtualFileOverlay_addFileMapping(overlay: CXVirtualFileOverlay, virtual_: *const c_char, real: *const c_char) -> CXErrorCode;
-    pub fn clang_VirtualFileOverlay_create(reserved: c_uint) -> CXVirtualFileOverlay;
-    pub fn clang_VirtualFileOverlay_dispose(overlay: CXVirtualFileOverlay);
-    pub fn clang_VirtualFileOverlay_setCaseSensitivity(overlay: CXVirtualFileOverlay, sensitive: c_int) -> CXErrorCode;
-    pub fn clang_VirtualFileOverlay_writeToBuffer(overlay: CXVirtualFileOverlay, reserved: c_uint, buffer: *mut *mut c_char, n_buffer: *mut c_uint) -> CXErrorCode;
     pub fn clang_annotateTokens(tu: CXTranslationUnit, tokens: *mut CXToken, n_tokens: c_uint, cursors: *mut CXCursor);
     pub fn clang_codeCompleteAt(tu: CXTranslationUnit, file: *const c_char, line: c_uint, column: c_uint, unsaved: *mut CXUnsavedFile, n_unsaved: c_uint, flags: CXCodeComplete_Flags) -> *mut CXCodeCompleteResults;
     pub fn clang_codeCompleteGetContainerKind(results: *mut CXCodeCompleteResults, incomplete: *mut c_uint) -> CXCursorKind;
@@ -1261,7 +1249,6 @@ extern {
     pub fn clang_getArgType(type_: CXType, index: c_uint) -> CXType;
     pub fn clang_getArrayElementType(type_: CXType) -> CXType;
     pub fn clang_getArraySize(type_: CXType) -> c_longlong;
-    pub fn clang_getBuildSessionTimestamp() -> c_ulonglong;
     pub fn clang_getCString(string: CXString) -> *const c_char;
     pub fn clang_getCXTUResourceUsage(tu: CXTranslationUnit) -> CXTUResourceUsage;
     pub fn clang_getCXXAccessSpecifier(cursor: CXCursor) -> CX_CXXAccessSpecifier;

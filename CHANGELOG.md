@@ -23,3 +23,8 @@
 - Bumped `bitflags` version
 - Bumped `libc` version
 - Bumped `rustc_version` version
+
+## [0.3.0] - UNRELEASED
+
+### Removed
+- Removed build system types and functions
