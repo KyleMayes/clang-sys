@@ -20,6 +20,7 @@ On Windows, `libclang.dll` should be placed in `<rust>\lib\rustlib\*-pc-windows-
 
 ### Supported Versions
 
+* 3.4.x - [Documentation](https://kylemayes.github.io/clang-sys/3_4/clang_sys)
 * 3.5.x - [Documentation](https://kylemayes.github.io/clang-sys/3_5/clang_sys)
 * 3.6.x - [Documentation](https://kylemayes.github.io/clang-sys/3_6/clang_sys)
 * 3.7.x - [Documentation](https://kylemayes.github.io/clang-sys/3_7/clang_sys)

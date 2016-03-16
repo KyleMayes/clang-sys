@@ -28,3 +28,6 @@
 
 ### Removed
 - Removed build system types and functions
+
+### Added
+- Added support for `clang` 3.4.x
