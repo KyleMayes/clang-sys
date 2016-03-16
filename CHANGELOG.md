@@ -24,7 +24,7 @@
 - Bumped `libc` version
 - Bumped `rustc_version` version
 
-## [0.3.0] - UNRELEASED
+## [0.3.0] - 2016-3-16
 
 ### Removed
 - Removed build system types and functions
