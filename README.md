@@ -5,7 +5,7 @@ clang-sys
 
 Rust bindings for libclang.
 
-Released under the MIT license.
+Released under the Apache License 2.0
 
 ### Dependencies
 
