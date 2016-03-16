@@ -10,7 +10,7 @@
 //! The documentation for the non-version specific API is
 //! [here](https://kylemayes.github.io/clang-sys/all/clang_sys).
 
-#![allow(non_upper_case_globals, non_snake_case)]
+#![allow(non_camel_case_types, non_snake_case, non_upper_case_globals)]
 
 #![cfg_attr(lte_rustc_1_5, allow(raw_pointer_derive))]
 
@@ -626,7 +626,7 @@ pub enum CX_StorageClass {
 
 bitflags! {
     #[repr(C)]
-    flags CXCodeComplete_Flags: c_uint {
+    pub flags CXCodeComplete_Flags: ::libc::c_uint {
         const CXCodeComplete_IncludeMacros = 1,
         const CXCodeComplete_IncludeCodePatterns = 2,
         const CXCodeComplete_IncludeBriefComments = 4,
@@ -635,7 +635,7 @@ bitflags! {
 
 bitflags! {
     #[repr(C)]
-    flags CXCompletionContext: c_uint {
+    pub flags CXCompletionContext: ::libc::c_uint {
         const CXCompletionContext_Unexposed = 0,
         const CXCompletionContext_AnyType = 1,
         const CXCompletionContext_AnyValue = 2,
@@ -665,7 +665,7 @@ bitflags! {
 
 bitflags! {
     #[repr(C)]
-    flags CXDiagnosticDisplayOptions: c_uint {
+    pub flags CXDiagnosticDisplayOptions: ::libc::c_uint {
         const CXDiagnostic_DisplaySourceLocation = 1,
         const CXDiagnostic_DisplayColumn = 2,
         const CXDiagnostic_DisplaySourceRanges = 4,
@@ -677,7 +677,7 @@ bitflags! {
 
 bitflags! {
     #[repr(C)]
-    flags CXGlobalOptFlags: c_uint {
+    pub flags CXGlobalOptFlags: ::libc::c_uint {
         const CXGlobalOpt_None = 0,
         const CXGlobalOpt_ThreadBackgroundPriorityForIndexing = 1,
         const CXGlobalOpt_ThreadBackgroundPriorityForEditing = 2,
@@ -687,14 +687,14 @@ bitflags! {
 
 bitflags! {
     #[repr(C)]
-    flags CXIdxDeclInfoFlags: c_uint {
+    pub flags CXIdxDeclInfoFlags: ::libc::c_uint {
         const CXIdxDeclFlag_Skipped = 1,
     }
 }
 
 bitflags! {
     #[repr(C)]
-    flags CXIndexOptFlags: c_uint {
+    pub flags CXIndexOptFlags: ::libc::c_uint {
         const CXIndexOptNone = 0,
         const CXIndexOptSuppressRedundantRefs = 1,
         const CXIndexOptIndexFunctionLocalSymbols = 2,
@@ -706,7 +706,7 @@ bitflags! {
 
 bitflags! {
     #[repr(C)]
-    flags CXNameRefFlags: c_uint {
+    pub flags CXNameRefFlags: ::libc::c_uint {
         const CXNameRange_WantQualifier = 1,
         const CXNameRange_WantTemplateArgs = 2,
         const CXNameRange_WantSinglePiece = 4
@@ -715,7 +715,7 @@ bitflags! {
 
 bitflags! {
     #[repr(C)]
-    flags CXObjCDeclQualifierKind: c_uint {
+    pub flags CXObjCDeclQualifierKind: ::libc::c_uint {
         const CXObjCDeclQualifier_None = 0,
         const CXObjCDeclQualifier_In = 1,
         const CXObjCDeclQualifier_Inout = 2,
@@ -728,7 +728,7 @@ bitflags! {
 
 bitflags! {
     #[repr(C)]
-    flags CXObjCPropertyAttrKind: c_uint {
+    pub flags CXObjCPropertyAttrKind: ::libc::c_uint {
         const CXObjCPropertyAttr_noattr = 0,
         const CXObjCPropertyAttr_readonly = 1,
         const CXObjCPropertyAttr_getter = 2,
@@ -747,21 +747,21 @@ bitflags! {
 
 bitflags! {
     #[repr(C)]
-    flags CXReparse_Flags: c_uint {
+    pub flags CXReparse_Flags: ::libc::c_uint {
         const CXReparse_None = 0,
     }
 }
 
 bitflags! {
     #[repr(C)]
-    flags CXSaveTranslationUnit_Flags: c_uint {
+    pub flags CXSaveTranslationUnit_Flags: ::libc::c_uint {
         const CXSaveTranslationUnit_None = 0,
     }
 }
 
 bitflags! {
     #[repr(C)]
-    flags CXTranslationUnit_Flags: c_uint {
+    pub flags CXTranslationUnit_Flags: ::libc::c_uint {
         const CXTranslationUnit_None = 0,
         const CXTranslationUnit_DetailedPreprocessingRecord = 1,
         const CXTranslationUnit_Incomplete = 2,
