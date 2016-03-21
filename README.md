@@ -3,20 +3,22 @@ clang-sys
 
 [![crates.io](https://img.shields.io/crates/v/clang-sys.svg)](https://crates.io/crates/clang-sys)
 
-Rust bindings for libclang.
+Rust bindings for `libclang`.
 
 Released under the Apache License 2.0
 
 ### Dependencies
 
 This crate depends on `libclang.dll` (Windows), `libclang.so` (Linux), or `libclang.dylib` (OS X).
-These binaries can be either be installed as a part of clang or downloaded
+These binaries can be either be installed as a part of Clang or downloaded
 [here](http://llvm.org/releases/download.html).
 
-#### Windows
+The `libclang` binary will be looked for in likely places (e.g., `/usr/lib` on Linux), but you can
+specify the directory the `libclang` binary is in with the `LIBCLANG_PATH` environment variable.
 
-On Windows, `libclang.dll` should be placed in `<rust>\lib\rustlib\*-pc-windows-*\lib` where
-`<rust>` is your Rust installation directory.
+If you want to link to `libclang` statically, set the `LIBCLANG_STATIC` environment variable or
+enable the `static` feature. You can specify the directory the various LLVM and Clang static
+libraries are searched for with the `LIBCLANG_STATIC_PATH` environment variable.
 
 ### Supported Versions
 

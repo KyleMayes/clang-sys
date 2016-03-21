@@ -1136,7 +1136,6 @@ pub struct IndexerCallbacks {
 // Functions
 //================================================
 
-#[link(name="clang")]
 extern {
     pub fn clang_CXCursorSet_contains(set: CXCursorSet, cursor: CXCursor) -> c_uint;
     pub fn clang_CXCursorSet_insert(set: CXCursorSet, cursor: CXCursor) -> c_uint;

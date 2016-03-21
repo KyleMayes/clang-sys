@@ -31,3 +31,8 @@
 
 ### Added
 - Added support for `clang` 3.4.x
+
+## [0.3.1] - UNRELEASED
+
+### Added
+- Added support for finding `libclang`
