@@ -20,9 +20,9 @@
 
 ### Changed
 - Simplified internal usage of conditional compilation
-- Bumped `bitflags` version
-- Bumped `libc` version
-- Bumped `rustc_version` version
+- Bumped `bitflags` version to `0.4.0`
+- Bumped `libc` version to `0.2.7`
+- Bumped `rustc_version` version to `0.1.6`
 
 ## [0.3.0] - 2016-3-16
 
@@ -31,6 +31,10 @@
 
 ### Added
 - Added support for `clang` 3.4.x
+
+### Changed
+- Bumped `bitflags` version to `0.5.0`
+- Bumped `libc` version to `0.2.8`
 
 ## [0.3.1] - 2016-3-21
 
