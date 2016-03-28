@@ -16,7 +16,6 @@
 //!
 //! ## Version Specific Documentation
 //!
-//! * 3.4.x - [Documentation](https://kylemayes.github.io/clang-sys/3_4/clang_sys)
 //! * 3.5.x - [Documentation](https://kylemayes.github.io/clang-sys/3_5/clang_sys)
 //! * 3.6.x - [Documentation](https://kylemayes.github.io/clang-sys/3_6/clang_sys)
 //! * 3.7.x - [Documentation](https://kylemayes.github.io/clang-sys/3_7/clang_sys)
@@ -260,35 +259,20 @@ pub enum CXCursorKind {
     NullStmt = 230,
     DeclStmt = 231,
     OMPParallelDirective = 232,
-    #[cfg(feature="gte_clang_3_5")]
     OMPSimdDirective = 233,
-    #[cfg(feature="gte_clang_3_5")]
     OMPForDirective = 234,
-    #[cfg(feature="gte_clang_3_5")]
     OMPSectionsDirective = 235,
-    #[cfg(feature="gte_clang_3_5")]
     OMPSectionDirective = 236,
-    #[cfg(feature="gte_clang_3_5")]
     OMPSingleDirective = 237,
-    #[cfg(feature="gte_clang_3_5")]
     OMPParallelForDirective = 238,
-    #[cfg(feature="gte_clang_3_5")]
     OMPParallelSectionsDirective = 239,
-    #[cfg(feature="gte_clang_3_5")]
     OMPTaskDirective = 240,
-    #[cfg(feature="gte_clang_3_5")]
     OMPMasterDirective = 241,
-    #[cfg(feature="gte_clang_3_5")]
     OMPCriticalDirective = 242,
-    #[cfg(feature="gte_clang_3_5")]
     OMPTaskyieldDirective = 243,
-    #[cfg(feature="gte_clang_3_5")]
     OMPBarrierDirective = 244,
-    #[cfg(feature="gte_clang_3_5")]
     OMPTaskwaitDirective = 245,
-    #[cfg(feature="gte_clang_3_5")]
     OMPFlushDirective = 246,
-    #[cfg(feature="gte_clang_3_5")]
     SEHLeaveStmt = 247,
     #[cfg(feature="gte_clang_3_6")]
     OMPOrderedDirective = 248,
@@ -326,19 +310,12 @@ pub enum CXCursorKind {
     AnnotateAttr = 406,
     AsmLabelAttr = 407,
     PackedAttr = 408,
-    #[cfg(feature="gte_clang_3_5")]
     PureAttr = 409,
-    #[cfg(feature="gte_clang_3_5")]
     ConstAttr = 410,
-    #[cfg(feature="gte_clang_3_5")]
     NoDuplicateAttr = 411,
-    #[cfg(feature="gte_clang_3_5")]
     CUDAConstantAttr = 412,
-    #[cfg(feature="gte_clang_3_5")]
     CUDADeviceAttr = 413,
-    #[cfg(feature="gte_clang_3_5")]
     CUDAGlobalAttr = 414,
-    #[cfg(feature="gte_clang_3_5")]
     CUDAHostAttr = 415,
     #[cfg(feature="gte_clang_3_6")]
     CUDASharedAttr = 416,
@@ -370,7 +347,6 @@ pub enum CXDiagnosticSeverity {
     Fatal = 4,
 }
 
-#[cfg(feature="gte_clang_3_5")]
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub enum CXErrorCode {
@@ -1065,7 +1041,6 @@ pub struct CXSourceRange {
     pub end_int_data: c_uint,
 }
 
-#[cfg(feature="gte_clang_3_5")]
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXSourceRangeList {
@@ -1157,7 +1132,6 @@ extern {
     pub fn clang_CXIndex_setGlobalOptions(index: CXIndex, flags: CXGlobalOptFlags);
     #[cfg(feature="gte_clang_3_8")]
     pub fn clang_CXXField_isMutable(cursor: CXCursor) -> c_uint;
-    #[cfg(feature="gte_clang_3_5")]
     pub fn clang_CXXMethod_isConst(cursor: CXCursor) -> c_uint;
     pub fn clang_CXXMethod_isPureVirtual(cursor: CXCursor) -> c_uint;
     pub fn clang_CXXMethod_isStatic(cursor: CXCursor) -> c_uint;
@@ -1226,17 +1200,14 @@ extern {
     pub fn clang_Module_getNumTopLevelHeaders(tu: CXTranslationUnit, module: CXModule) -> c_uint;
     pub fn clang_Module_getParent(module: CXModule) -> CXModule;
     pub fn clang_Module_getTopLevelHeader(tu: CXTranslationUnit, module: CXModule, index: c_uint) -> CXFile;
-    #[cfg(feature="gte_clang_3_5")]
     pub fn clang_Module_isSystem(module: CXModule) -> c_int;
     pub fn clang_Range_isNull(range: CXSourceRange) -> c_int;
     pub fn clang_Type_getAlignOf(type_: CXType) -> c_longlong;
     pub fn clang_Type_getCXXRefQualifier(type_: CXType) -> CXRefQualifierKind;
     pub fn clang_Type_getClassType(type_: CXType) -> CXType;
-    #[cfg(feature="gte_clang_3_5")]
     pub fn clang_Type_getNumTemplateArguments(type_: CXType) -> c_int;
     pub fn clang_Type_getOffsetOf(type_: CXType, field: *const c_char) -> c_longlong;
     pub fn clang_Type_getSizeOf(type_: CXType) -> c_longlong;
-    #[cfg(feature="gte_clang_3_5")]
     pub fn clang_Type_getTemplateArgumentAsType(type_: CXType, index: c_uint) -> CXType;
     #[cfg(feature="gte_clang_3_7")]
     pub fn clang_Type_visitFields(type_: CXType, visitor: CXFieldVisitor, data: CXClientData) -> CXVisitorResult;
@@ -1257,7 +1228,6 @@ extern {
     pub fn clang_createCXCursorSet() -> CXCursorSet;
     pub fn clang_createIndex(exclude: c_int, display: c_int) -> CXIndex;
     pub fn clang_createTranslationUnit(index: CXIndex, file: *const c_char) -> CXTranslationUnit;
-    #[cfg(feature="gte_clang_3_5")]
     pub fn clang_createTranslationUnit2(index: CXIndex, file: *const c_char, tu: *mut CXTranslationUnit) -> CXErrorCode;
     pub fn clang_createTranslationUnitFromSourceFile(index: CXIndex, file: *const c_char, n_arguments: c_int, arguments: *const *const c_char, n_unsaved: c_uint, unsaved: *mut CXUnsavedFile) -> CXTranslationUnit;
     pub fn clang_defaultCodeCompleteOptions() -> CXCodeComplete_Flags;
@@ -1273,7 +1243,6 @@ extern {
     pub fn clang_disposeDiagnosticSet(diagnostic: CXDiagnosticSet);
     pub fn clang_disposeIndex(index: CXIndex);
     pub fn clang_disposeOverriddenCursors(cursors: *mut CXCursor);
-    #[cfg(feature="gte_clang_3_5")]
     pub fn clang_disposeSourceRangeList(list: *mut CXSourceRangeList);
     pub fn clang_disposeString(string: CXString);
     #[cfg(feature="gte_clang_3_8")]
@@ -1365,7 +1334,6 @@ extern {
     pub fn clang_getInstantiationLocation(location: CXSourceLocation, file: *mut CXFile, line: *mut c_uint, column: *mut c_uint, offset: *mut c_uint);
     pub fn clang_getLocation(tu: CXTranslationUnit, file: CXFile, line: c_uint, column: c_uint) -> CXSourceLocation;
     pub fn clang_getLocationForOffset(tu: CXTranslationUnit, file: CXFile, offset: c_uint) -> CXSourceLocation;
-    #[cfg(feature="gte_clang_3_5")]
     pub fn clang_getModuleForFile(tu: CXTranslationUnit, file: CXFile) -> CXModule;
     pub fn clang_getNullCursor() -> CXCursor;
     pub fn clang_getNullLocation() -> CXSourceLocation;
@@ -1386,7 +1354,6 @@ extern {
     pub fn clang_getRemappings(file: *const c_char) -> CXRemapping;
     pub fn clang_getRemappingsFromFileList(files: *mut *const c_char, n_files: c_uint) -> CXRemapping;
     pub fn clang_getResultType(type_: CXType) -> CXType;
-    #[cfg(feature="gte_clang_3_5")]
     pub fn clang_getSkippedRanges(tu: CXTranslationUnit, file: CXFile) -> *mut CXSourceRangeList;
     pub fn clang_getSpecializedCursorTemplate(cursor: CXCursor) -> CXCursor;
     pub fn clang_getSpellingLocation(location: CXSourceLocation, file: *mut CXFile, line: *mut c_uint, column: *mut c_uint, offset: *mut c_uint);
@@ -1405,10 +1372,7 @@ extern {
     pub fn clang_hashCursor(cursor: CXCursor) -> c_uint;
     pub fn clang_indexLoc_getCXSourceLocation(location: CXIdxLoc) -> CXSourceLocation;
     pub fn clang_indexLoc_getFileLocation(location: CXIdxLoc, index_file: *mut CXIdxClientFile, file: *mut CXFile, line: *mut c_uint, column: *mut c_uint, offset: *mut c_uint);
-    #[cfg(feature="gte_clang_3_5")]
     pub fn clang_indexSourceFile(index: CXIndexAction, data: CXClientData, callbacks: *mut IndexerCallbacks, n_callbacks: c_uint, index_flags: CXIndexOptFlags, file: *const c_char, arguments: *const *const c_char, n_arguments: c_int, unsaved: *mut CXUnsavedFile, n_unsaved: c_uint, tu: *mut CXTranslationUnit, tu_flags: CXTranslationUnit_Flags) -> CXErrorCode;
-    #[cfg(not(feature="gte_clang_3_5"))]
-    pub fn clang_indexSourceFile(index: CXIndexAction, data: CXClientData, callbacks: *mut IndexerCallbacks, n_callbacks: c_uint, index_flags: CXIndexOptFlags, file: *const c_char, arguments: *const *const c_char, n_arguments: c_int, unsaved: *mut CXUnsavedFile, n_unsaved: c_uint, tu: *mut CXTranslationUnit, tu_flags: CXTranslationUnit_Flags) -> c_int;
     #[cfg(feature="gte_clang_3_8")]
     pub fn clang_indexSourceFileFullArgv(index: CXIndexAction, data: CXClientData, callbacks: *mut IndexerCallbacks, n_callbacks: c_uint, index_flags: CXIndexOptFlags, file: *const c_char, arguments: *const *const c_char, n_arguments: c_int, unsaved: *mut CXUnsavedFile, n_unsaved: c_uint, tu: *mut CXTranslationUnit, tu_flags: CXTranslationUnit_Flags) -> CXErrorCode;
     pub fn clang_indexTranslationUnit(index: CXIndexAction, data: CXClientData, callbacks: *mut IndexerCallbacks, n_callbacks: c_uint, flags: CXIndexOptFlags, tu: CXTranslationUnit) -> c_int;
@@ -1443,17 +1407,13 @@ extern {
     pub fn clang_isVolatileQualifiedType(type_: CXType) -> c_uint;
     pub fn clang_loadDiagnostics(file: *const c_char, error: *mut CXLoadDiag_Error, message: *mut CXString) -> CXDiagnosticSet;
     pub fn clang_parseTranslationUnit(index: CXIndex, file: *const c_char, arguments: *const *const c_char, n_arguments: c_int, unsaved: *mut CXUnsavedFile, n_unsaved: c_uint, flags: CXTranslationUnit_Flags) -> CXTranslationUnit;
-    #[cfg(feature="gte_clang_3_5")]
     pub fn clang_parseTranslationUnit2(index: CXIndex, file: *const c_char, arguments: *const *const c_char, n_arguments: c_int, unsaved: *mut CXUnsavedFile, n_unsaved: c_uint, flags: CXTranslationUnit_Flags, tu: *mut CXTranslationUnit) -> CXErrorCode;
     #[cfg(feature="gte_clang_3_8")]
     pub fn clang_parseTranslationUnit2FullArgv(index: CXIndex, file: *const c_char, arguments: *const *const c_char, n_arguments: c_int, unsaved: *mut CXUnsavedFile, n_unsaved: c_uint, flags: CXTranslationUnit_Flags, tu: *mut CXTranslationUnit) -> CXErrorCode;
     pub fn clang_remap_dispose(remapping: CXRemapping);
     pub fn clang_remap_getFilenames(remapping: CXRemapping, index: c_uint, original: *mut CXString, transformed: *mut CXString);
     pub fn clang_remap_getNumFiles(remapping: CXRemapping) -> c_uint;
-    #[cfg(feature="gte_clang_3_5")]
     pub fn clang_reparseTranslationUnit(tu: CXTranslationUnit, n_unsaved: c_uint, unsaved: *mut CXUnsavedFile, flags: CXReparse_Flags) -> CXErrorCode;
-    #[cfg(not(feature="gte_clang_3_5"))]
-    pub fn clang_reparseTranslationUnit(tu: CXTranslationUnit, n_unsaved: c_uint, unsaved: *mut CXUnsavedFile, flags: CXReparse_Flags) -> c_int;
     pub fn clang_saveTranslationUnit(tu: CXTranslationUnit, file: *const c_char, options: CXSaveTranslationUnit_Flags) -> CXSaveError;
     pub fn clang_sortCodeCompletionResults(results: *mut CXCompletionResult, n_results: c_uint);
     pub fn clang_toggleCrashRecovery(recovery: c_uint);

@@ -40,3 +40,8 @@
 
 ### Added
 - Added support for finding `libclang`
+
+## [0.4.0] - UNRELEASED
+
+### Removed
+- Removed support for `clang` 3.4.x
