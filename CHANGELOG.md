@@ -45,3 +45,8 @@
 
 ### Removed
 - Removed support for `clang` 3.4.x
+
+## [0.4.1] - UNRELEASED
+
+### Changed
+- Bumped `libc` version to `0.2.9`
