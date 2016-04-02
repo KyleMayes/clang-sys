@@ -50,3 +50,4 @@
 
 ### Changed
 - Bumped `libc` version to `0.2.9`
+- Bumped `rustc_version` version to `0.1.7`

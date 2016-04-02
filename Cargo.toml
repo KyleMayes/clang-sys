@@ -35,4 +35,4 @@ libc = "0.2.9"
 
 [build-dependencies]
 
-rustc_version = "0.1.6"
+rustc_version = "0.1.7"
