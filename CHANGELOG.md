@@ -51,3 +51,8 @@
 ### Changed
 - Bumped `libc` version to `0.2.9`
 - Bumped `rustc_version` version to `0.1.7`
+
+## [0.4.2] - UNRELEASED
+
+### Changed
+- Bumped `libc` version to `0.2.10`
