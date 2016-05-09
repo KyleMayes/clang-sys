@@ -61,3 +61,4 @@
 
 ### Changed
 - Improved `libclang` search path
+- Improved `libclang` static linking

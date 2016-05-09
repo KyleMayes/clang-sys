@@ -119,6 +119,14 @@ const LIBRARIES: &'static [&'static str] = &[
     "clangTooling",
 ];
 
+fn get_libraries() -> Vec<String> {
+    run("llvm-config", &["--libs"]).map(|o| {
+        o.split_whitespace().filter_map(|p| {
+            Path::new(p).file_stem().map(|l| l.to_string_lossy()[3..].into())
+        }).collect()
+    }).unwrap_or_else(|| LIBRARIES.iter().map(|l| (*l).into()).collect())
+}
+
 fn main() {
     if let Some((directory, file)) = find_libclang() {
         if cfg!(feature="static") || env::var("LIBCLANG_STATIC").is_ok() {
@@ -126,7 +134,7 @@ fn main() {
             if let Ok(directory) = env::var("LIBCLANG_STATIC_PATH") {
                 print!("-L {} ", directory);
             }
-            for library in LIBRARIES {
+            for library in get_libraries() {
                 print!("-l static={} ", library)
             }
             println!("-L {} -l ncursesw -l z -l stdc++", directory);
