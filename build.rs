@@ -139,10 +139,6 @@ fn main() {
         println!("-L {} -l ncursesw -l z -l stdc++", directory);
     } else {
         println!("cargo:rustc-link-search={}", directory);
-        if let Some(file) = file {
-            println!("cargo:rustc-link-lib=dylib=:{}", file);
-        } else {
-            println!("cargo:rustc-link-lib=dylib=clang");
-        }
+        println!("cargo:rustc-link-lib=dylib=:{}", file.unwrap_or("clang".into()));
     }
 }
