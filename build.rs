@@ -21,7 +21,7 @@ fn run(command: &str, arguments: &[&str]) -> Option<String> {
     }).ok()
 }
 
-fn find_libclang() -> Option<(String, Option<String>)> {
+fn find_libclang() -> Option<(String, String)> {
     let search = if let Ok(directory) = env::var("LIBCLANG_PATH") {
         vec![directory]
     } else {
@@ -46,12 +46,12 @@ fn find_libclang() -> Option<(String, Option<String>)> {
         if let Some(output) = run("llvm-config", &["--libdir"]) {
             output.lines()
                 .next()
-                .map(|l| (l.into(), Some(library)))
+                .map(|l| (l.into(), library))
         } else {
             None
         }
     } else {
-        directory.map(|d| (d, None))
+        directory.map(|d| (d, library))
     }
 }
 
@@ -118,6 +118,6 @@ fn main() {
         println!("-L {} -l ncursesw -l z -l stdc++", directory);
     } else {
         println!("cargo:rustc-link-search={}", directory);
-        println!("cargo:rustc-link-lib=dylib=:{}", file.unwrap_or("clang".into()));
+        println!("cargo:rustc-link-lib=dylib=:{}", file);
     }
 }
