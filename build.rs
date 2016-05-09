@@ -4,19 +4,6 @@ use std::env;
 use std::path::{Path};
 use std::process::{Command};
 
-const SEARCH_LINUX: &'static [&'static str] = &[
-    "/usr/lib",
-    "/usr/lib/llvm",
-    "/usr/lib/llvm-3.8/lib",
-    "/usr/lib/llvm-3.7/lib",
-    "/usr/lib/llvm-3.6/lib",
-    "/usr/lib/llvm-3.5/lib",
-    "/usr/lib/llvm-3.4/lib",
-    "/usr/lib64/llvm",
-    "/usr/lib/x86_64-linux-gnu",
-    "/usr/local/lib",
-];
-
 const SEARCH_OSX: &'static [&'static str] = &[
     "/usr/local/opt/llvm/lib",
     "/Library/Developer/CommandLineTools/usr/lib",
@@ -39,9 +26,7 @@ fn find_libclang() -> Option<(String, Option<String>)> {
         vec![directory]
     } else {
         run("llvm-config", &["--libdir"]).map(|d| vec![d]).unwrap_or_else(|| {
-            if cfg!(any(target_os="freebsd", target_os="linux")) {
-                SEARCH_LINUX
-            } else if cfg!(target_os="osx") {
+            if cfg!(target_os="osx") {
                 SEARCH_OSX
             } else if cfg!(target_os="windows") {
                 SEARCH_WINDOWS
