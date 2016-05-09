@@ -128,25 +128,23 @@ fn get_libraries() -> Vec<String> {
 }
 
 fn main() {
-    if let Some((directory, file)) = find_libclang() {
-        if cfg!(feature="static") || env::var("LIBCLANG_STATIC").is_ok() {
-            print!("cargo:rustc-flags=");
-            if let Ok(directory) = env::var("LIBCLANG_STATIC_PATH") {
-                print!("-L {} ", directory);
-            }
-            for library in get_libraries() {
-                print!("-l static={} ", library)
-            }
-            println!("-L {} -l ncursesw -l z -l stdc++", directory);
-        } else {
-            println!("cargo:rustc-link-search={}", directory);
-            if let Some(file) = file {
-                println!("cargo:rustc-link-lib=dylib=:{}", file);
-            } else {
-                println!("cargo:rustc-link-lib=dylib=clang");
-            }
+    let (directory, file) = find_libclang().expect("unable to find libclang!");
+
+    if cfg!(feature="static") || env::var("LIBCLANG_STATIC").is_ok() {
+        print!("cargo:rustc-flags=");
+        if let Ok(directory) = env::var("LIBCLANG_STATIC_PATH") {
+            print!("-L {} ", directory);
         }
+        for library in get_libraries() {
+            print!("-l static={} ", library)
+        }
+        println!("-L {} -l ncursesw -l z -l stdc++", directory);
     } else {
-        panic!("unable to find libclang!");
+        println!("cargo:rustc-link-search={}", directory);
+        if let Some(file) = file {
+            println!("cargo:rustc-link-lib=dylib=:{}", file);
+        } else {
+            println!("cargo:rustc-link-lib=dylib=clang");
+        }
     }
 }
