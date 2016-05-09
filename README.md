@@ -2,6 +2,7 @@ clang-sys
 =========
 
 [![crates.io](https://img.shields.io/crates/v/clang-sys.svg)](https://crates.io/crates/clang-sys)
+[![Travis CI](https://travis-ci.org/KyleMayes/clang-sys.svg?branch=master)](https://travis-ci.org/KyleMayes/clang-sys)
 
 Rust bindings for `libclang`.
 

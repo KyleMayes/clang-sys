@@ -1,0 +1,51 @@
+language: rust
+
+matrix:
+  include:
+    - rust: stable
+      env: CLANG_VERSION=clang_3_5
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise
+            - llvm-toolchain-precise-3.5
+          packages:
+            - libclang-3.5-dev
+            - llvm-3.5-dev
+    - rust: stable
+      env: CLANG_VERSION=clang_3_6
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise
+            - llvm-toolchain-precise-3.6
+          packages:
+            - libclang-3.6-dev
+            - llvm-3.6-dev
+    - rust: stable
+      env: CLANG_VERSION=clang_3_7
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise
+            - llvm-toolchain-precise-3.7
+          packages:
+            - libclang-3.7-dev
+            - llvm-3.7-dev
+    - rust: stable
+      env: CLANG_VERSION=clang_3_8
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise
+            - llvm-toolchain-precise-3.8
+          packages:
+            - libclang-3.8-dev
+            - llvm-3.8-dev
+
+script:
+  - RUST_BACKTRACE=1 cargo test --verbose --features $CLANG_VERSION
