@@ -61,5 +61,6 @@
 
 ### Changed
 - Bumped `bitflags` version to `0.6.0`
+- Bumped `libc` version to `0.2.11`
 - Improved `libclang` search path
 - Improved `libclang` static linking
