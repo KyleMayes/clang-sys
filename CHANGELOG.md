@@ -60,5 +60,6 @@
 ## [0.4.3] - UNRELEASED
 
 ### Changed
+- Bumped `bitflags` version to `0.6.0`
 - Improved `libclang` search path
 - Improved `libclang` static linking
