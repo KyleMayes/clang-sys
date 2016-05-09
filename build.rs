@@ -149,8 +149,4 @@ fn main() {
     } else {
         panic!("unable to find libclang!");
     }
-
-    if rustc_version::version_matches("<=1.5.*") {
-        println!("cargo:rustc-cfg={}", "lte_rustc_1_5");
-    }
 }
