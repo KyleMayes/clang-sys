@@ -56,3 +56,8 @@
 
 ### Changed
 - Bumped `libc` version to `0.2.10`
+
+## [0.4.3] - UNRELEASED
+
+### Changed
+- Improved `libclang` search path

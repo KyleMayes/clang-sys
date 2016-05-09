@@ -28,19 +28,27 @@ const SEARCH_WINDOWS: &'static [&'static str] = &[
     "C:\\Program Files\\LLVM\\lib",
 ];
 
+fn run(command: &str, arguments: &[&str]) -> Option<String> {
+    Command::new(command).args(arguments).output().map(|o| {
+        String::from_utf8_lossy(&o.stdout).into_owned()
+    }).ok()
+}
+
 fn find_libclang() -> Option<(String, Option<String>)> {
     let search = if let Ok(directory) = env::var("LIBCLANG_PATH") {
         vec![directory]
     } else {
-        if cfg!(any(target_os="freebsd", target_os="linux")) {
-            SEARCH_LINUX
-        } else if cfg!(target_os="osx") {
-            SEARCH_OSX
-        } else if cfg!(target_os="windows") {
-            SEARCH_WINDOWS
-        } else {
-            panic!("unsupported operating system!");
-        }.into_iter().map(|s| s.to_string()).collect()
+        run("llvm-config", &["--libdir"]).map(|d| vec![d]).unwrap_or_else(|| {
+            if cfg!(any(target_os="freebsd", target_os="linux")) {
+                SEARCH_LINUX
+            } else if cfg!(target_os="osx") {
+                SEARCH_OSX
+            } else if cfg!(target_os="windows") {
+                SEARCH_WINDOWS
+            } else {
+                panic!("unsupported operating system!");
+            }.into_iter().map(|s| s.to_string()).collect()
+        })
     };
 
     let library = if cfg!(target_os="windows") {
@@ -52,8 +60,7 @@ fn find_libclang() -> Option<(String, Option<String>)> {
     let directory = search.into_iter().find(|d| Path::new(&d).join(&library).exists());
 
     if directory.is_none() && cfg!(target_os="linux") {
-        let output = Command::new("/sbin/ldconfig").arg("-p").output().unwrap();
-        String::from_utf8_lossy(&output.stdout).lines().map(|l| l.trim()).find(|l| {
+        run("/sbin/ldconfig", &["-p"]).unwrap().lines().map(|l| l.trim()).find(|l| {
             l.starts_with(&library)
         }).and_then(|l| {
             let path = l.rsplit(" ").next().map(|p| Path::new(p));
