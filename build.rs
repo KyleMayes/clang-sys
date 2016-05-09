@@ -58,19 +58,13 @@ fn find_libclang() -> Option<(String, Option<String>)> {
     let directory = search.into_iter().find(|d| Path::new(&d).join(&library).exists());
 
     if directory.is_none() && cfg!(target_os="linux") {
-        run("/sbin/ldconfig", &["-p"]).unwrap().lines().map(|l| l.trim()).find(|l| {
-            l.starts_with(&library)
-        }).and_then(|l| {
-            let path = l.rsplit(" ").next().map(|p| Path::new(p));
-            if path.map_or(false, |p| p.exists()) {
-                let path = path.unwrap();
-                let directory = path.parent().unwrap().to_str().unwrap().into();
-                let file = path.file_name().unwrap().to_str().unwrap().into();
-                Some((directory, Some(file)))
-            } else {
-                None
-            }
-        })
+        if let Some(output) = run("llvm-config", &["--libdir"]) {
+            output.lines()
+                .next()
+                .map(|l| (l.into(), Some(library)))
+        } else {
+            None
+        }
     } else {
         directory.map(|d| (d, None))
     }
