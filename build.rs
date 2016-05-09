@@ -4,19 +4,6 @@ use std::env;
 use std::path::{Path};
 use std::process::{Command};
 
-const SEARCH_LINUX: &'static [&'static str] = &[
-    "/usr/lib",
-    "/usr/lib/llvm",
-    "/usr/lib/llvm-3.8/lib",
-    "/usr/lib/llvm-3.7/lib",
-    "/usr/lib/llvm-3.6/lib",
-    "/usr/lib/llvm-3.5/lib",
-    "/usr/lib/llvm-3.4/lib",
-    "/usr/lib64/llvm",
-    "/usr/lib/x86_64-linux-gnu",
-    "/usr/local/lib",
-];
-
 const SEARCH_OSX: &'static [&'static str] = &[
     "/usr/local/opt/llvm/lib",
     "/Library/Developer/CommandLineTools/usr/lib",
@@ -34,14 +21,12 @@ fn run(command: &str, arguments: &[&str]) -> Option<String> {
     }).ok()
 }
 
-fn find_libclang() -> Option<(String, Option<String>)> {
+fn find_libclang() -> Option<(String, String)> {
     let search = if let Ok(directory) = env::var("LIBCLANG_PATH") {
         vec![directory]
     } else {
         run("llvm-config", &["--libdir"]).map(|d| vec![d]).unwrap_or_else(|| {
-            if cfg!(any(target_os="freebsd", target_os="linux")) {
-                SEARCH_LINUX
-            } else if cfg!(target_os="osx") {
+            if cfg!(target_os="osx") {
                 SEARCH_OSX
             } else if cfg!(target_os="windows") {
                 SEARCH_WINDOWS
@@ -51,30 +36,22 @@ fn find_libclang() -> Option<(String, Option<String>)> {
         })
     };
 
-    let library = if cfg!(target_os="windows") {
-        format!("libclang{}", env::consts::DLL_SUFFIX)
-    } else {
-        format!("{}clang{}", env::consts::DLL_PREFIX, env::consts::DLL_SUFFIX)
-    };
+    let library = format!("{}clang{}",
+                          env::consts::DLL_PREFIX,
+                          env::consts::DLL_SUFFIX);
 
     let directory = search.into_iter().find(|d| Path::new(&d).join(&library).exists());
 
     if directory.is_none() && cfg!(target_os="linux") {
-        run("/sbin/ldconfig", &["-p"]).unwrap().lines().map(|l| l.trim()).find(|l| {
-            l.starts_with(&library)
-        }).and_then(|l| {
-            let path = l.rsplit(" ").next().map(|p| Path::new(p));
-            if path.map_or(false, |p| p.exists()) {
-                let path = path.unwrap();
-                let directory = path.parent().unwrap().to_str().unwrap().into();
-                let file = path.file_name().unwrap().to_str().unwrap().into();
-                Some((directory, Some(file)))
-            } else {
-                None
-            }
-        })
+        if let Some(output) = run("llvm-config", &["--libdir"]) {
+            output.lines()
+                .next()
+                .map(|l| (l.into(), library))
+        } else {
+            None
+        }
     } else {
-        directory.map(|d| (d, None))
+        directory.map(|d| (d, library))
     }
 }
 
@@ -122,35 +99,25 @@ const LIBRARIES: &'static [&'static str] = &[
 fn get_libraries() -> Vec<String> {
     run("llvm-config", &["--libs"]).map(|o| {
         o.split_whitespace().filter_map(|p| {
-            Path::new(p).file_stem().map(|l| l.to_string_lossy()[3..].into())
+            Path::new(p).file_stem().map(|l| l.to_string_lossy()[2..].into())
         }).collect()
     }).unwrap_or_else(|| LIBRARIES.iter().map(|l| (*l).into()).collect())
 }
 
 fn main() {
-    if let Some((directory, file)) = find_libclang() {
-        if cfg!(feature="static") || env::var("LIBCLANG_STATIC").is_ok() {
-            print!("cargo:rustc-flags=");
-            if let Ok(directory) = env::var("LIBCLANG_STATIC_PATH") {
-                print!("-L {} ", directory);
-            }
-            for library in get_libraries() {
-                print!("-l static={} ", library)
-            }
-            println!("-L {} -l ncursesw -l z -l stdc++", directory);
-        } else {
-            println!("cargo:rustc-link-search={}", directory);
-            if let Some(file) = file {
-                println!("cargo:rustc-link-lib=dylib=:{}", file);
-            } else {
-                println!("cargo:rustc-link-lib=dylib=clang");
-            }
-        }
-    } else {
-        panic!("unable to find libclang!");
-    }
+    let (directory, file) = find_libclang().expect("unable to find libclang!");
 
-    if rustc_version::version_matches("<=1.5.*") {
-        println!("cargo:rustc-cfg={}", "lte_rustc_1_5");
+    if cfg!(feature="static") || env::var("LIBCLANG_STATIC").is_ok() {
+        print!("cargo:rustc-flags=");
+        if let Ok(directory) = env::var("LIBCLANG_STATIC_PATH") {
+            print!("-L {} ", directory);
+        }
+        for library in get_libraries() {
+            print!("-l static={} ", library)
+        }
+        println!("-L {} -l ncursesw -l z -l stdc++", directory);
+    } else {
+        println!("cargo:rustc-link-search={}", directory);
+        println!("cargo:rustc-link-lib=dylib=:{}", file);
     }
 }
