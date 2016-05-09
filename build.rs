@@ -120,7 +120,7 @@ const LIBRARIES: &'static [&'static str] = &[
 fn get_libraries() -> Vec<String> {
     run("llvm-config", &["--libs"]).map(|o| {
         o.split_whitespace().filter_map(|p| {
-            Path::new(p).file_stem().map(|l| l.to_string_lossy()[3..].into())
+            Path::new(p).file_stem().map(|l| l.to_string_lossy()[2..].into())
         }).collect()
     }).unwrap_or_else(|| LIBRARIES.iter().map(|l| (*l).into()).collect())
 }
