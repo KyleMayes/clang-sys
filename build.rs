@@ -51,11 +51,9 @@ fn find_libclang() -> Option<(String, Option<String>)> {
         })
     };
 
-    let library = if cfg!(target_os="windows") {
-        format!("libclang{}", env::consts::DLL_SUFFIX)
-    } else {
-        format!("{}clang{}", env::consts::DLL_PREFIX, env::consts::DLL_SUFFIX)
-    };
+    let library = format!("{}clang{}",
+                          env::consts::DLL_PREFIX,
+                          env::consts::DLL_SUFFIX);
 
     let directory = search.into_iter().find(|d| Path::new(&d).join(&library).exists());
 
