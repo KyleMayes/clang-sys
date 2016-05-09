@@ -57,10 +57,11 @@
 ### Changed
 - Bumped `libc` version to `0.2.10`
 
-## [0.4.3] - UNRELEASED
+## [0.5.0] - UNRELEASED
 
 ### Changed
 - Bumped `bitflags` version to `0.6.0`
 - Bumped `libc` version to `0.2.11`
+- Removed `rustc_version` dependency
 - Improved `libclang` search path
 - Improved `libclang` static linking
