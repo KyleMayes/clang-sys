@@ -13,6 +13,10 @@ const SEARCH_WINDOWS: &'static [&'static str] = &[
     "C:\\Program Files\\LLVM\\lib",
 ];
 
+fn error(prefix: &str) -> ! {
+    panic!("{:?}, set the LIBCLANG_PATH environment variable to your system's libclang directory", prefix);
+}
+
 fn run(command: &str, arguments: &[&str]) -> Option<String> {
     Command::new(command).args(arguments).output().map(|o| {
         String::from_utf8_lossy(&o.stdout).into_owned()
@@ -29,22 +33,21 @@ fn find_libclang() -> Option<(String, String)> {
             } else if cfg!(target_os="windows") {
                 SEARCH_WINDOWS
             } else {
-                panic!("unsupported operating system!");
+                if cfg!(any(target_os="freebsd", target_os="linux")) {
+                    error("llvm-config was not found");
+                } else {
+                    error("unsupported operating system");
+                }
             }.into_iter().map(|s| s.to_string()).collect()
         })
     };
 
-    let library = format!("{}clang{}",
-                          env::consts::DLL_PREFIX,
-                          env::consts::DLL_SUFFIX);
-
+    let library = format!("{}clang{}", env::consts::DLL_PREFIX, env::consts::DLL_SUFFIX);
     let directory = search.into_iter().find(|d| Path::new(&d).join(&library).exists());
 
     if directory.is_none() && cfg!(target_os="linux") {
         if let Some(output) = run("llvm-config", &["--libdir"]) {
-            output.lines()
-                .next()
-                .map(|l| (l.into(), library))
+            output.lines().next().map(|l| (l.into(), library))
         } else {
             None
         }
@@ -103,7 +106,10 @@ fn get_libraries() -> Vec<String> {
 }
 
 fn main() {
-    let (directory, file) = find_libclang().expect("unable to find libclang!");
+    let (directory, file) = match find_libclang() {
+        Some((directory, file)) => (directory, file),
+        _ => error("unable to find libclang"),
+    };
 
     if cfg!(feature="static") || env::var("LIBCLANG_STATIC").is_ok() {
         print!("cargo:rustc-flags=");
