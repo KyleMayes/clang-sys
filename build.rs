@@ -111,7 +111,7 @@ fn main() {
         _ => error("unable to find libclang"),
     };
 
-    if cfg!(feature="static") || env::var("LIBCLANG_STATIC").is_ok() {
+    if cfg!(feature="static") {
         print!("cargo:rustc-flags=");
         if let Ok(directory) = env::var("LIBCLANG_STATIC_PATH") {
             print!("-L {} ", directory);

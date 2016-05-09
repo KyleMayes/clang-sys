@@ -59,9 +59,12 @@
 
 ## [0.5.0] - UNRELEASED
 
+### Removed
+- Removed `rustc_version` dependency
+- Removed support for `LIBCLANG_STATIC` environment variable
+
 ### Changed
 - Bumped `bitflags` version to `0.6.0`
 - Bumped `libc` version to `0.2.11`
-- Removed `rustc_version` dependency
 - Improved `libclang` search path
 - Improved `libclang` static linking
