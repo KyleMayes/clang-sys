@@ -68,3 +68,8 @@
 - Bumped `libc` version to `0.2.11`
 - Improved `libclang` search path
 - Improved `libclang` static linking
+
+## [0.5.1] - UNRELEASED
+
+### Fixed
+- Fixed `libclang` linking on OS X

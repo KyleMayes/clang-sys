@@ -122,7 +122,12 @@ fn main() {
         }
         println!("-L {} -l ncursesw -l z -l stdc++", directory);
     } else {
-        println!("cargo:rustc-link-search={}", directory);
-        println!("cargo:rustc-link-lib=dylib=:{}", file);
+        if cfg!(target_os="linux") {
+            println!("cargo:rustc-link-search={}", directory);
+            println!("cargo:rustc-link-lib=dylib=:{}", file);
+        } else {
+            println!("cargo:rustc-link-search={}", directory);
+            println!("cargo:rustc-link-lib=dylib=clang");
+        }
     }
 }
