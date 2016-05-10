@@ -44,7 +44,7 @@ fn find_libclang() -> Option<(String, String)> {
     } else {
         if cfg!(any(target_os="freebsd", target_os="linux")) {
             SEARCH_LINUX
-        } else if cfg!(target_os="osx") {
+        } else if cfg!(target_os="macos") {
             SEARCH_OSX
         } else if cfg!(target_os="windows") {
             SEARCH_WINDOWS
