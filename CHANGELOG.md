@@ -57,7 +57,7 @@
 ### Changed
 - Bumped `libc` version to `0.2.10`
 
-## [0.5.0] - UNRELEASED
+## [0.5.0] - 2016-5-10
 
 ### Removed
 - Removed `rustc_version` dependency
