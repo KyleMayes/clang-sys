@@ -3,46 +3,68 @@ language: rust
 matrix:
   include:
     - rust: stable
-      env: CLANG_VERSION=clang_3_5
+      env: CLANG_VERSION=clang_3_5 LIBCLANG_PATH=/usr/lib/llvm-3.5/lib
       addons:
         apt:
           sources:
-            - ubuntu-toolchain-r-test
             - llvm-toolchain-precise
             - llvm-toolchain-precise-3.5
+            - ubuntu-toolchain-r-test
           packages:
             - libclang-3.5-dev
             - llvm-3.5-dev
     - rust: stable
-      env: CLANG_VERSION=clang_3_6
+      env: CLANG_VERSION=clang_3_6 LIBCLANG_PATH=/usr/lib/llvm-3.6/lib
       addons:
         apt:
           sources:
-            - ubuntu-toolchain-r-test
             - llvm-toolchain-precise
             - llvm-toolchain-precise-3.6
+            - ubuntu-toolchain-r-test
           packages:
             - libclang-3.6-dev
             - llvm-3.6-dev
     - rust: stable
-      env: CLANG_VERSION=clang_3_7
+      env: CLANG_VERSION=clang_3_7 LIBCLANG_PATH=/usr/lib/llvm-3.7/lib
       addons:
         apt:
           sources:
-            - ubuntu-toolchain-r-test
             - llvm-toolchain-precise
             - llvm-toolchain-precise-3.7
+            - ubuntu-toolchain-r-test
           packages:
             - libclang-3.7-dev
             - llvm-3.7-dev
     - rust: stable
-      env: CLANG_VERSION=clang_3_8
+      env: CLANG_VERSION=clang_3_8 LIBCLANG_PATH=/usr/lib/llvm-3.8/lib
       addons:
         apt:
           sources:
-            - ubuntu-toolchain-r-test
             - llvm-toolchain-precise
             - llvm-toolchain-precise-3.8
+            - ubuntu-toolchain-r-test
+          packages:
+            - libclang-3.8-dev
+            - llvm-3.8-dev
+    - rust: beta
+      env: CLANG_VERSION=clang_3_8 LIBCLANG_PATH=/usr/lib/llvm-3.8/lib
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-precise
+            - llvm-toolchain-precise-3.8
+            - ubuntu-toolchain-r-test
+          packages:
+            - libclang-3.8-dev
+            - llvm-3.8-dev
+    - rust: nightly
+      env: CLANG_VERSION=clang_3_8 LIBCLANG_PATH=/usr/lib/llvm-3.8/lib
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-precise
+            - llvm-toolchain-precise-3.8
+            - ubuntu-toolchain-r-test
           packages:
             - libclang-3.8-dev
             - llvm-3.8-dev
