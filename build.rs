@@ -40,10 +40,7 @@ fn find_libclang() -> Option<(String, String)> {
     let search = if let Ok(directory) = env::var("LIBCLANG_PATH") {
         vec![directory]
     } else if let Some(output) = run("llvm-config", &["--libdir"]) {
-        vec![output.lines()
-                   .map(|s| s.to_string())
-                   .next()
-                   .unwrap()]
+        vec![output.lines().map(|s| s.to_string()).next().unwrap()]
     } else {
         if cfg!(any(target_os="freebsd", target_os="linux")) {
             SEARCH_LINUX
@@ -55,16 +52,8 @@ fn find_libclang() -> Option<(String, String)> {
             error("unsupported operating system");
         }.into_iter().map(|s| s.to_string()).collect()
     };
-
-    let library = format!("{}clang{}",
-                          env::consts::DLL_PREFIX,
-                          env::consts::DLL_SUFFIX);
-
-    let directory = search.into_iter()
-                          .find(|d| Path::new(&d)
-                                         .join(&library)
-                                         .exists());
-
+    let library = format!("{}clang{}", env::consts::DLL_PREFIX, env::consts::DLL_SUFFIX);
+    let directory = search.into_iter().find(|d| Path::new(&d).join(&library).exists());
     directory.map(|d| (d, library))
 }
 
