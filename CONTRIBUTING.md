@@ -1,6 +1,11 @@
 Contributing to clang-sys
 =========================
 
+Issues
+------
+
+Please include the output of `rustc --version --verbose` in your issue.
+
 Pull Requests
 -------------
 
