@@ -39,32 +39,33 @@ fn run(command: &str, arguments: &[&str]) -> Option<String> {
 fn find_libclang() -> Option<(String, String)> {
     let search = if let Ok(directory) = env::var("LIBCLANG_PATH") {
         vec![directory]
+    } else if let Some(output) = run("llvm-config", &["--libdir"]) {
+        vec![output.lines()
+                   .map(|s| s.to_string())
+                   .next()
+                   .unwrap()]
     } else {
-        run("llvm-config", &["--libdir"]).map(|d| vec![d]).unwrap_or_else(|| {
-            if cfg!(any(target_os="freebsd", target_os="linux")) {
-                SEARCH_LINUX
-            } else if cfg!(target_os="osx") {
-                SEARCH_OSX
-            } else if cfg!(target_os="windows") {
-                SEARCH_WINDOWS
-            } else {
-                error("unsupported operating system");
-            }.into_iter().map(|s| s.to_string()).collect()
-        })
+        if cfg!(any(target_os="freebsd", target_os="linux")) {
+            SEARCH_LINUX
+        } else if cfg!(target_os="osx") {
+            SEARCH_OSX
+        } else if cfg!(target_os="windows") {
+            SEARCH_WINDOWS
+        } else {
+            error("unsupported operating system");
+        }.into_iter().map(|s| s.to_string()).collect()
     };
 
-    let library = format!("{}clang{}", env::consts::DLL_PREFIX, env::consts::DLL_SUFFIX);
-    let directory = search.into_iter().find(|d| Path::new(&d).join(&library).exists());
+    let library = format!("{}clang{}",
+                          env::consts::DLL_PREFIX,
+                          env::consts::DLL_SUFFIX);
 
-    if directory.is_none() && cfg!(target_os="linux") {
-        if let Some(output) = run("llvm-config", &["--libdir"]) {
-            output.lines().next().map(|l| (l.into(), library))
-        } else {
-            None
-        }
-    } else {
-        directory.map(|d| (d, library))
-    }
+    let directory = search.into_iter()
+                          .find(|d| Path::new(&d)
+                                         .join(&library)
+                                         .exists());
+
+    directory.map(|d| (d, library))
 }
 
 const LIBRARIES: &'static [&'static str] = &[
