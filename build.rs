@@ -52,7 +52,12 @@ fn find_libclang() -> Option<(String, String)> {
             error("unsupported operating system");
         }.into_iter().map(|s| s.to_string()).collect()
     };
-    let library = format!("{}clang{}", env::consts::DLL_PREFIX, env::consts::DLL_SUFFIX);
+    let prefix = if cfg!(target_os="windows") {
+        "lib"
+    } else {
+        env::consts::DLL_PREFIX
+    };
+    let library = format!("{}clang{}", prefix, env::consts::DLL_SUFFIX);
     let directory = search.into_iter().find(|d| Path::new(&d).join(&library).exists());
     directory.map(|d| (d, library))
 }

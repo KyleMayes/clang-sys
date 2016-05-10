@@ -73,3 +73,4 @@
 
 ### Fixed
 - Fixed `libclang` linking on OS X
+- Fixed `libclang` linking on Windows
