@@ -69,7 +69,7 @@
 - Improved `libclang` search path
 - Improved `libclang` static linking
 
-## [0.5.1] - UNRELEASED
+## [0.5.1] - 2016-5-10
 
 ### Fixed
 - Fixed `libclang` linking on OS X
