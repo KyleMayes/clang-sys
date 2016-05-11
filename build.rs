@@ -30,13 +30,15 @@ fn error(prefix: &str) -> ! {
     panic!("{:?}, set the LIBCLANG_PATH environment variable to your system's libclang directory", prefix);
 }
 
+/// Runs a console command, returning the output if the command was successfully executed.
 fn run(command: &str, arguments: &[&str]) -> Option<String> {
     Command::new(command).args(arguments).output().map(|o| {
         String::from_utf8_lossy(&o.stdout).into_owned()
     }).ok()
 }
 
-fn find_libclang() -> Option<(String, String)> {
+/// Returns a directory containing libclang if it can be found.
+fn find_libclang() -> Option<String> {
     let search = if let Ok(directory) = env::var("LIBCLANG_PATH") {
         vec![directory]
     } else if let Some(output) = run("llvm-config", &["--libdir"]) {
@@ -52,14 +54,14 @@ fn find_libclang() -> Option<(String, String)> {
             error("unsupported operating system");
         }.into_iter().map(|s| s.to_string()).collect()
     };
+    // libclang's filename should be `clang.dll` on Windows, but it is `libclang.dll`.
     let prefix = if cfg!(target_os="windows") {
         "lib"
     } else {
         env::consts::DLL_PREFIX
     };
-    let library = format!("{}clang{}", prefix, env::consts::DLL_SUFFIX);
-    let directory = search.into_iter().find(|d| Path::new(&d).join(&library).exists());
-    directory.map(|d| (d, library))
+    let file = format!("{}clang{}", prefix, env::consts::DLL_SUFFIX);
+    search.into_iter().find(|d| Path::new(&d).join(&file).exists())
 }
 
 const LIBRARIES: &'static [&'static str] = &[
@@ -103,6 +105,7 @@ const LIBRARIES: &'static [&'static str] = &[
     "clangTooling",
 ];
 
+/// Returns the list of static libraries that need to be linked to to use libclang.
 fn get_libraries() -> Vec<String> {
     run("llvm-config", &["--libs"]).map(|o| {
         o.split_whitespace().filter_map(|p| {
@@ -112,8 +115,8 @@ fn get_libraries() -> Vec<String> {
 }
 
 fn main() {
-    let (directory, file) = match find_libclang() {
-        Some((directory, file)) => (directory, file),
+    let directory = match find_libclang() {
+        Some(directory) => directory,
         _ => error("unable to find libclang"),
     };
 
@@ -127,12 +130,7 @@ fn main() {
         }
         println!("-L {} -l ncursesw -l z -l stdc++", directory);
     } else {
-        if cfg!(target_os="linux") {
-            println!("cargo:rustc-link-search={}", directory);
-            println!("cargo:rustc-link-lib=dylib=:{}", file);
-        } else {
-            println!("cargo:rustc-link-search={}", directory);
-            println!("cargo:rustc-link-lib=dylib=clang");
-        }
+        println!("cargo:rustc-link-search={}", directory);
+        println!("cargo:rustc-link-lib=dylib=clang");
     }
 }
