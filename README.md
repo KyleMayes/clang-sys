@@ -19,11 +19,12 @@ These binaries can be either be installed as a part of Clang or downloaded
 The `libclang` binary will be searched for first by calling `llvm-config --libdir`. If this fails,
 the `libclang` binary will be searched for in likely places (e.g., `/usr/local/lib/` on Linux). If
 neither of these approaches is successful, you can specify the directory the `libclang` binary can
-be found in with the `LIBCLANG_PATH` environment variable.
+be found in with the `LIBCLANG_PATH` environment variable. The path to the `llvm-config` executable
+you want to use can be specified with the `LLVM_CONFIG_PATH` environment variable.
 
 If you want to link to `libclang` statically, enable the `static` feature. You can specify the
 directory the various LLVM and Clang static libraries can be found in with the
-`LIBCLANG_STATIC_PATH` environment variable.
+`LIBCLANG_STATIC_PATH` environment variable. This feature is not supported for LLVM + Clang 3.8.
 
 ### Supported Versions
 
