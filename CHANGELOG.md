@@ -75,7 +75,7 @@
 - Fixed `libclang` linking on OS X
 - Fixed `libclang` linking on Windows
 
-## [0.5.2] - UNRELEASED
+## [0.5.2] - 2016-5-12
 
 ### Fixed
 - Fixed `libclang` static linking
