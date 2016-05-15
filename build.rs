@@ -5,12 +5,17 @@ use std::process::{Command};
 // Environment variables:
 //
 // * LLVM_CONFIG_PATH - provides a path to an `llvm-config` executable
-// * LIBCLANG_PATH - provides a path to a libclang dynamic library
-// * LIBCLANG_STATIC_PATH - provides a path to LLVM and Clang static libraries
+// * LIBCLANG_PATH - provides a path to a directory containing a libclang shared library
+// * LIBCLANG_STATIC_PATH - provides a path to a directory containing LLVM and Clang static libraries
 
 /// Returns whether the supplied directory contains the supplied file.
 fn contains(directory: &str, file: &str) -> bool {
     Path::new(&directory).join(&file).exists()
+}
+
+/// Panics with a user friendly error message.
+fn error(file: &str, env: &str) -> ! {
+    panic!("could not find {0}, set the {1} environment variable to a path where {0} can be found", file, env);
 }
 
 /// Runs a console command, returning the output if the command was successfully executed.
@@ -25,6 +30,7 @@ fn run_llvm_config(arguments: &[&str]) -> Option<String> {
     run(&env::var("LLVM_CONFIG_PATH").unwrap_or("llvm-config".into()), arguments)
 }
 
+/// Backup search directories for Linux.
 const SEARCH_LINUX: &'static [&'static str] = &[
     "/usr/lib",
     "/usr/lib/llvm",
@@ -38,6 +44,7 @@ const SEARCH_LINUX: &'static [&'static str] = &[
     "/usr/local/lib",
 ];
 
+/// Backup search directories for OS X.
 const SEARCH_OSX: &'static [&'static str] = &[
     "/usr/local/opt/llvm/lib",
     "/Library/Developer/CommandLineTools/usr/lib",
@@ -48,6 +55,7 @@ const SEARCH_OSX: &'static [&'static str] = &[
     "/usr/local/opt/llvm35/lib/llvm-3.5/lib",
 ];
 
+/// Backup search directories for Windows.
 const SEARCH_WINDOWS: &'static [&'static str] = &[
     "C:\\Program Files\\LLVM\\bin",
     "C:\\Program Files\\LLVM\\lib",
@@ -55,17 +63,22 @@ const SEARCH_WINDOWS: &'static [&'static str] = &[
 
 /// Searches for a library, returning the directory it can be found in if the search was successful.
 fn find(file: &str, env: &str) -> Option<String> {
+    // Search the directory provided by the relevant environment variable, if set.
     if let Some(directory) = env::var(env).ok() {
         if contains(&directory, file) {
             return Some(directory);
         }
     }
+
+    // Search the directory returned by `llvm-config --libdir`, if `llvm-config` is available.
     if let Some(output) = run_llvm_config(&["--libdir"]) {
         let directory = output.lines().map(|s| s.to_string()).next().unwrap();
         if contains(&directory, file) {
             return Some(directory);
         }
     }
+
+    // Search the backup directories.
     let search = if cfg!(any(target_os="freebsd", target_os="linux")) {
         SEARCH_LINUX
     } else if cfg!(target_os="macos") {
@@ -73,15 +86,12 @@ fn find(file: &str, env: &str) -> Option<String> {
     } else if cfg!(target_os="windows") {
         SEARCH_WINDOWS
     } else {
-        panic!(
-            "unsupported operating system, set the LIBCLANG_PATH environment variable to a path \
-            where {} can be found",
-            file,
-        );
+        return None;
     };
     search.iter().find(|d| contains(d, file)).map(|s| s.to_string())
 }
 
+/// Clang libraries required to link to libclang statically.
 const CLANG_LIBRARIES: &'static [&'static str] = &[
     "clang",
     "clangARCMigrate",
@@ -106,11 +116,11 @@ const CLANG_LIBRARIES: &'static [&'static str] = &[
     "clangTooling",
 ];
 
-/// Returns the list of LLVM static libraries that need to be linked to to use libclang.
+/// Returns the LLVM libraries required to link to libclang statically.
 fn get_llvm_libraries() -> Vec<String> {
     run_llvm_config(&["--libs"]).expect(
-        "could not execute `llvm-config --libs`, either add `llvm-config` to your system's path or \
-         set the LLVM_CONFIG_PATH environment variable to a path to an `llvm-config` executable"
+        "could not execute `llvm-config --libs`, set the LLVM_CONFIG_PATH environment variable to \
+         a path to an `llvm-config` executable"
     ).split_whitespace().filter_map(|p| {
         // Depending on the version of `llvm-config` in use, listed libraries may be in one of two
         // forms, a full path to the library or simply prefixed with `-l`.
@@ -124,15 +134,15 @@ fn get_llvm_libraries() -> Vec<String> {
 
 fn main() {
     if cfg!(feature="static") {
-        let directory = match find("libclangLex.a", "LIBCLANG_STATIC_PATH") {
+        // Find LLVM and Clang static libraries.
+        let directory = match find("libclang.a", "LIBCLANG_STATIC_PATH") {
             Some(directory) => directory,
-            _ => panic!(
-                "could not find LLVM and Clang static libraries, set the LIBCLANG_STATIC_PATH \
-                 environment variable to a path where these libraries can be found"
-            ),
+            _ => error("libclang.a", "LIBCLANG_STATIC_PATH"),
         };
 
         print!("cargo:rustc-flags=");
+
+        // Specify required LLVM and Clang static libraries.
         print!("-L {} ", directory);
         for library in get_llvm_libraries() {
             print!("-l static={} ", library);
@@ -140,6 +150,8 @@ fn main() {
         for library in CLANG_LIBRARIES {
             print!("-l static={} ", library);
         }
+
+        // Specify required system libraries.
         if cfg!(any(target_os="freebsd", target_os="linux")) {
             println!("-l ffi -l ncursesw -l stdc++ -l z");
         } else if cfg!(target_os="macos") {
@@ -148,19 +160,17 @@ fn main() {
             panic!("unsupported operating system for static linking");
         };
     } else {
-        // libclang's filename should be `clang.dll` on Windows, but it is `libclang.dll`.
         let file = if cfg!(target_os="windows") {
+            // The filename of the `libclang` dynamic library is `libclang.dll` instead of `clang.dll`..
             "libclang.dll".into()
         } else {
             format!("{}clang{}", env::consts::DLL_PREFIX, env::consts::DLL_SUFFIX)
         };
+
+        // Find the libclang shared library.
         let directory = match find(&file, "LIBCLANG_PATH") {
             Some(directory) => directory,
-            _ => panic!(
-                "could not find `{0}`, set the LIBCLANG_PATH environment variable to a path where \
-                {0} can be found",
-                file,
-            ),
+            _ => error(&file, "LIBCLANG_PATH")
         };
 
         println!("cargo:rustc-link-search={}", directory);
