@@ -94,26 +94,18 @@ fn find(file: &str, env: &str) -> Option<String> {
 /// Clang libraries required to link to libclang statically.
 const CLANG_LIBRARIES: &'static [&'static str] = &[
     "clang",
-    "clangARCMigrate",
     "clangAST",
-    "clangASTMatchers",
     "clangAnalysis",
     "clangBasic",
     "clangDriver",
     "clangEdit",
-    "clangFormat",
     "clangFrontend",
     "clangIndex",
     "clangLex",
     "clangParse",
     "clangRewrite",
-    "clangRewriteFrontend",
     "clangSema",
     "clangSerialization",
-    "clangStaticAnalyzerCheckers",
-    "clangStaticAnalyzerCore",
-    "clangStaticAnalyzerFrontend",
-    "clangTooling",
 ];
 
 /// Returns the LLVM libraries required to link to libclang statically.
