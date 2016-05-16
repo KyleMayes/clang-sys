@@ -70,7 +70,7 @@ matrix:
             - llvm-3.8-dev
     - os: osx
       rust: stable
-      env: LLVM_VERSION=devtools
+      env: LLVM_VERSION=devtools CLANG_VERSION=clang_3_5
     - os: osx
       rust: stable
       env: LLVM_VERSION=3.5 CLANG_VERSION=clang_3_5
@@ -101,6 +101,7 @@ before_script:
 
 script:
   -
+    set -e;
     if [ "${LLVM_VERSION}" == "devtools" ]; then
         RUST_BACKTRACE=1 cargo test --verbose;
     else
