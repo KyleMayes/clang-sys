@@ -14,19 +14,14 @@
 
 //! Rust bindings for `libclang`.
 //!
-//! ## Version Specific Documentation
+//! ## Supported Versions
 //!
-//! * 3.5.x - [Documentation](https://kylemayes.github.io/clang-sys/3_5/clang_sys)
-//! * 3.6.x - [Documentation](https://kylemayes.github.io/clang-sys/3_6/clang_sys)
-//! * 3.7.x - [Documentation](https://kylemayes.github.io/clang-sys/3_7/clang_sys)
-//! * 3.8.x - [Documentation](https://kylemayes.github.io/clang-sys/3_8/clang_sys)
-//!
-//! The documentation for the non-version specific API is
-//! [here](https://kylemayes.github.io/clang-sys/all/clang_sys).
+//! * 3.5 - [Documentation](https://kylemayes.github.io/clang-sys/3_5/clang_sys)
+//! * 3.6 - [Documentation](https://kylemayes.github.io/clang-sys/3_6/clang_sys)
+//! * 3.7 - [Documentation](https://kylemayes.github.io/clang-sys/3_7/clang_sys)
+//! * 3.8 - [Documentation](https://kylemayes.github.io/clang-sys/3_8/clang_sys)
 
 #![allow(non_camel_case_types, non_snake_case, non_upper_case_globals)]
-
-#![cfg_attr(lte_rustc_1_5, allow(raw_pointer_derive))]
 
 #[macro_use]
 extern crate bitflags;
