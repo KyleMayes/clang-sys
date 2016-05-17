@@ -1,3 +1,8 @@
+## [0.5.3] - UNRELEASED
+
+### Changed
+- Bumped `bitflags` version to `0.7.0`
+
 ## [0.5.2] - 2016-5-12
 
 ### Fixed

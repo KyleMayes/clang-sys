@@ -640,7 +640,7 @@ pub enum CX_StorageClass {
 
 bitflags! {
     #[repr(C)]
-    pub flags CXCodeComplete_Flags: ::libc::c_uint {
+    pub flags CXCodeComplete_Flags: c_uint {
         const CXCodeComplete_IncludeMacros = 1,
         const CXCodeComplete_IncludeCodePatterns = 2,
         const CXCodeComplete_IncludeBriefComments = 4,
@@ -649,7 +649,7 @@ bitflags! {
 
 bitflags! {
     #[repr(C)]
-    pub flags CXCompletionContext: ::libc::c_uint {
+    pub flags CXCompletionContext: c_uint {
         const CXCompletionContext_Unexposed = 0,
         const CXCompletionContext_AnyType = 1,
         const CXCompletionContext_AnyValue = 2,
@@ -679,7 +679,7 @@ bitflags! {
 
 bitflags! {
     #[repr(C)]
-    pub flags CXDiagnosticDisplayOptions: ::libc::c_uint {
+    pub flags CXDiagnosticDisplayOptions: c_uint {
         const CXDiagnostic_DisplaySourceLocation = 1,
         const CXDiagnostic_DisplayColumn = 2,
         const CXDiagnostic_DisplaySourceRanges = 4,
@@ -691,7 +691,7 @@ bitflags! {
 
 bitflags! {
     #[repr(C)]
-    pub flags CXGlobalOptFlags: ::libc::c_uint {
+    pub flags CXGlobalOptFlags: c_uint {
         const CXGlobalOpt_None = 0,
         const CXGlobalOpt_ThreadBackgroundPriorityForIndexing = 1,
         const CXGlobalOpt_ThreadBackgroundPriorityForEditing = 2,
@@ -701,14 +701,14 @@ bitflags! {
 
 bitflags! {
     #[repr(C)]
-    pub flags CXIdxDeclInfoFlags: ::libc::c_uint {
+    pub flags CXIdxDeclInfoFlags: c_uint {
         const CXIdxDeclFlag_Skipped = 1,
     }
 }
 
 bitflags! {
     #[repr(C)]
-    pub flags CXIndexOptFlags: ::libc::c_uint {
+    pub flags CXIndexOptFlags: c_uint {
         const CXIndexOptNone = 0,
         const CXIndexOptSuppressRedundantRefs = 1,
         const CXIndexOptIndexFunctionLocalSymbols = 2,
@@ -720,7 +720,7 @@ bitflags! {
 
 bitflags! {
     #[repr(C)]
-    pub flags CXNameRefFlags: ::libc::c_uint {
+    pub flags CXNameRefFlags: c_uint {
         const CXNameRange_WantQualifier = 1,
         const CXNameRange_WantTemplateArgs = 2,
         const CXNameRange_WantSinglePiece = 4
@@ -729,7 +729,7 @@ bitflags! {
 
 bitflags! {
     #[repr(C)]
-    pub flags CXObjCDeclQualifierKind: ::libc::c_uint {
+    pub flags CXObjCDeclQualifierKind: c_uint {
         const CXObjCDeclQualifier_None = 0,
         const CXObjCDeclQualifier_In = 1,
         const CXObjCDeclQualifier_Inout = 2,
@@ -742,7 +742,7 @@ bitflags! {
 
 bitflags! {
     #[repr(C)]
-    pub flags CXObjCPropertyAttrKind: ::libc::c_uint {
+    pub flags CXObjCPropertyAttrKind: c_uint {
         const CXObjCPropertyAttr_noattr = 0,
         const CXObjCPropertyAttr_readonly = 1,
         const CXObjCPropertyAttr_getter = 2,
@@ -761,21 +761,21 @@ bitflags! {
 
 bitflags! {
     #[repr(C)]
-    pub flags CXReparse_Flags: ::libc::c_uint {
+    pub flags CXReparse_Flags: c_uint {
         const CXReparse_None = 0,
     }
 }
 
 bitflags! {
     #[repr(C)]
-    pub flags CXSaveTranslationUnit_Flags: ::libc::c_uint {
+    pub flags CXSaveTranslationUnit_Flags: c_uint {
         const CXSaveTranslationUnit_None = 0,
     }
 }
 
 bitflags! {
     #[repr(C)]
-    pub flags CXTranslationUnit_Flags: ::libc::c_uint {
+    pub flags CXTranslationUnit_Flags: c_uint {
         const CXTranslationUnit_None = 0,
         const CXTranslationUnit_DetailedPreprocessingRecord = 1,
         const CXTranslationUnit_Incomplete = 2,
