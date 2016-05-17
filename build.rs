@@ -5,7 +5,7 @@ use std::process::{Command};
 // Environment variables:
 //
 // * LLVM_CONFIG_PATH - provides a path to an `llvm-config` executable
-// * LIBCLANG_PATH - provides a path to a directory containing a libclang shared library
+// * LIBCLANG_PATH - provides a path to a directory containing a `libclang` shared library
 // * LIBCLANG_STATIC_PATH - provides a path to a directory containing LLVM and Clang static libraries
 
 /// Returns whether the supplied directory contains the supplied file.
@@ -91,7 +91,7 @@ fn find(file: &str, env: &str) -> Option<String> {
     search.iter().find(|d| contains(d, file)).map(|s| s.to_string())
 }
 
-/// Clang libraries required to link to libclang statically.
+/// Clang libraries required to link to `libclang` statically.
 const CLANG_LIBRARIES: &'static [&'static str] = &[
     "clang",
     "clangAST",
@@ -108,7 +108,7 @@ const CLANG_LIBRARIES: &'static [&'static str] = &[
     "clangSerialization",
 ];
 
-/// Returns the LLVM libraries required to link to libclang statically.
+/// Returns the LLVM libraries required to link to `libclang` statically.
 fn get_llvm_libraries() -> Vec<String> {
     run_llvm_config(&["--libs"]).expect(
         "could not execute `llvm-config --libs`, set the LLVM_CONFIG_PATH environment variable to \
@@ -153,13 +153,14 @@ fn main() {
         };
     } else {
         let file = if cfg!(target_os="windows") {
-            // The filename of the `libclang` dynamic library is `libclang.dll` instead of `clang.dll`..
+            // The filename of the `libclang` shared library on Windows is `libclang.dll` instead of
+            // the expected `clang.dll`.
             "libclang.dll".into()
         } else {
             format!("{}clang{}", env::consts::DLL_PREFIX, env::consts::DLL_SUFFIX)
         };
 
-        // Find the libclang shared library.
+        // Find the `libclang` shared library.
         let directory = match find(&file, "LIBCLANG_PATH") {
             Some(directory) => directory,
             _ => error(&file, "LIBCLANG_PATH")
