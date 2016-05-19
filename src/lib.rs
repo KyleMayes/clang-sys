@@ -28,17 +28,41 @@ extern crate bitflags;
 
 extern crate libc;
 
-use libc::{c_char, c_int, c_longlong, c_uint, c_ulong, c_ulonglong, c_void, time_t};
+use std::mem;
+use std::ptr;
 
-//================================================
-// Typedefs
-//================================================
+use libc::{c_char, c_int, c_longlong, c_uint, c_ulong, c_ulonglong, c_void, time_t};
 
 pub type CXClientData = *mut c_void;
 pub type CXCursorVisitor = extern fn(CXCursor, CXCursor, CXClientData) -> CXChildVisitResult;
 #[cfg(feature="gte_clang_3_7")]
 pub type CXFieldVisitor = extern fn(CXCursor, CXClientData) -> CXVisitorResult;
 pub type CXInclusionVisitor = extern fn(CXFile, *mut CXSourceLocation, c_uint, CXClientData);
+
+//================================================
+// Macros
+//================================================
+
+// default! ______________________________________
+
+macro_rules! default {
+    (#[$meta:meta] $ty:ty) => {
+        #[$meta]
+        impl Default for $ty {
+            fn default() -> $ty {
+                unsafe { mem::uninitialized() }
+            }
+        }
+    };
+
+    ($ty:ty) => {
+        impl Default for $ty {
+            fn default() -> $ty {
+                unsafe { mem::uninitialized() }
+            }
+        }
+    };
+}
 
 //================================================
 // Enums
@@ -796,6 +820,12 @@ macro_rules! opaque {
         #[derive(Copy, Clone, Debug)]
         #[repr(C)]
         pub struct $name(pub *mut c_void);
+
+        impl Default for $name {
+            fn default() -> $name {
+                $name(ptr::null_mut())
+            }
+        }
     );
 }
 
@@ -826,12 +856,16 @@ pub struct CXCodeCompleteResults {
     pub NumResults: c_uint,
 }
 
+default!(CXCodeCompleteResults);
+
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXCompletionResult {
     pub CursorKind: CXCursorKind,
     pub CompletionString: CXCompletionString,
 }
+
+default!(CXCompletionResult);
 
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
@@ -841,6 +875,8 @@ pub struct CXCursor {
     pub data: [*const c_void; 3],
 }
 
+default!(CXCursor);
+
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXCursorAndRangeVisitor {
@@ -848,11 +884,15 @@ pub struct CXCursorAndRangeVisitor {
     pub visit: extern fn(*mut c_void, CXCursor, CXSourceRange) -> CXVisitorResult,
 }
 
+default!(CXCursorAndRangeVisitor);
+
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXFileUniqueID {
     pub data: [c_ulonglong; 3],
 }
+
+default!(CXFileUniqueID);
 
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
@@ -862,6 +902,8 @@ pub struct CXIdxAttrInfo {
     pub loc: CXIdxLoc,
 }
 
+default!(CXIdxAttrInfo);
+
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXIdxBaseClassInfo {
@@ -869,6 +911,8 @@ pub struct CXIdxBaseClassInfo {
     pub cursor: CXCursor,
     pub loc: CXIdxLoc,
 }
+
+default!(CXIdxBaseClassInfo);
 
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
@@ -878,11 +922,15 @@ pub struct CXIdxCXXClassDeclInfo {
     pub numBases: c_uint,
 }
 
+default!(CXIdxCXXClassDeclInfo);
+
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXIdxContainerInfo {
     pub cursor: CXCursor,
 }
+
+default!(CXIdxContainerInfo);
 
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
@@ -902,6 +950,8 @@ pub struct CXIdxDeclInfo {
     pub flags: c_uint,
 }
 
+default!(CXIdxDeclInfo);
+
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXIdxEntityInfo {
@@ -915,6 +965,8 @@ pub struct CXIdxEntityInfo {
     pub numAttributes: c_uint,
 }
 
+default!(CXIdxEntityInfo);
+
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXIdxEntityRefInfo {
@@ -926,6 +978,8 @@ pub struct CXIdxEntityRefInfo {
     pub container: *const CXIdxContainerInfo,
 }
 
+default!(CXIdxEntityRefInfo);
+
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXIdxIBOutletCollectionAttrInfo {
@@ -935,6 +989,8 @@ pub struct CXIdxIBOutletCollectionAttrInfo {
     pub classLoc: CXIdxLoc,
 }
 
+default!(CXIdxIBOutletCollectionAttrInfo);
+
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXIdxImportedASTFileInfo {
@@ -943,6 +999,8 @@ pub struct CXIdxImportedASTFileInfo {
     pub loc: CXIdxLoc,
     pub isImplicit: c_int,
 }
+
+default!(CXIdxImportedASTFileInfo);
 
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
@@ -955,12 +1013,16 @@ pub struct CXIdxIncludedFileInfo {
     pub isModuleImport: c_int,
 }
 
+default!(CXIdxIncludedFileInfo);
+
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXIdxLoc {
     pub ptr_data: [*mut c_void; 2],
     pub int_data: c_uint,
 }
+
+default!(CXIdxLoc);
 
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
@@ -972,12 +1034,16 @@ pub struct CXIdxObjCCategoryDeclInfo {
     pub protocols: *const CXIdxObjCProtocolRefListInfo,
 }
 
+default!(CXIdxObjCCategoryDeclInfo);
+
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXIdxObjCContainerDeclInfo {
     pub declInfo: *const CXIdxDeclInfo,
     pub kind: CXIdxObjCContainerKind,
 }
+
+default!(CXIdxObjCContainerDeclInfo);
 
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
@@ -987,6 +1053,8 @@ pub struct CXIdxObjCInterfaceDeclInfo {
     pub protocols: *const CXIdxObjCProtocolRefListInfo,
 }
 
+default!(CXIdxObjCInterfaceDeclInfo);
+
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXIdxObjCPropertyDeclInfo {
@@ -994,6 +1062,8 @@ pub struct CXIdxObjCPropertyDeclInfo {
     pub getter: *const CXIdxEntityInfo,
     pub setter: *const CXIdxEntityInfo,
 }
+
+default!(CXIdxObjCPropertyDeclInfo);
 
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
@@ -1003,12 +1073,16 @@ pub struct CXIdxObjCProtocolRefInfo {
     pub loc: CXIdxLoc,
 }
 
+default!(CXIdxObjCProtocolRefInfo);
+
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXIdxObjCProtocolRefListInfo {
     pub protocols: *const *const CXIdxObjCProtocolRefInfo,
     pub numProtocols: c_uint,
 }
+
+default!(CXIdxObjCProtocolRefListInfo);
 
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
@@ -1021,12 +1095,16 @@ pub struct CXPlatformAvailability {
     pub Message: CXString,
 }
 
+default!(CXPlatformAvailability);
+
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXSourceLocation {
     pub ptr_data: [*const c_void; 2],
     pub int_data: c_uint,
 }
+
+default!(CXSourceLocation);
 
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
@@ -1036,6 +1114,8 @@ pub struct CXSourceRange {
     pub end_int_data: c_uint,
 }
 
+default!(CXSourceRange);
+
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXSourceRangeList {
@@ -1043,12 +1123,16 @@ pub struct CXSourceRangeList {
     pub ranges: *mut CXSourceRange,
 }
 
+default!(CXSourceRangeList);
+
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXString {
     pub data: *const c_void,
     pub private_flags: c_uint,
 }
+
+default!(CXString);
 
 #[cfg(feature="gte_clang_3_8")]
 #[derive(Copy, Clone, Debug)]
@@ -1058,6 +1142,8 @@ pub struct CXStringSet {
     pub Count: c_uint,
 }
 
+default!(#[cfg(feature="gte_clang_3_8")] CXStringSet);
+
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXTUResourceUsage {
@@ -1066,12 +1152,16 @@ pub struct CXTUResourceUsage {
     pub entries: *mut CXTUResourceUsageEntry,
 }
 
+default!(CXTUResourceUsage);
+
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXTUResourceUsageEntry {
     pub kind: CXTUResourceUsageKind,
     pub amount: c_ulong,
 }
+
+default!(CXTUResourceUsageEntry);
 
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
@@ -1080,12 +1170,16 @@ pub struct CXToken {
     pub ptr_data: *mut c_void,
 }
 
+default!(CXToken);
+
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXType {
     pub kind: CXTypeKind,
     pub data: [*mut c_void; 2],
 }
+
+default!(CXType);
 
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
@@ -1095,6 +1189,8 @@ pub struct CXUnsavedFile {
     pub Length: c_ulong,
 }
 
+default!(CXUnsavedFile);
+
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXVersion {
@@ -1102,6 +1198,8 @@ pub struct CXVersion {
     pub Minor: c_int,
     pub Subminor: c_int,
 }
+
+default!(CXVersion);
 
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
@@ -1115,6 +1213,8 @@ pub struct IndexerCallbacks {
     pub indexDeclaration: extern fn(CXClientData, *const CXIdxDeclInfo),
     pub indexEntityReference: extern fn(CXClientData, *const CXIdxEntityRefInfo),
 }
+
+default!(IndexerCallbacks);
 
 //================================================
 // Functions
