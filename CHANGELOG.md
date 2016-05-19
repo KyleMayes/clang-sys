@@ -1,4 +1,4 @@
-## [0.5.4] - UNRELEASED
+## [0.5.4] - 2016-5-19
 
 ### Changed
 - Added implementations of `Default` for FFI structs
