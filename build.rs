@@ -1,3 +1,5 @@
+extern crate glob;
+
 use std::env;
 use std::path::{Path};
 use std::process::{Command};
@@ -91,7 +93,28 @@ fn find(file: &str, env: &str) -> Option<String> {
     search.iter().find(|d| contains(d, file)).map(|s| s.to_string())
 }
 
-/// Clang libraries required to link to `libclang` statically.
+/// Returns the name of an LLVM or Clang library from a path.
+fn get_library(path: &Path) -> Option<String> {
+    path.file_stem().map(|l| l.to_string_lossy()[3..].into())
+}
+
+/// Returns the LLVM libraries required to link to `libclang` statically.
+fn get_llvm_libraries() -> Vec<String> {
+    run_llvm_config(&["--libs"]).expect(
+        "could not execute `llvm-config --libs`, set the LLVM_CONFIG_PATH environment variable to \
+         a path to an `llvm-config` executable"
+    ).split_whitespace().filter_map(|p| {
+        // Depending on the version of `llvm-config` in use, listed libraries may be in one of two
+        // forms, a full path to the library or simply prefixed with `-l`.
+        if p.starts_with("-l") {
+            Some(p[2..].into())
+        } else {
+            get_library(&Path::new(p))
+        }
+    }).collect()
+}
+
+/// Clang libraries required to link to `libclang` 3.5 and later statically.
 const CLANG_LIBRARIES: &'static [&'static str] = &[
     "clang",
     "clangAST",
@@ -108,20 +131,14 @@ const CLANG_LIBRARIES: &'static [&'static str] = &[
     "clangSerialization",
 ];
 
-/// Returns the LLVM libraries required to link to `libclang` statically.
-fn get_llvm_libraries() -> Vec<String> {
-    run_llvm_config(&["--libs"]).expect(
-        "could not execute `llvm-config --libs`, set the LLVM_CONFIG_PATH environment variable to \
-         a path to an `llvm-config` executable"
-    ).split_whitespace().filter_map(|p| {
-        // Depending on the version of `llvm-config` in use, listed libraries may be in one of two
-        // forms, a full path to the library or simply prefixed with `-l`.
-        if p.starts_with("-l") {
-            Some(p[2..].into())
-        } else {
-            Path::new(p).file_stem().map(|l| l.to_string_lossy()[3..].into())
-        }
-    }).collect()
+/// Returns the Clang libraries required to link to `libclang` statically.
+fn get_clang_libraries(directory: &str) -> Vec<String> {
+    let pattern = Path::new(directory).join("libclang*.a").to_string_lossy().to_string();
+    if let Ok(libraries) = glob::glob(&pattern) {
+        libraries.filter_map(|l| l.ok().and_then(|l| get_library(&l))).collect()
+    } else {
+        CLANG_LIBRARIES.iter().map(|l| l.to_string()).collect()
+    }
 }
 
 fn main() {
@@ -139,7 +156,7 @@ fn main() {
         for library in get_llvm_libraries() {
             print!("-l static={} ", library);
         }
-        for library in CLANG_LIBRARIES {
+        for library in get_clang_libraries(&directory) {
             print!("-l static={} ", library);
         }
 

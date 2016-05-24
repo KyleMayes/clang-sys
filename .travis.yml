@@ -3,6 +3,13 @@ language: rust
 matrix:
   include:
     - rust: stable
+      env: CLANG_VERSION=clang_3_5 LLVM_CONFIG_PATH=/usr/lib/llvm-3.4/bin/llvm-config
+      addons:
+        apt:
+          packages:
+            - libclang-3.4-dev
+            - llvm-3.4-dev
+    - rust: stable
       env: CLANG_VERSION=clang_3_5 LLVM_CONFIG_PATH=/usr/lib/llvm-3.5/bin/llvm-config
       addons:
         apt:
@@ -71,6 +78,9 @@ matrix:
     - os: osx
       rust: stable
       env: LLVM_VERSION=devtools CLANG_VERSION=clang_3_5
+    - os: osx
+      rust: stable
+      env: LLVM_VERSION=3.4 CLANG_VERSION=clang_3_5
     - os: osx
       rust: stable
       env: LLVM_VERSION=3.5 CLANG_VERSION=clang_3_5

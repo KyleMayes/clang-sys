@@ -1,3 +1,8 @@
+## [0.5.5] - UNRELEASED
+
+### Fixed
+- Improved `libclang` static linking
+
 ## [0.5.4] - 2016-5-19
 
 ### Changed

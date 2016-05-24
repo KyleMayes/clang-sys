@@ -32,3 +32,7 @@ static = []
 
 bitflags = "0.7.0"
 libc = "0.2.11"
+
+[build-dependencies]
+
+glob = "0.2.11"
