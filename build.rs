@@ -184,6 +184,22 @@ fn main() {
         };
 
         println!("cargo:rustc-link-search={}", directory);
-        println!("cargo:rustc-link-lib=dylib=clang");
+
+        if cfg!(all(target_os="windows", target_env="msvc")) {
+
+            let lib_file = "libclang.lib";
+            
+            // Find the `libclang` link library.
+            let lib_directory = match find(lib_file, "LIBCLANG_PATH") {
+                Some(directory) => directory,
+                _ => error(lib_file, "LIBCLANG_PATH")
+            };
+
+            println!("cargo:rustc-link-search={}", lib_directory);
+            println!("cargo:rustc-link-lib=dylib=libclang");
+
+        } else {
+            println!("cargo:rustc-link-lib=dylib=clang");
+        };
     }
 }
