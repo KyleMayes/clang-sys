@@ -6,6 +6,9 @@ clang-sys
 
 Rust bindings for `libclang`.
 
+If you are interested in a Rust wrapper for these bindings, see
+[clang-rs](https://github.com/KyleMayes/clang-rs).
+
 Supported on the stable, beta, and nightly Rust channels.
 
 Released under the Apache License 2.0.
