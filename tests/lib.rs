@@ -25,3 +25,8 @@ fn test() {
         assert!(!tu.0.is_null());
     }
 }
+
+#[test]
+fn test_support() {
+    support::Clang::find(None).unwrap();
+}

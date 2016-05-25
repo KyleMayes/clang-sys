@@ -28,6 +28,8 @@ extern crate bitflags;
 
 extern crate libc;
 
+pub mod support;
+
 use std::mem;
 use std::ptr;
 

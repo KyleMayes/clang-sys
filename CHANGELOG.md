@@ -1,4 +1,7 @@
-## [0.5.5] - UNRELEASED
+## [0.6.0] - UNRELEASED
+
+### Added
+- Added `support` module
 
 ### Fixed
 - Improved `libclang` static linking
