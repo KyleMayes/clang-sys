@@ -4,6 +4,8 @@
 - Added `support` module
 
 ### Fixed
+- Fixed `libclang` linking on FreeBSD
+- Fixed `libclang` linking on Windows with the MSVC toolchain
 - Improved `libclang` static linking
 
 ## [0.5.4] - 2016-5-19

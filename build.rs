@@ -1,7 +1,7 @@
 extern crate glob;
 
 use std::env;
-use std::path::{Path};
+use std::path::{MAIN_SEPARATOR, Path};
 use std::process::{Command};
 
 // Environment variables:
@@ -12,7 +12,7 @@ use std::process::{Command};
 
 /// Returns whether the supplied directory contains the supplied file.
 fn contains(directory: &str, file: &str) -> bool {
-    Path::new(&directory).join(&file).exists()
+    Path::new(directory).join(file).exists()
 }
 
 /// Panics with a user friendly error message.
@@ -32,7 +32,7 @@ fn run_llvm_config(arguments: &[&str]) -> Option<String> {
     run(&env::var("LLVM_CONFIG_PATH").unwrap_or("llvm-config".into()), arguments)
 }
 
-/// Backup search directories for Linux.
+/// Backup search directories for FreeBSD and Linux.
 const SEARCH_LINUX: &'static [&'static str] = &[
     "/usr/lib",
     "/usr/lib/llvm",
@@ -77,11 +77,17 @@ fn find(file: &str, env: &str) -> Option<String> {
         }
     }
 
-    // Search the directory returned by `llvm-config --libdir`, if `llvm-config` is available.
-    if let Some(output) = run_llvm_config(&["--libdir"]) {
+    // Search the `bin` and `lib` subdirectories in the directory returned by
+    // `llvm-config --prefix`, if `llvm-config` is available.
+    if let Some(output) = run_llvm_config(&["--prefix"]) {
         let directory = output.lines().map(|s| s.to_string()).next().unwrap();
-        if contains(&directory, file) {
-            return Some(directory);
+        let bin = format!("{}{}bin", directory, MAIN_SEPARATOR);
+        if contains(&bin, file) {
+            return Some(bin);
+        }
+        let lib = format!("{}{}lib", directory, MAIN_SEPARATOR);
+        if contains(&lib, file) {
+            return Some(lib);
         }
     }
 
@@ -99,7 +105,7 @@ fn find(file: &str, env: &str) -> Option<String> {
 }
 
 /// Returns the name of an LLVM or Clang library from a path.
-fn get_library(path: &Path) -> Option<String> {
+fn get_library_name(path: &Path) -> Option<String> {
     path.file_stem().map(|l| l.to_string_lossy()[3..].into())
 }
 
@@ -114,7 +120,7 @@ fn get_llvm_libraries() -> Vec<String> {
         if p.starts_with("-l") {
             Some(p[2..].into())
         } else {
-            get_library(&Path::new(p))
+            get_library_name(&Path::new(p))
         }
     }).collect()
 }
@@ -140,7 +146,7 @@ const CLANG_LIBRARIES: &'static [&'static str] = &[
 fn get_clang_libraries(directory: &str) -> Vec<String> {
     let pattern = Path::new(directory).join("libclang*.a").to_string_lossy().to_string();
     if let Ok(libraries) = glob::glob(&pattern) {
-        libraries.filter_map(|l| l.ok().and_then(|l| get_library(&l))).collect()
+        libraries.filter_map(|l| l.ok().and_then(|l| get_library_name(&l))).collect()
     } else {
         CLANG_LIBRARIES.iter().map(|l| l.to_string()).collect()
     }
@@ -172,7 +178,7 @@ fn main() {
             println!("-l ffi -l ncurses -l stdc++ -l z");
         } else {
             panic!("unsupported operating system for static linking");
-        };
+        }
     } else {
         let file = if cfg!(target_os="windows") {
             // The filename of the `libclang` shared library on Windows is `libclang.dll` instead of
@@ -189,22 +195,17 @@ fn main() {
         };
 
         println!("cargo:rustc-link-search={}", directory);
-
         if cfg!(all(target_os="windows", target_env="msvc")) {
-
-            let lib_file = "libclang.lib";
-            
-            // Find the `libclang` link library.
-            let lib_directory = match find(lib_file, "LIBCLANG_PATH") {
+            // Find the `libclang` stub static library required for the MSVC toolchain.
+            let directory = match find("libclang.lib", "LIBCLANG_PATH") {
                 Some(directory) => directory,
-                _ => error(lib_file, "LIBCLANG_PATH")
+                _ => error("libclang.lib", "LIBCLANG_PATH"),
             };
 
-            println!("cargo:rustc-link-search={}", lib_directory);
+            println!("cargo:rustc-link-search={}", directory);
             println!("cargo:rustc-link-lib=dylib=libclang");
-
         } else {
             println!("cargo:rustc-link-lib=dylib=clang");
-        };
+        }
     }
 }
