@@ -43,17 +43,21 @@ fn run_llvm_config(arguments: &[&str]) -> Option<String> {
 
 /// Backup search directory globs for FreeBSD and Linux.
 const SEARCH_LINUX: &'static [&'static str] = &[
-    "/usr/*",
-    "/usr/*/*",
-    "/usr/*/*/*",
+    "/usr/lib*",
+    "/usr/lib*/*",
+    "/usr/lib*/*/*",
+    "/usr/local/lib*",
+    "/usr/local/lib*/*",
+    "/usr/local/lib*/*/*",
+    "/usr/local/llvm*/lib",
 ];
 
 /// Backup search directory globs for OS X.
 const SEARCH_OSX: &'static [&'static str] = &[
-    "/usr/local/opt/*/lib",
+    "/usr/local/opt/llvm*/lib",
     "/Library/Developer/CommandLineTools/usr/lib",
     "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib",
-    "/usr/local/opt/*/lib/*/lib",
+    "/usr/local/opt/llvm*/lib/llvm*/lib",
 ];
 
 /// Backup search directory globs for Windows.
@@ -102,7 +106,7 @@ fn find(file: &str, env: &str) -> Option<String> {
         options.case_sensitive = false;
         options.require_literal_separator = true;
         if let Ok(paths) = glob::glob_with(pattern, &options) {
-            for path in paths.filter_map(Result::ok) {
+            for path in paths.filter_map(Result::ok).filter(|p| p.is_dir()) {
                 if contains(&path, file) {
                     return Some(path.to_string_lossy().into_owned());
                 }
