@@ -1,3 +1,10 @@
+//! Finds and links to the required `libclang` libraries.
+
+#![cfg_attr(feature="clippy", feature(plugin))]
+#![cfg_attr(feature="clippy", plugin(clippy))]
+#![cfg_attr(feature="clippy", warn(clippy))]
+#![cfg_attr(feature="clippy", allow(if_not_else, similar_names))]
+
 extern crate glob;
 
 use std::env;
@@ -121,7 +128,7 @@ fn get_llvm_libraries() -> Vec<String> {
         if p.starts_with("-l") {
             Some(p[2..].into())
         } else {
-            get_library_name(&Path::new(p))
+            get_library_name(Path::new(p))
         }
     }).collect()
 }

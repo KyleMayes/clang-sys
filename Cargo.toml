@@ -33,6 +33,16 @@ static = []
 bitflags = "0.7.0"
 libc = "0.2.11"
 
+[dependencies.clippy]
+
+version = "0.0.69"
+optional = true
+
 [build-dependencies]
 
 glob = "0.2.11"
+
+[build-dependencies.clippy]
+
+version = "0.0.69"
+optional = true

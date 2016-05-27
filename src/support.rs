@@ -85,7 +85,7 @@ fn run_clang(path: &Path, arguments: &[&str], stdout: bool) -> String {
 fn parse_version(path: &Path) -> CXVersion {
     let output = run_clang(path, &["--version"], true);
     let start = output.find("version ").unwrap() + 8;
-    let digits = output[start..].split_whitespace().nth(0).unwrap().split(".");
+    let digits = output[start..].split_whitespace().nth(0).unwrap().split('.');
     let numbers = digits.map(|d| d.parse::<c_int>().unwrap()).collect::<Vec<_>>();
     CXVersion { Major: numbers[0], Minor: numbers[1], Subminor: *numbers.get(2).unwrap_or(&0) }
 }
