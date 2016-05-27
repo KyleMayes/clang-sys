@@ -4,6 +4,8 @@ use std::env;
 use std::path::{Path};
 use std::process::{Command};
 
+use glob::{MatchOptions};
+
 // Environment variables:
 //
 // * LLVM_CONFIG_PATH - provides a path to an `llvm-config` executable
@@ -11,8 +13,8 @@ use std::process::{Command};
 // * LIBCLANG_STATIC_PATH - provides a path to a directory containing LLVM and Clang static libraries
 
 /// Returns whether the supplied directory contains the supplied file.
-fn contains(directory: &str, file: &str) -> bool {
-    Path::new(directory).join(file).exists()
+fn contains<D: AsRef<Path>>(directory: D, file: &str) -> bool {
+    directory.as_ref().join(file).exists()
 }
 
 /// Panics with a user friendly error message.
@@ -32,40 +34,27 @@ fn run_llvm_config(arguments: &[&str]) -> Option<String> {
     run(&env::var("LLVM_CONFIG_PATH").unwrap_or("llvm-config".into()), arguments)
 }
 
-/// Backup search directories for FreeBSD and Linux.
+/// Backup search directory globs for FreeBSD and Linux.
 const SEARCH_LINUX: &'static [&'static str] = &[
-    "/usr/lib",
-    "/usr/lib/llvm",
-    "/usr/lib/llvm-3.8/lib",
-    "/usr/lib/llvm-3.7/lib",
-    "/usr/lib/llvm-3.6/lib",
-    "/usr/lib/llvm-3.5/lib",
-    "/usr/lib/llvm-3.4/lib",
-    "/usr/local/llvm38/lib",
-    "/usr/local/llvm37/lib",
-    "/usr/local/llvm36/lib",
-    "/usr/local/llvm35/lib",
-    "/usr/local/llvm34/lib",
-    "/usr/lib64/llvm",
-    "/usr/lib/x86_64-linux-gnu",
-    "/usr/local/lib",
+    "/usr/*",
+    "/usr/*/*",
+    "/usr/*/*/*",
 ];
 
-/// Backup search directories for OS X.
+/// Backup search directory globs for OS X.
 const SEARCH_OSX: &'static [&'static str] = &[
-    "/usr/local/opt/llvm/lib",
+    "/usr/local/opt/*/lib",
     "/Library/Developer/CommandLineTools/usr/lib",
     "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib",
-    "/usr/local/opt/llvm35/lib/llvm-3.8/lib",
-    "/usr/local/opt/llvm35/lib/llvm-3.7/lib",
-    "/usr/local/opt/llvm35/lib/llvm-3.6/lib",
-    "/usr/local/opt/llvm35/lib/llvm-3.5/lib",
+    "/usr/local/opt/*/lib/*/lib",
 ];
 
-/// Backup search directories for Windows.
+/// Backup search directory globs for Windows.
 const SEARCH_WINDOWS: &'static [&'static str] = &[
-    "C:\\Program Files\\LLVM\\bin",
-    "C:\\Program Files\\LLVM\\lib",
+    "C:\\LLVM\\bin",
+    "C:\\LLVM\\lib",
+    "C:\\Program Files*\\LLVM\\bin",
+    "C:\\Program Files*\\LLVM\\lib",
 ];
 
 /// Searches for a library, returning the directory it can be found in if the search was successful.
@@ -101,7 +90,19 @@ fn find(file: &str, env: &str) -> Option<String> {
     } else {
         return None;
     };
-    search.iter().find(|d| contains(d, file)).map(|s| s.to_string())
+    for pattern in search {
+        let mut options = MatchOptions::new();
+        options.case_sensitive = false;
+        options.require_literal_separator = true;
+        if let Ok(paths) = glob::glob_with(pattern, &options) {
+            for path in paths.filter_map(Result::ok) {
+                if contains(&path, file) {
+                    return Some(path.to_string_lossy().into_owned());
+                }
+            }
+        }
+    }
+    None
 }
 
 /// Returns the name of an LLVM or Clang library from a path.
