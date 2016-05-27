@@ -1,4 +1,4 @@
-## [0.6.0] - UNRELEASED
+## [0.6.0] - 2016-5-26
 
 ### Added
 - Added `support` module
