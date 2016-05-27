@@ -1,7 +1,7 @@
 extern crate glob;
 
 use std::env;
-use std::path::{MAIN_SEPARATOR, Path};
+use std::path::{Path};
 use std::process::{Command};
 
 // Environment variables:
@@ -81,11 +81,11 @@ fn find(file: &str, env: &str) -> Option<String> {
     // `llvm-config --prefix`, if `llvm-config` is available.
     if let Some(output) = run_llvm_config(&["--prefix"]) {
         let directory = output.lines().map(|s| s.to_string()).next().unwrap();
-        let bin = format!("{}{}bin", directory, MAIN_SEPARATOR);
+        let bin = format!("{}/bin", directory);
         if contains(&bin, file) {
             return Some(bin);
         }
-        let lib = format!("{}{}lib", directory, MAIN_SEPARATOR);
+        let lib = format!("{}/lib", directory);
         if contains(&lib, file) {
             return Some(lib);
         }
