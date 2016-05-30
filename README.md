@@ -57,6 +57,14 @@ First, the `libclang` shared library will be searched for in the directory provi
 `llvm-config --libdir` will be searched. If neither of these approaches is successful, a list of
 likely directories will be searched (e.g., `/usr/local/lib` on Linux).
 
+On Linux, running an executable that has been dynamically linked to `libclang` may require you to
+add a path to `libclang.so` to the `LD_LIBRARY_PATH` environment variable. The same is true on OS
+X, except the `DYLD_LIBRARY_PATH` environment variable is used instead.
+
+On Windows, running an executable that has been dynamically linked to `libclang` requires that
+`libclang.dll` can be found by the executable at runtime. See
+[here](https://msdn.microsoft.com/en-us/library/7d83bc18.aspx) for more information.
+
 #### Static
 
 The availability of `llvm-config` is not optional for static linking. Ensure that an instance of
