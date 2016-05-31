@@ -1,5 +1,4 @@
-clang-sys
-=========
+# clang-sys
 
 [![crates.io](https://img.shields.io/crates/v/clang-sys.svg)](https://crates.io/crates/clang-sys)
 [![Travis CI](https://travis-ci.org/KyleMayes/clang-sys.svg?branch=master)](https://travis-ci.org/KyleMayes/clang-sys)
@@ -13,7 +12,7 @@ Supported on the stable, beta, and nightly Rust channels.
 
 Released under the Apache License 2.0.
 
-### Supported Versions
+## Supported Versions
 
 To target a version of `libclang`, enable one of the following Cargo features:
 
@@ -29,7 +28,7 @@ To target a version of `libclang`, enable one of the following Cargo features:
 If you do not enable one of these features, the API provided by `libclang` 3.5 will be available by
 default.
 
-### Dependencies
+## Dependencies
 
 By default, this crate will attempt to link to `libclang` dynamically. In this case, this crate
 depends on the `libclang` shared library (`libclang.so` on Linux, `libclang.dylib` on OS X,
@@ -42,7 +41,7 @@ These libraries can be either be installed as a part of Clang or downloaded
 **Note:** The downloads for LLVM and Clang 3.8 do not include the `libclang.a` static library. This
 means you cannot link to this version of `libclang` statically unless you build it from source.
 
-#### Environment Variables
+## Environment Variables
 
 The following environment variables, if set, are used by this crate to find the required libraries:
 
@@ -50,7 +49,9 @@ The following environment variables, if set, are used by this crate to find the 
 * `LIBCLANG_PATH` - provides a path to a directory containing a `libclang` shared library
 * `LIBCLANG_STATIC_PATH` - provides a path to a directory containing LLVM and Clang static libraries
 
-#### Dynamic
+## Build type
+
+### Dynamic
 
 First, the `libclang` shared library will be searched for in the directory provided by the
 `LIBCLANG_PATH` environment variable if it was set. If this fails, the directory returned by
@@ -65,7 +66,7 @@ On Windows, running an executable that has been dynamically linked to `libclang`
 `libclang.dll` can be found by the executable at runtime. See
 [here](https://msdn.microsoft.com/en-us/library/7d83bc18.aspx) for more information.
 
-#### Static
+### Static
 
 The availability of `llvm-config` is not optional for static linking. Ensure that an instance of
 this executable can be found on your system's path or set the `LLVM_CONFIG_PATH` environment
