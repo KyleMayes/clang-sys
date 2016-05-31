@@ -1,4 +1,4 @@
-## [0.7.0] - UNRELEASED
+## [0.7.0] - 2016-5-31
 
 ### Changed
 - Changed `Clang` struct `version` field type to `Option<CXVersion>`
