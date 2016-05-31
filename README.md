@@ -49,7 +49,7 @@ The following environment variables, if set, are used by this crate to find the 
 * `LIBCLANG_PATH` - provides a path to a directory containing a `libclang` shared library
 * `LIBCLANG_STATIC_PATH` - provides a path to a directory containing LLVM and Clang static libraries
 
-## Build type
+## Linking
 
 ### Dynamic
 
