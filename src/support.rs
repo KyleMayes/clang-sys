@@ -12,13 +12,28 @@ use super::{CXVersion};
 // Structs
 //================================================
 
+// try_opt! ______________________________________
+
+macro_rules! try_opt {
+    ($option:expr) => ({
+        match $option {
+            Some(some) => some,
+            None => return None,
+        }
+    });
+}
+
+//================================================
+// Structs
+//================================================
+
 /// A `clang` executable.
 #[derive(Clone, Debug)]
 pub struct Clang {
     /// The path to this `clang` executable.
     pub path: PathBuf,
-    /// The version of this `clang` executable.
-    pub version: CXVersion,
+    /// The version of this `clang` executable if it could be parsed.
+    pub version: Option<CXVersion>,
     /// The directories searched by this `clang` executable for C headers.
     pub c_search_paths: Vec<PathBuf>,
     /// The directories searched by this `clang` executable for C++ headers.
@@ -81,13 +96,20 @@ fn run_clang(path: &Path, arguments: &[&str], stdout: bool) -> String {
     }).unwrap()
 }
 
-/// Parses the version from the output of a `clang` executable.
-fn parse_version(path: &Path) -> CXVersion {
+/// Parses a version number if possible, ignoring trailing non-digit characters.
+fn parse_version_number(number: &str) -> Option<c_int> {
+    number.chars().take_while(|c| c.is_digit(10)).collect::<String>().parse().ok()
+}
+
+/// Parses the version from the output of a `clang` executable if possible.
+fn parse_version(path: &Path) -> Option<CXVersion> {
     let output = run_clang(path, &["--version"], true);
-    let start = output.find("version ").unwrap() + 8;
-    let digits = output[start..].split_whitespace().nth(0).unwrap().split('.');
-    let numbers = digits.map(|d| d.parse::<c_int>().unwrap()).collect::<Vec<_>>();
-    CXVersion { Major: numbers[0], Minor: numbers[1], Subminor: *numbers.get(2).unwrap_or(&0) }
+    let start = try_opt!(output.find("version ")) + 8;
+    let mut numbers = try_opt!(output[start..].split_whitespace().nth(0)).split(".");
+    let major = try_opt!(numbers.next().and_then(parse_version_number));
+    let minor = try_opt!(numbers.next().and_then(parse_version_number));
+    let subminor = numbers.next().and_then(parse_version_number).unwrap_or(0);
+    Some(CXVersion { Major: major, Minor: minor, Subminor: subminor })
 }
 
 /// Parses the search paths from the output of a `clang` executable.
