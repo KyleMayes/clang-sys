@@ -18,6 +18,8 @@ use std::env;
 use std::process::{Command};
 use std::path::{Path, PathBuf};
 
+use glob;
+
 use libc::{c_int};
 
 use super::{CXVersion};
@@ -74,15 +76,15 @@ impl Clang {
     /// If a path is supplied, that is the first directory searched. Otherwise, the directories in
     /// the system's `PATH` are searched.
     pub fn find(path: Option<&Path>) -> Option<Clang> {
-        let clang = format!("clang{}", env::consts::EXE_SUFFIX);
-        if let Some(path) = path {
-            if contains(path, &clang) {
-                return Some(Clang::new(path.join(&clang)));
-            }
+        let default = format!("clang{}", env::consts::EXE_SUFFIX);
+        let versioned = format!("clang-*{}", env::consts::EXE_SUFFIX);
+        let patterns = &[&default[..], &versioned[..]];
+        if let Some(path) = path.and_then(|p| find(p, patterns)) {
+            return Some(Clang::new(path));
         }
         for path in env::split_paths(&env::var("PATH").unwrap()) {
-            if contains(&path, &clang) {
-                return Some(Clang::new(path.join(&clang)));
+            if let Some(path) = find(&path, patterns) {
+                return Some(Clang::new(path));
             }
         }
         None
@@ -93,9 +95,16 @@ impl Clang {
 // Functions
 //================================================
 
-/// Returns whether the supplied directory contains the supplied file.
-fn contains(directory: &Path, file: &str) -> bool {
-    Path::new(&directory).join(&file).exists()
+/// Returns the first match to the supplied glob patterns in the supplied directory if there are any
+/// matches.
+fn find(directory: &Path, patterns: &[&str]) -> Option<PathBuf> {
+    for pattern in patterns {
+        let pattern = directory.join(pattern).to_string_lossy().into_owned();
+        if let Some(path) = try_opt!(glob::glob(&pattern).ok()).filter_map(|p| p.ok()).next() {
+            return Some(path);
+        }
+    }
+    None
 }
 
 /// Runs a `clang` executable, returning the output.

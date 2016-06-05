@@ -30,6 +30,7 @@
 #[macro_use]
 extern crate bitflags;
 
+extern crate glob;
 extern crate libc;
 
 pub mod support;

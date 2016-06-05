@@ -1,3 +1,8 @@
+## [0.7.1] - UNRELEASED
+
+### Fixed
+- Fixed finding of `clang` executables suffixed by their version (e.g., `clang-3.5`)
+
 ## [0.7.0] - 2016-5-31
 
 ### Changed
