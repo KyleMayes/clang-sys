@@ -1,4 +1,4 @@
-## [0.7.1] - UNRELEASED
+## [0.7.1] - 2016-6-10
 
 ### Changed
 - Bumped `libc` version to `0.2.12`
