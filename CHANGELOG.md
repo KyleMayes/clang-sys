@@ -1,5 +1,8 @@
 ## [0.7.1] - UNRELEASED
 
+### Changed
+- Bumped `libc` version to `0.2.12`
+
 ### Fixed
 - Fixed finding of `clang` executables suffixed by their version (e.g., `clang-3.5`)
 
