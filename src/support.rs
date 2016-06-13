@@ -77,7 +77,7 @@ impl Clang {
     /// the system's `PATH` are searched.
     pub fn find(path: Option<&Path>) -> Option<Clang> {
         let default = format!("clang{}", env::consts::EXE_SUFFIX);
-        let versioned = format!("clang-*{}", env::consts::EXE_SUFFIX);
+        let versioned = format!("clang-[0-9]*{}", env::consts::EXE_SUFFIX);
         let patterns = &[&default[..], &versioned[..]];
         if let Some(path) = path.and_then(|p| find(p, patterns)) {
             return Some(Clang::new(path));
