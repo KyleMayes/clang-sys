@@ -1,3 +1,9 @@
+## [0.7.2] - UNRELEASED
+
+### Fixed
+- Fixed finding of `clang` executables when system has executables matching `clang-*`
+  (e.g., `clang-format`)
+
 ## [0.7.1] - 2016-6-10
 
 ### Changed
