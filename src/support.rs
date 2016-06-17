@@ -77,7 +77,7 @@ impl Clang {
     /// the system's `PATH` are searched.
     pub fn find(path: Option<&Path>) -> Option<Clang> {
         let default = format!("clang{}", env::consts::EXE_SUFFIX);
-        let versioned = format!("clang-*{}", env::consts::EXE_SUFFIX);
+        let versioned = format!("clang-[0-9]*{}", env::consts::EXE_SUFFIX);
         let patterns = &[&default[..], &versioned[..]];
         if let Some(path) = path.and_then(|p| find(p, patterns)) {
             return Some(Clang::new(path));
@@ -138,7 +138,9 @@ fn parse_version(path: &Path) -> Option<CXVersion> {
 /// Parses the search paths from the output of a `clang` executable.
 fn parse_search_paths(path: &Path, language: &str) -> Vec<PathBuf> {
     let output = run_clang(path, &["-E", "-x", language, "-", "-v"], false);
-    let start = output.find("#include <...> search starts here:").unwrap() + 34;
-    let end = output.find("End of search list.").unwrap();
+    let include_start = "#include <...> search starts here:";
+    let start = output.find(include_start).expect(include_start)
+              + include_start.len();
+    let end = output.find("End of search list.").expect("End of search list");
     output[start..end].split_whitespace().map(|l| Path::new(l.trim()).into()).collect()
 }
