@@ -141,5 +141,6 @@ fn parse_search_paths(path: &Path, language: &str) -> Vec<PathBuf> {
     let include_start = "#include <...> search starts here:";
     let start = output.find(include_start).expect(include_start) + include_start.len();
     let end = output.find("End of search list.").expect("End of search list");
-    output[start..end].split_whitespace().map(|l| Path::new(l.trim()).into()).collect()
+    let paths = output[start..end].replace("(framework directory)", "");
+    paths.split_whitespace().map(|l| Path::new(l.trim()).into()).collect()
 }
