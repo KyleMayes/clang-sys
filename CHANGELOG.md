@@ -1,3 +1,9 @@
+## [0.8.0] - UNRELEASED
+
+### Fixed
+- Fixed `LIBCLANG_PATH` usage on Windows to search both the `bin` and `lib` directories
+- Fixed search path parsing on OS X
+
 ## [0.7.2] - 2016-6-17
 
 ### Fixed
