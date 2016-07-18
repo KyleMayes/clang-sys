@@ -68,8 +68,8 @@ const SEARCH_LINUX: &'static [&'static str] = &[
 /// Backup search directory globs for OS X.
 const SEARCH_OSX: &'static [&'static str] = &[
     "/usr/local/opt/llvm*/lib",
-    "/Library/Developer/CommandLineTools/usr/lib",
     "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib",
+    "/Library/Developer/CommandLineTools/usr/lib",
     "/usr/local/opt/llvm*/lib/llvm*/lib",
 ];
 

@@ -7,6 +7,7 @@
 - Fixed `LIBCLANG_PATH` usage on Windows to search both the `bin` and `lib` directories
 - Fixed search path parsing on OS X
 - Fixed search path parsing on Windows
+- Fixed default search path ordering on OS X
 
 ## [0.7.2] - 2016-6-17
 
