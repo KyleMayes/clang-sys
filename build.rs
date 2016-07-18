@@ -21,7 +21,7 @@
 extern crate glob;
 
 use std::env;
-use std::path::{Path};
+use std::path::{Path, PathBuf};
 use std::process::{Command};
 
 use glob::{MatchOptions};
@@ -82,28 +82,28 @@ const SEARCH_WINDOWS: &'static [&'static str] = &[
 ];
 
 /// Searches for a library, returning the directory it can be found in if the search was successful.
-fn find(file: &str, env: &str) -> Option<String> {
+fn find(file: &str, env: &str) -> Option<PathBuf> {
     // Search the directory provided by the relevant environment variable, if set.
-    if let Some(directory) = env::var(env).ok() {
+    if let Some(directory) = env::var(env).map(|d| Path::new(&d).to_path_buf()).ok() {
         if contains(&directory, file) {
             return Some(directory);
         }
-        // On Windows, libclang.dll is usually put in bin directory while
-        // libclang.lib is placed under lib directory. So we try to search
-        // both directories here.
+
+        // On Windows, `libclang.dll` is usually found in the LLVM `bin` directory while
+        // `libclang.lib` is usually found in the LLVM `lib` directory. Search the other if one is
+        // specified with `LIBCLANG_PATH`.
         if cfg!(target_os="windows") {
-            let dir_path = Path::new(&directory);
-            let alternative_dir = if dir_path.ends_with("lib") {
+            let suffix = if directory.ends_with("lib") {
                 Some("bin")
-            } else if dir_path.ends_with("bin") {
+            } else if directory.ends_with("bin") {
                 Some("lib")
             } else {
                 None
             };
-            if let Some(dir) = alternative_dir {
-                let alternative_path = dir_path.parent().unwrap().join(dir);
-                if contains(&alternative_path, file) {
-                    return Some(alternative_path.into_os_string().into_string().unwrap());
+            if let Some(suffix) = suffix {
+                let alternative = directory.parent().unwrap().join(suffix);
+                if contains(&alternative, file) {
+                    return Some(alternative);
                 }
             }
         }
@@ -112,12 +112,12 @@ fn find(file: &str, env: &str) -> Option<String> {
     // Search the `bin` and `lib` subdirectories in the directory returned by
     // `llvm-config --prefix`, if `llvm-config` is available.
     if let Some(output) = run_llvm_config(&["--prefix"]) {
-        let directory = output.lines().map(|s| s.to_string()).next().unwrap();
-        let bin = format!("{}/bin", directory);
+        let directory = Path::new(output.lines().next().unwrap()).to_path_buf();
+        let bin = directory.join("bin");
         if contains(&bin, file) {
             return Some(bin);
         }
-        let lib = format!("{}/lib", directory);
+        let lib = directory.join("lib");
         if contains(&lib, file) {
             return Some(lib);
         }
@@ -140,7 +140,7 @@ fn find(file: &str, env: &str) -> Option<String> {
         if let Ok(paths) = glob::glob_with(pattern, &options) {
             for path in paths.filter_map(Result::ok).filter(|p| p.is_dir()) {
                 if contains(&path, file) {
-                    return Some(path.to_string_lossy().into_owned());
+                    return Some(path);
                 }
             }
         }
@@ -187,8 +187,8 @@ const CLANG_LIBRARIES: &'static [&'static str] = &[
 ];
 
 /// Returns the Clang libraries required to link to `libclang` statically.
-fn get_clang_libraries(directory: &str) -> Vec<String> {
-    let pattern = Path::new(directory).join("libclang*.a").to_string_lossy().to_string();
+fn get_clang_libraries<P: AsRef<Path>>(directory: P) -> Vec<String> {
+    let pattern = directory.as_ref().join("libclang*.a").to_string_lossy().to_string();
     if let Ok(libraries) = glob::glob(&pattern) {
         libraries.filter_map(|l| l.ok().and_then(|l| get_library_name(&l))).collect()
     } else {
@@ -207,7 +207,7 @@ fn main() {
         print!("cargo:rustc-flags=");
 
         // Specify required LLVM and Clang static libraries.
-        print!("-L {} ", directory);
+        print!("-L {} ", directory.display());
         for library in get_llvm_libraries() {
             print!("-l static={} ", library);
         }
@@ -238,7 +238,7 @@ fn main() {
             _ => error(&file, "LIBCLANG_PATH")
         };
 
-        println!("cargo:rustc-link-search={}", directory);
+        println!("cargo:rustc-link-search={}", directory.display());
         if cfg!(all(target_os="windows", target_env="msvc")) {
             // Find the `libclang` stub static library required for the MSVC toolchain.
             let directory = match find("libclang.lib", "LIBCLANG_PATH") {
@@ -246,7 +246,7 @@ fn main() {
                 _ => error("libclang.lib", "LIBCLANG_PATH"),
             };
 
-            println!("cargo:rustc-link-search={}", directory);
+            println!("cargo:rustc-link-search={}", directory.display());
             println!("cargo:rustc-link-lib=dylib=libclang");
         } else {
             println!("cargo:rustc-link-lib=dylib=clang");
