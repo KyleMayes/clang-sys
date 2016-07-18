@@ -5,8 +5,11 @@ environment:
 
 install:
   - ps: .\ci\install.ps1
+  - rustc --version
+  - cargo --version
 
 build: false
 
 test_script:
-  - ps: .\ci\test_script.ps1
+  - SET RUST_BACKTRACE=1
+  - cargo test --verbose --features %CLANG_VERSION% -- --nocapture
