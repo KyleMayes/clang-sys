@@ -41,6 +41,10 @@ depends on the `libclang` shared library (`libclang.so` on Linux, `libclang.dyli
 These libraries can be either be installed as a part of Clang or downloaded
 [here](http://llvm.org/releases/download.html).
 
+**Note:** Installing `libclang` through a package manager might install the `libclang` shared
+library as something like `libclang.so.1` instead of `libclang.so`. In this case, you need to make a
+symbolic link from the versioned shared library to `libclang.so`.
+
 **Note:** The downloads for LLVM and Clang 3.8 and later do not include the `libclang.a` static
 library. This means you cannot link to any of these versions of `libclang` statically unless you
 build it from source.
