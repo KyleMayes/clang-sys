@@ -2,6 +2,7 @@
 
 [![crates.io](https://img.shields.io/crates/v/clang-sys.svg)](https://crates.io/crates/clang-sys)
 [![Travis CI](https://travis-ci.org/KyleMayes/clang-sys.svg?branch=master)](https://travis-ci.org/KyleMayes/clang-sys)
+[![AppVeyor](https://ci.appveyor.com/api/projects/status/7tv5mjyg55rof356?svg=true)](https://ci.appveyor.com/project/KyleMayes/clang-sys-vtvy5)
 
 Rust bindings for `libclang`.
 

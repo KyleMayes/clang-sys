@@ -1,0 +1,12 @@
+environment:
+  matrix:
+    - LLVM_VERSION: 3.8
+      CLANG_VERSION: clang_3_8
+
+install:
+  - ps: .\ci\install.ps1
+
+build: false
+
+test_script:
+  - ps: .\ci\test_script.ps1
