@@ -24,6 +24,8 @@ To target a version of `libclang`, enable one of the following Cargo features:
   ([Documentation](https://kylemayes.github.io/clang-sys/3_7/clang_sys))
 * `clang_3_8` - requires `libclang` 3.8 or later
   ([Documentation](https://kylemayes.github.io/clang-sys/3_8/clang_sys))
+* `clang_3_9` - requires `libclang` 3.9 or later
+  ([Documentation](https://kylemayes.github.io/clang-sys/3_9/clang_sys))
 
 If you do not enable one of these features, the API provided by `libclang` 3.5 will be available by
 default.
@@ -38,8 +40,9 @@ depends on the `libclang` shared library (`libclang.so` on Linux, `libclang.dyli
 These libraries can be either be installed as a part of Clang or downloaded
 [here](http://llvm.org/releases/download.html).
 
-**Note:** The downloads for LLVM and Clang 3.8 do not include the `libclang.a` static library. This
-means you cannot link to this version of `libclang` statically unless you build it from source.
+**Note:** The downloads for LLVM and Clang 3.8 and later do not include the `libclang.a` static
+library. This means you cannot link to any of these versions of `libclang` statically unless you
+build it from source.
 
 ## Environment Variables
 

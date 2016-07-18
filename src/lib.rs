@@ -20,6 +20,7 @@
 //! * 3.6 - [Documentation](https://kylemayes.github.io/clang-sys/3_6/clang_sys)
 //! * 3.7 - [Documentation](https://kylemayes.github.io/clang-sys/3_7/clang_sys)
 //! * 3.8 - [Documentation](https://kylemayes.github.io/clang-sys/3_8/clang_sys)
+//! * 3.9 - [Documentation](https://kylemayes.github.io/clang-sys/3_9/clang_sys)
 
 #![allow(non_camel_case_types, non_snake_case, non_upper_case_globals)]
 
@@ -100,6 +101,12 @@ pub enum CXCallingConv {
     X86_64SysV = 11,
     #[cfg(feature="gte_clang_3_6")]
     X86VectorCall = 12,
+    #[cfg(feature="gte_clang_3_9")]
+    Swift = 13,
+    #[cfg(feature="gte_clang_3_9")]
+    PreserveMost = 14,
+    #[cfg(feature="gte_clang_3_9")]
+    PreserveAll = 15,
     Invalid = 100,
     Unexposed = 200,
 }
@@ -251,6 +258,8 @@ pub enum CXCursorKind {
     ObjCSelfExpr = 146,
     #[cfg(feature="gte_clang_3_8")]
     OMPArraySectionExpr = 147,
+    #[cfg(feature="gte_clang_3_9")]
+    ObjCAvailabilityCheckExpr = 148,
     UnexposedStmt = 200,
     LabelStmt = 201,
     CompoundStmt = 202,
@@ -326,6 +335,24 @@ pub enum CXCursorKind {
     OMPTaskLoopSimdDirective = 259,
     #[cfg(feature="gte_clang_3_8")]
     OMPDistributeDirective = 260,
+    #[cfg(feature="gte_clang_3_9")]
+    OMPTargetEnterDataDirective = 261,
+    #[cfg(feature="gte_clang_3_9")]
+    OMPTargetExitDataDirective = 262,
+    #[cfg(feature="gte_clang_3_9")]
+    OMPTargetParallelDirective = 263,
+    #[cfg(feature="gte_clang_3_9")]
+    OMPTargetParallelForDirective = 264,
+    #[cfg(feature="gte_clang_3_9")]
+    OMPTargetUpdateDirective = 265,
+    #[cfg(feature="gte_clang_3_9")]
+    OMPDistributeParallelForDirective = 266,
+    #[cfg(feature="gte_clang_3_9")]
+    OMPDistributeParallelForSimdDirective = 267,
+    #[cfg(feature="gte_clang_3_9")]
+    OMPDistributeSimdDirective = 268,
+    #[cfg(feature="gte_clang_3_9")]
+    OMPTargetParallelForSimdDirective = 269,
     TranslationUnit = 300,
     UnexposedAttr = 400,
     IBActionAttr = 401,
@@ -359,6 +386,8 @@ pub enum CXCursorKind {
     ModuleImportDecl = 600,
     #[cfg(feature="gte_clang_3_8")]
     TypeAliasTemplateDecl = 601,
+    #[cfg(feature="gte_clang_3_9")]
+    StaticAssert = 602,
     #[cfg(feature="gte_clang_3_7")]
     OverloadCandidate = 700,
 }
@@ -381,6 +410,19 @@ pub enum CXErrorCode {
     Crashed = 2,
     InvalidArguments = 3,
     ASTReadError = 4,
+}
+
+#[cfg(feature="gte_clang_3_9")]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[repr(C)]
+pub enum CXEvalResultKind {
+    UnExposed = 0,
+    Int = 1 ,
+    Float = 2,
+    ObjCStrLiteral = 3,
+    StrLiteral = 4,
+    CFStr = 5,
+    Other = 6,
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -588,6 +630,8 @@ pub enum CXTypeKind {
     ObjCId = 27,
     ObjCClass = 28,
     ObjCSel = 29,
+    #[cfg(feature="gte_clang_3_9")]
+    Float128 = 30,
     Complex = 100,
     Pointer = 101,
     BlockPointer = 102,
@@ -608,6 +652,8 @@ pub enum CXTypeKind {
     MemberPointer = 117,
     #[cfg(feature="gte_clang_3_8")]
     Auto = 118,
+    #[cfg(feature="gte_clang_3_9")]
+    Elaborated = 119,
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -782,6 +828,8 @@ bitflags! {
         const CXObjCPropertyAttr_weak = 512,
         const CXObjCPropertyAttr_strong = 1024,
         const CXObjCPropertyAttr_unsafe_unretained = 2048,
+        #[cfg(feature="gte_clang_3_9")]
+        const CXObjCPropertyAttr_class = 4096,
     }
 }
 
@@ -813,6 +861,8 @@ bitflags! {
         const CXTranslationUnit_IncludeBriefCommentsInCodeCompletion = 128,
         #[cfg(feature="gte_clang_3_8")]
         const CXTranslationUnit_CreatePreambleOnFirstParse = 256,
+        #[cfg(feature="gte_clang_3_9")]
+        const CXTranslationUnit_KeepGoing = 512,
     }
 }
 
@@ -843,6 +893,8 @@ opaque!(CXCompletionString);
 opaque!(CXCursorSet);
 opaque!(CXDiagnostic);
 opaque!(CXDiagnosticSet);
+#[cfg(feature="gte_clang_3_9")]
+opaque!(CXEvalResult);
 opaque!(CXFile);
 opaque!(CXIdxClientASTFile);
 opaque!(CXIdxClientContainer);
@@ -1232,9 +1284,19 @@ extern {
     pub fn clang_CXCursorSet_insert(set: CXCursorSet, cursor: CXCursor) -> c_uint;
     pub fn clang_CXIndex_getGlobalOptions(index: CXIndex) -> CXGlobalOptFlags;
     pub fn clang_CXIndex_setGlobalOptions(index: CXIndex, flags: CXGlobalOptFlags);
+    #[cfg(feature="gte_clang_3_9")]
+    pub fn clang_CXXConstructor_isConvertingConstructor(cursor: CXCursor) -> c_uint;
+    #[cfg(feature="gte_clang_3_9")]
+    pub fn clang_CXXConstructor_isCopyConstructor(cursor: CXCursor) -> c_uint;
+    #[cfg(feature="gte_clang_3_9")]
+    pub fn clang_CXXConstructor_isDefaultConstructor(cursor: CXCursor) -> c_uint;
+    #[cfg(feature="gte_clang_3_9")]
+    pub fn clang_CXXConstructor_isMoveConstructor(cursor: CXCursor) -> c_uint;
     #[cfg(feature="gte_clang_3_8")]
     pub fn clang_CXXField_isMutable(cursor: CXCursor) -> c_uint;
     pub fn clang_CXXMethod_isConst(cursor: CXCursor) -> c_uint;
+    #[cfg(feature="gte_clang_3_9")]
+    pub fn clang_CXXMethod_isDefaulted(cursor: CXCursor) -> c_uint;
     pub fn clang_CXXMethod_isPureVirtual(cursor: CXCursor) -> c_uint;
     pub fn clang_CXXMethod_isStatic(cursor: CXCursor) -> c_uint;
     pub fn clang_CXXMethod_isVirtual(cursor: CXCursor) -> c_uint;
@@ -1253,6 +1315,8 @@ extern {
     pub fn clang_CompileCommands_dispose(command: CXCompileCommands);
     pub fn clang_CompileCommands_getCommand(command: CXCompileCommands, index: c_uint) -> CXCompileCommand;
     pub fn clang_CompileCommands_getSize(command: CXCompileCommands) -> c_uint;
+    #[cfg(feature="gte_clang_3_9")]
+    pub fn clang_Cursor_Evaluate(cursor: CXCursor) -> CXEvalResult;
     pub fn clang_Cursor_getArgument(cursor: CXCursor, index: c_uint) -> CXCursor;
     pub fn clang_Cursor_getBriefCommentText(cursor: CXCursor) -> CXString;
     #[cfg(feature="gte_clang_3_8")]
@@ -1283,13 +1347,31 @@ extern {
     #[cfg(feature="gte_clang_3_6")]
     pub fn clang_Cursor_getTemplateArgumentValue(cursor: CXCursor, index: c_uint) -> c_longlong;
     pub fn clang_Cursor_getTranslationUnit(cursor: CXCursor) -> CXTranslationUnit;
+    #[cfg(feature="gte_clang_3_9")]
+    pub fn clang_Cursor_hasAttrs(cursor: CXCursor) -> c_uint;
     #[cfg(feature="gte_clang_3_7")]
     pub fn clang_Cursor_isAnonymous(cursor: CXCursor) -> c_uint;
     pub fn clang_Cursor_isBitField(cursor: CXCursor) -> c_uint;
     pub fn clang_Cursor_isDynamicCall(cursor: CXCursor) -> c_int;
+    #[cfg(feature="gte_clang_3_9")]
+    pub fn clang_Cursor_isFunctionInlined(cursor: CXCursor) -> c_uint;
+    #[cfg(feature="gte_clang_3_9")]
+    pub fn clang_Cursor_isMacroBuiltin(cursor: CXCursor) -> c_uint;
+    #[cfg(feature="gte_clang_3_9")]
+    pub fn clang_Cursor_isMacroFunctionLike(cursor: CXCursor) -> c_uint;
     pub fn clang_Cursor_isNull(cursor: CXCursor) -> c_int;
     pub fn clang_Cursor_isObjCOptional(cursor: CXCursor) -> c_uint;
     pub fn clang_Cursor_isVariadic(cursor: CXCursor) -> c_uint;
+    #[cfg(feature="gte_clang_3_9")]
+    pub fn clang_EvalResult_dispose(result: CXEvalResult);
+    #[cfg(feature="gte_clang_3_9")]
+    pub fn clang_EvalResult_getAsDouble(result: CXEvalResult) -> libc::c_double;
+    #[cfg(feature="gte_clang_3_9")]
+    pub fn clang_EvalResult_getAsInt(result: CXEvalResult) -> c_int;
+    #[cfg(feature="gte_clang_3_9")]
+    pub fn clang_EvalResult_getAsStr(result: CXEvalResult) -> *const c_char;
+    #[cfg(feature="gte_clang_3_9")]
+    pub fn clang_EvalResult_getKind(result: CXEvalResult) -> CXEvalResultKind;
     #[cfg(feature="gte_clang_3_6")]
     pub fn clang_File_isEqual(left: CXFile, right: CXFile) -> c_int;
     pub fn clang_IndexAction_create(index: CXIndex) -> CXIndexAction;
@@ -1307,7 +1389,11 @@ extern {
     pub fn clang_Type_getAlignOf(type_: CXType) -> c_longlong;
     pub fn clang_Type_getCXXRefQualifier(type_: CXType) -> CXRefQualifierKind;
     pub fn clang_Type_getClassType(type_: CXType) -> CXType;
+    #[cfg(feature="gte_clang_3_9")]
+    pub fn clang_Type_getNamedType(type_: CXType) -> CXType;
     pub fn clang_Type_getNumTemplateArguments(type_: CXType) -> c_int;
+    #[cfg(feature="gte_clang_3_9")]
+    pub fn clang_Type_getObjCEncoding(type_: CXType) -> CXString;
     pub fn clang_Type_getOffsetOf(type_: CXType, field: *const c_char) -> c_longlong;
     pub fn clang_Type_getSizeOf(type_: CXType) -> c_longlong;
     pub fn clang_Type_getTemplateArgumentAsType(type_: CXType, index: c_uint) -> CXType;
