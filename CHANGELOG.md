@@ -3,6 +3,9 @@
 ### Added
 - Added support for `clang` 3.9.x
 
+### Changed
+- Bumped `libc` version to `0.2.14`
+
 ### Fixed
 - Fixed `LIBCLANG_PATH` usage on Windows to search both the `bin` and `lib` directories
 - Fixed search path parsing on OS X
