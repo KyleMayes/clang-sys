@@ -1,3 +1,8 @@
+## [0.8.1] - UNRELEASED
+
+### Changed
+- Added usage of `xcodebuild` to search for `clang` on OS X
+
 ## [0.8.0] - 2016-7-18
 
 ### Added

@@ -79,6 +79,11 @@ impl Clang {
         let default = format!("clang{}", env::consts::EXE_SUFFIX);
         let versioned = format!("clang-[0-9]*{}", env::consts::EXE_SUFFIX);
         let patterns = &[&default[..], &versioned[..]];
+        if cfg!(target_os="macos") {
+            if let Some((path, _)) = run("xcodebuild", &["-find", "clang"]) {
+                return Some(Clang::new(Path::new(path.trim()).into()));
+            }
+        }
         if let Some(path) = path.and_then(|p| find(p, patterns)) {
             return Some(Clang::new(path));
         }
@@ -107,16 +112,18 @@ fn find(directory: &Path, patterns: &[&str]) -> Option<PathBuf> {
     None
 }
 
-/// Runs a `clang` executable, returning the output.
-fn run_clang(path: &Path, arguments: &[&str], stdout: bool) -> String {
-    Command::new(path.to_string_lossy().into_owned()).args(arguments).output().map(|o| {
-        let output = if stdout {
-            &o.stdout
-        } else {
-            &o.stderr
-        };
-        String::from_utf8_lossy(output).into_owned()
-    }).unwrap()
+/// Attempts to run an executable, returning the `stdout` and `stderr` output if successful.
+fn run(executable: &str, arguments: &[&str]) -> Option<(String, String)> {
+    Command::new(executable).args(arguments).output().map(|o| {
+        let stdout = String::from_utf8_lossy(&o.stdout).into_owned();
+        let stderr = String::from_utf8_lossy(&o.stderr).into_owned();
+        (stdout, stderr)
+    }).ok()
+}
+
+/// Runs `clang`, returning the `stdout` and `stderr` output.
+fn run_clang(path: &Path, arguments: &[&str]) -> (String, String) {
+    run(&path.to_string_lossy().into_owned(), arguments).unwrap()
 }
 
 /// Parses a version number if possible, ignoring trailing non-digit characters.
@@ -126,7 +133,7 @@ fn parse_version_number(number: &str) -> Option<c_int> {
 
 /// Parses the version from the output of a `clang` executable if possible.
 fn parse_version(path: &Path) -> Option<CXVersion> {
-    let output = run_clang(path, &["--version"], true);
+    let output = run_clang(path, &["--version"]).0;
     let start = try_opt!(output.find("version ")) + 8;
     let mut numbers = try_opt!(output[start..].split_whitespace().nth(0)).split('.');
     let major = try_opt!(numbers.next().and_then(parse_version_number));
@@ -137,7 +144,7 @@ fn parse_version(path: &Path) -> Option<CXVersion> {
 
 /// Parses the search paths from the output of a `clang` executable.
 fn parse_search_paths(path: &Path, language: &str) -> Vec<PathBuf> {
-    let output = run_clang(path, &["-E", "-x", language, "-", "-v"], false);
+    let output = run_clang(path, &["-E", "-x", language, "-", "-v"]).1;
     let include_start = "#include <...> search starts here:";
     let start = output.find(include_start).expect(include_start) + include_start.len();
     let end = output.find("End of search list.").expect("End of search list");
