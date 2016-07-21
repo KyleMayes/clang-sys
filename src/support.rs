@@ -73,21 +73,34 @@ impl Clang {
 
     /// Returns a `clang` executable if one can be found.
     ///
-    /// If a path is supplied, that is the first directory searched. Otherwise, the directories in
-    /// the system's `PATH` are searched.
+    /// If the `CLANG_PATH` environment variable is set, that is the instance of `clang` used.
+    /// Otherwise, a series of directories are searched. First, If a path is supplied, that is the
+    /// first directory searched. Then, the directory returned by `llvm-config --bindir` is
+    /// searched. On OS X systems, `xcodebuild -find clang` will next be queried. Last, the
+    /// directories in the system's `PATH` are searched.
     pub fn find(path: Option<&Path>) -> Option<Clang> {
+        if let Ok(path) = env::var("CLANG_PATH") {
+            return Some(Clang::new(path.into()));
+        }
+
+        let mut paths = vec![];
+        if let Some(path) = path {
+            paths.push(path.into());
+        }
+        if let Ok(path) = run_llvm_config(&["--bindir"]) {
+            paths.push(path.into());
+        }
+        if cfg!(target_os="macos") {
+            if let Ok((path, _)) = run("xcodebuild", &["-find", "clang"]) {
+                paths.push(path.into());
+            }
+        }
+        paths.extend(env::split_paths(&env::var("PATH").unwrap()));
+
         let default = format!("clang{}", env::consts::EXE_SUFFIX);
         let versioned = format!("clang-[0-9]*{}", env::consts::EXE_SUFFIX);
         let patterns = &[&default[..], &versioned[..]];
-        if cfg!(target_os="macos") {
-            if let Some((path, _)) = run("xcodebuild", &["-find", "clang"]) {
-                return Some(Clang::new(Path::new(path.trim()).into()));
-            }
-        }
-        if let Some(path) = path.and_then(|p| find(p, patterns)) {
-            return Some(Clang::new(path));
-        }
-        for path in env::split_paths(&env::var("PATH").unwrap()) {
+        for path in paths {
             if let Some(path) = find(&path, patterns) {
                 return Some(Clang::new(path));
             }
@@ -113,17 +126,22 @@ fn find(directory: &Path, patterns: &[&str]) -> Option<PathBuf> {
 }
 
 /// Attempts to run an executable, returning the `stdout` and `stderr` output if successful.
-fn run(executable: &str, arguments: &[&str]) -> Option<(String, String)> {
+fn run(executable: &str, arguments: &[&str]) -> Result<(String, String), String> {
     Command::new(executable).args(arguments).output().map(|o| {
         let stdout = String::from_utf8_lossy(&o.stdout).into_owned();
         let stderr = String::from_utf8_lossy(&o.stderr).into_owned();
         (stdout, stderr)
-    }).ok()
+    }).map_err(|_| format!("could not run executable: `{}`", executable))
 }
 
 /// Runs `clang`, returning the `stdout` and `stderr` output.
 fn run_clang(path: &Path, arguments: &[&str]) -> (String, String) {
     run(&path.to_string_lossy().into_owned(), arguments).unwrap()
+}
+
+/// Runs `llvm-config`, returning the `stdout` output if successful.
+fn run_llvm_config(arguments: &[&str]) -> Result<String, String> {
+    run(&env::var("LLVM_CONFIG_PATH").unwrap_or("llvm-config".into()), arguments).map(|(o, _)| o)
 }
 
 /// Parses a version number if possible, ignoring trailing non-digit characters.
