@@ -1,4 +1,4 @@
-## [0.8.1] - UNRELEASED
+## [0.8.1] - 2016-7-20
 
 ### Changed
 - Added `CLANG_PATH` environment variable for providing a path to `clang` executable
