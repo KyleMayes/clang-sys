@@ -54,10 +54,12 @@ build it from source.
 The following environment variables, if set, are used by this crate to find the required libraries
 and executables:
 
-* `LLVM_CONFIG_PATH` - provides a path to an `llvm-config` executable
-* `LIBCLANG_PATH` - provides a path to a directory containing a `libclang` shared library
-* `LIBCLANG_STATIC_PATH` - provides a path to a directory containing LLVM and Clang static libraries
-* `CLANG_PATH` - provides a path to a `clang` executable
+* `LLVM_CONFIG_PATH` **(compile time)** - provides a path to an `llvm-config` executable
+* `LIBCLANG_PATH` **(compile time)** - provides a path to a directory containing a `libclang` shared
+  library
+* `LIBCLANG_STATIC_PATH` **(compile time)** - provides a path to a directory containing LLVM and
+  Clang static libraries
+* `CLANG_PATH` **(run time)** - provides a path to a `clang` executable
 
 ## Linking
 

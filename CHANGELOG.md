@@ -1,7 +1,7 @@
 ## [0.8.1] - UNRELEASED
 
 ### Changed
-- Added `CLANG_PATH` environment variable
+- Added `CLANG_PATH` environment variable for providing a path to `clang` executable
 - Added usage of `llvm-config` to search for `clang`
 - Added usage of `xcodebuild` to search for `clang` on OS X
 
