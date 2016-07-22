@@ -1,3 +1,8 @@
+## [0.9.0] - UNRELEASED
+
+### Added
+- Added documentation bindings
+
 ## [0.8.1] - 2016-7-20
 
 ### Changed
