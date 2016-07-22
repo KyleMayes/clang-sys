@@ -1,4 +1,4 @@
-## [0.9.0] - UNRELEASED
+## [0.9.0] - 2016-7-21
 
 ### Added
 - Added documentation bindings
