@@ -58,7 +58,7 @@ macro_rules! default {
         #[$meta]
         impl Default for $ty {
             fn default() -> $ty {
-                unsafe { mem::uninitialized() }
+                unsafe { mem::zeroed() }
             }
         }
     };
@@ -66,7 +66,7 @@ macro_rules! default {
     ($ty:ty) => {
         impl Default for $ty {
             fn default() -> $ty {
-                unsafe { mem::uninitialized() }
+                unsafe { mem::zeroed() }
             }
         }
     };
