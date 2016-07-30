@@ -1,3 +1,8 @@
+## [0.11.0] - UNRELEASED
+
+### Changed
+- Added `from_raw` method to `CXTypeLayoutError` enum
+
 ## [0.10.0] - 2016-7-21
 
 ### Changed

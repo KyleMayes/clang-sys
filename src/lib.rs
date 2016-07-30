@@ -666,6 +666,20 @@ pub enum CXTypeLayoutError {
     InvalidFieldName = -5,
 }
 
+impl CXTypeLayoutError {
+    //- Constructors -----------------------------
+
+    /// Converts the supplied C value into the `CXTypeLayoutError` value with the same discriminant,
+    /// if such a value exists.
+    pub fn from_raw(raw: c_longlong) -> Option<CXTypeLayoutError> {
+        if raw >= -5 && raw <= -1 {
+            unsafe { mem::transmute(raw) }
+        } else {
+            None
+        }
+    }
+}
+
 #[cfg(feature="gte_clang_3_8")]
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
