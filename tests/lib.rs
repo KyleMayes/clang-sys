@@ -11,7 +11,7 @@ use libc::{c_char};
 fn test() {
     unsafe {
         let index = clang_createIndex(0, 0);
-        assert!(!index.0.is_null());
+        assert!(!index.is_null());
 
         let tu = clang_parseTranslationUnit(
             index,
@@ -22,7 +22,7 @@ fn test() {
             0,
             CXTranslationUnit_Flags::empty(),
         );
-        assert!(!tu.0.is_null());
+        assert!(!tu.is_null());
     }
 }
 
