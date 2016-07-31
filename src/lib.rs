@@ -885,6 +885,7 @@ bitflags! {
 //================================================
 
 // Opaque ________________________________________
+//
 
 macro_rules! opaque {
     ($name:ident) => (
@@ -895,6 +896,14 @@ macro_rules! opaque {
         impl Default for $name {
             fn default() -> $name {
                 $name(ptr::null_mut())
+            }
+        }
+
+        impl std::ops::Deref for $name {
+            type Target = *mut c_void;
+
+            fn deref(&self) -> &Self::Target {
+                &self.0
             }
         }
     );
