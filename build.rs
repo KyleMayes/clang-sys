@@ -37,11 +37,6 @@ fn contains<D: AsRef<Path>>(directory: D, file: &str) -> bool {
     directory.as_ref().join(file).exists()
 }
 
-/// Panics with a user friendly error message.
-fn error(file: &str, env: &str) -> ! {
-    panic!("could not find {0}, set the {1} environment variable to a path where {0} can be found", file, env);
-}
-
 /// Runs a console command, returning the output if the command was successfully executed.
 fn run(command: &str, arguments: &[&str]) -> Option<String> {
     Command::new(command).args(arguments).output().map(|o| {
@@ -82,11 +77,11 @@ const SEARCH_WINDOWS: &'static [&'static str] = &[
 ];
 
 /// Searches for a library, returning the directory it can be found in if the search was successful.
-fn find(file: &str, env: &str) -> Option<PathBuf> {
+fn find(file: &str, env: &str) -> Result<PathBuf, String> {
     // Search the directory provided by the relevant environment variable, if set.
     if let Some(directory) = env::var(env).map(|d| Path::new(&d).to_path_buf()).ok() {
         if contains(&directory, file) {
-            return Some(directory);
+            return Ok(directory);
         }
 
         // On Windows, `libclang.dll` is usually found in the LLVM `bin` directory while
@@ -103,7 +98,7 @@ fn find(file: &str, env: &str) -> Option<PathBuf> {
             if let Some(suffix) = suffix {
                 let alternative = directory.parent().unwrap().join(suffix);
                 if contains(&alternative, file) {
-                    return Some(alternative);
+                    return Ok(alternative);
                 }
             }
         }
@@ -115,11 +110,11 @@ fn find(file: &str, env: &str) -> Option<PathBuf> {
         let directory = Path::new(output.lines().next().unwrap()).to_path_buf();
         let bin = directory.join("bin");
         if contains(&bin, file) {
-            return Some(bin);
+            return Ok(bin);
         }
         let lib = directory.join("lib");
         if contains(&lib, file) {
-            return Some(lib);
+            return Ok(lib);
         }
     }
 
@@ -131,7 +126,7 @@ fn find(file: &str, env: &str) -> Option<PathBuf> {
     } else if cfg!(target_os="windows") {
         SEARCH_WINDOWS
     } else {
-        return None;
+        &[]
     };
     for pattern in search {
         let mut options = MatchOptions::new();
@@ -140,12 +135,17 @@ fn find(file: &str, env: &str) -> Option<PathBuf> {
         if let Ok(paths) = glob::glob_with(pattern, &options) {
             for path in paths.filter_map(Result::ok).filter(|p| p.is_dir()) {
                 if contains(&path, file) {
-                    return Some(path);
+                    return Ok(path);
                 }
             }
         }
     }
-    None
+    let message = format!(
+        "couldn't find '{0}', set the {1} environment variable to a path where '{0}' can be found",
+        file,
+        env,
+    );
+    Err(message)
 }
 
 /// Returns the name of an LLVM or Clang library from a path.
@@ -156,7 +156,7 @@ fn get_library_name(path: &Path) -> Option<String> {
 /// Returns the LLVM libraries required to link to `libclang` statically.
 fn get_llvm_libraries() -> Vec<String> {
     run_llvm_config(&["--libs"]).expect(
-        "could not execute `llvm-config --libs`, set the LLVM_CONFIG_PATH environment variable to \
+        "couldn't execute `llvm-config --libs`, set the LLVM_CONFIG_PATH environment variable to \
          a path to an `llvm-config` executable"
     ).split_whitespace().filter_map(|p| {
         // Depending on the version of `llvm-config` in use, listed libraries may be in one of two
@@ -199,10 +199,7 @@ fn get_clang_libraries<P: AsRef<Path>>(directory: P) -> Vec<String> {
 fn main() {
     if cfg!(feature="static") {
         // Find LLVM and Clang static libraries.
-        let directory = match find("libclang.a", "LIBCLANG_STATIC_PATH") {
-            Some(directory) => directory,
-            _ => error("libclang.a", "LIBCLANG_STATIC_PATH"),
-        };
+        let directory = find("libclang.a", "LIBCLANG_STATIC_PATH").unwrap();
 
         print!("cargo:rustc-flags=");
 
@@ -233,18 +230,12 @@ fn main() {
         };
 
         // Find the `libclang` shared library.
-        let directory = match find(&file, "LIBCLANG_PATH") {
-            Some(directory) => directory,
-            _ => error(&file, "LIBCLANG_PATH")
-        };
+        let directory = find(&file, "LIBCLANG_PATH").unwrap();
 
         println!("cargo:rustc-link-search={}", directory.display());
         if cfg!(all(target_os="windows", target_env="msvc")) {
             // Find the `libclang` stub static library required for the MSVC toolchain.
-            let directory = match find("libclang.lib", "LIBCLANG_PATH") {
-                Some(directory) => directory,
-                _ => error("libclang.lib", "LIBCLANG_PATH"),
-            };
+            let directory = find("libclang.lib", "LIBCLANG_PATH").unwrap();
 
             println!("cargo:rustc-link-search={}", directory.display());
             println!("cargo:rustc-link-lib=dylib=libclang");
