@@ -30,11 +30,19 @@
 
 #[macro_use]
 extern crate bitflags;
+#[cfg(feature="runtime")]
+#[macro_use]
+extern crate lazy_static;
 
 extern crate glob;
 extern crate libc;
+#[cfg(feature="runtime")]
+extern crate libloading;
 
 pub mod support;
+
+#[macro_use]
+mod link;
 
 use std::mem;
 use std::ptr;
@@ -117,6 +125,41 @@ pub enum CXChildVisitResult {
     Break = 0,
     Continue = 1,
     Recurse = 2,
+}
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[repr(C)]
+pub enum CXCommentInlineCommandRenderKind {
+    Normal = 0,
+    Bold = 1,
+    Monospaced = 2,
+    Emphasized = 3,
+}
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[repr(C)]
+pub enum CXCommentKind {
+    Null = 0,
+    Text = 1,
+    InlineCommand = 2,
+    HTMLStartTag = 3,
+    HTMLEndTag = 4,
+    Paragraph = 5,
+    BlockCommand = 6,
+    ParamCommand = 7,
+    TParamCommand = 8,
+    VerbatimBlockCommand = 9,
+    VerbatimBlockLine = 10,
+    VerbatimLine = 11,
+    FullComment = 12,
+}
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[repr(C)]
+pub enum CXCommentParamPassDirection {
+    In = 0,
+    Out = 1,
+    InOut = 2,
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -885,7 +928,6 @@ bitflags! {
 //================================================
 
 // Opaque ________________________________________
-//
 
 macro_rules! opaque {
     ($name:ident) => (
@@ -939,6 +981,15 @@ pub struct CXCodeCompleteResults {
 }
 
 default!(CXCodeCompleteResults);
+
+#[derive(Copy, Clone, Debug)]
+#[repr(C)]
+pub struct CXComment {
+    pub ASTNode: *const c_void,
+    pub TranslationUnit: CXTranslationUnit,
+}
+
+default!(CXComment);
 
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
@@ -1302,7 +1353,7 @@ default!(IndexerCallbacks);
 // Functions
 //================================================
 
-extern {
+link! {
     pub fn clang_CXCursorSet_contains(set: CXCursorSet, cursor: CXCursor) -> c_uint;
     pub fn clang_CXCursorSet_insert(set: CXCursorSet, cursor: CXCursor) -> c_uint;
     pub fn clang_CXIndex_getGlobalOptions(index: CXIndex) -> CXGlobalOptFlags;
@@ -1331,10 +1382,11 @@ extern {
     pub fn clang_CompileCommand_getDirectory(command: CXCompileCommand) -> CXString;
     #[cfg(feature="gte_clang_3_8")]
     pub fn clang_CompileCommand_getFilename(command: CXCompileCommand) -> CXString;
+    #[cfg(feature="gte_clang_3_8")]
     pub fn clang_CompileCommand_getMappedSourceContent(command: CXCompileCommand, index: c_uint) -> CXString;
+    #[cfg(feature="gte_clang_3_8")]
     pub fn clang_CompileCommand_getMappedSourcePath(command: CXCompileCommand, index: c_uint) -> CXString;
     pub fn clang_CompileCommand_getNumArgs(command: CXCompileCommand) -> c_uint;
-    pub fn clang_CompileCommand_getNumMappedSources(command: CXCompileCommand) -> c_uint;
     pub fn clang_CompileCommands_dispose(command: CXCompileCommands);
     pub fn clang_CompileCommands_getCommand(command: CXCompileCommands, index: c_uint) -> CXCompileCommand;
     pub fn clang_CompileCommands_getSize(command: CXCompileCommands) -> c_uint;
@@ -1467,8 +1519,9 @@ extern {
     pub fn clang_equalTypes(left: CXType, right: CXType) -> c_uint;
     pub fn clang_executeOnThread(function: extern fn(*mut c_void), data: *mut c_void, stack: c_uint);
     pub fn clang_findIncludesInFile(tu: CXTranslationUnit, file: CXFile, cursor: CXCursorAndRangeVisitor) -> CXResult;
-    pub fn clang_findReferencesInFile(cursor: CXCursor, file: CXFile, cursor: CXCursorAndRangeVisitor) -> CXResult;
+    pub fn clang_findReferencesInFile(cursor: CXCursor, file: CXFile, visitor: CXCursorAndRangeVisitor) -> CXResult;
     pub fn clang_formatDiagnostic(diagnostic: CXDiagnostic, flags: CXDiagnosticDisplayOptions) -> CXString;
+    #[cfg(feature="gte_clang_3_7")]
     pub fn clang_free(buffer: *mut c_void);
     pub fn clang_getArgType(type_: CXType, index: c_uint) -> CXType;
     pub fn clang_getArrayElementType(type_: CXType) -> CXType;
@@ -1630,7 +1683,40 @@ extern {
     pub fn clang_toggleCrashRecovery(recovery: c_uint);
     pub fn clang_tokenize(tu: CXTranslationUnit, range: CXSourceRange, tokens: *mut *mut CXToken, n_tokens: *mut c_uint);
     pub fn clang_visitChildren(cursor: CXCursor, visitor: CXCursorVisitor, data: CXClientData) -> c_uint;
-}
 
-mod documentation;
-pub use documentation::*;
+    // Documentation
+    pub fn clang_BlockCommandComment_getArgText(comment: CXComment, index: c_uint) -> CXString;
+    pub fn clang_BlockCommandComment_getCommandName(comment: CXComment) -> CXString;
+    pub fn clang_BlockCommandComment_getNumArgs(comment: CXComment) -> c_uint;
+    pub fn clang_BlockCommandComment_getParagraph(comment: CXComment) -> CXComment;
+    pub fn clang_Comment_getChild(comment: CXComment, index: c_uint) -> CXComment;
+    pub fn clang_Comment_getKind(comment: CXComment) -> CXCommentKind;
+    pub fn clang_Comment_getNumChildren(comment: CXComment) -> c_uint;
+    pub fn clang_Comment_isWhitespace(comment: CXComment) -> c_uint;
+    pub fn clang_Cursor_getParsedComment(C: CXCursor) -> CXComment;
+    pub fn clang_FullComment_getAsHTML(comment: CXComment) -> CXString;
+    pub fn clang_FullComment_getAsXML(comment: CXComment) -> CXString;
+    pub fn clang_HTMLStartTagComment_isSelfClosing(comment: CXComment) -> c_uint;
+    pub fn clang_HTMLStartTag_getAttrName(comment: CXComment, index: c_uint) -> CXString;
+    pub fn clang_HTMLStartTag_getAttrValue(comment: CXComment, index: c_uint) -> CXString;
+    pub fn clang_HTMLStartTag_getNumAttrs(comment: CXComment) -> c_uint;
+    pub fn clang_HTMLTagComment_getAsString(comment: CXComment) -> CXString;
+    pub fn clang_HTMLTagComment_getTagName(comment: CXComment) -> CXString;
+    pub fn clang_InlineCommandComment_getArgText(comment: CXComment, index: c_uint) -> CXString;
+    pub fn clang_InlineCommandComment_getCommandName(comment: CXComment) -> CXString;
+    pub fn clang_InlineCommandComment_getNumArgs(comment: CXComment) -> c_uint;
+    pub fn clang_InlineCommandComment_getRenderKind(comment: CXComment) -> CXCommentInlineCommandRenderKind;
+    pub fn clang_InlineContentComment_hasTrailingNewline(comment: CXComment) -> c_uint;
+    pub fn clang_ParamCommandComment_getDirection(comment: CXComment) -> CXCommentParamPassDirection;
+    pub fn clang_ParamCommandComment_getParamIndex(comment: CXComment) -> c_uint;
+    pub fn clang_ParamCommandComment_getParamName(comment: CXComment) -> CXString;
+    pub fn clang_ParamCommandComment_isDirectionExplicit(comment: CXComment) -> c_uint;
+    pub fn clang_ParamCommandComment_isParamIndexValid(comment: CXComment) -> c_uint;
+    pub fn clang_TParamCommandComment_getDepth(comment: CXComment) -> c_uint;
+    pub fn clang_TParamCommandComment_getIndex(comment: CXComment, depth: c_uint) -> c_uint;
+    pub fn clang_TParamCommandComment_getParamName(comment: CXComment) -> CXString;
+    pub fn clang_TParamCommandComment_isParamPositionValid(comment: CXComment) -> c_uint;
+    pub fn clang_TextComment_getText(comment: CXComment) -> CXString;
+    pub fn clang_VerbatimBlockLineComment_getText(comment: CXComment) -> CXString;
+    pub fn clang_VerbatimLineComment_getText(comment: CXComment) -> CXString;
+}

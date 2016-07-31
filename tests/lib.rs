@@ -7,8 +7,7 @@ use clang_sys::*;
 
 use libc::{c_char};
 
-#[test]
-fn test() {
+fn parse() {
     unsafe {
         let index = clang_createIndex(0, 0);
         assert!(!index.is_null());
@@ -24,6 +23,20 @@ fn test() {
         );
         assert!(!tu.is_null());
     }
+}
+
+#[cfg(feature="runtime")]
+#[test]
+fn test() {
+    load().unwrap();
+    parse();
+    unload().unwrap();
+}
+
+#[cfg(not(feature="runtime"))]
+#[test]
+fn test() {
+    parse();
 }
 
 #[test]

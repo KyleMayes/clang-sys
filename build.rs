@@ -148,6 +148,19 @@ fn find(file: &str, env: &str) -> Result<PathBuf, String> {
     Err(message)
 }
 
+/// Searches for a `libclang` shared library, returning the name of the shared library and the
+/// directory it can be found in if the search was successful.
+pub fn find_shared_library() -> Result<(PathBuf, String), String> {
+    let file = if cfg!(target_os="windows") {
+        // The filename of the `libclang` shared library on Windows is `libclang.dll` instead of
+        // the expected `clang.dll`.
+        "libclang.dll".into()
+    } else {
+        format!("{}clang{}", env::consts::DLL_PREFIX, env::consts::DLL_SUFFIX)
+    };
+    find(&file, "LIBCLANG_PATH").map(|d| (d, file))
+}
+
 /// Returns the name of an LLVM or Clang library from a path.
 fn get_library_name(path: &Path) -> Option<String> {
     path.file_stem().map(|l| l.to_string_lossy()[3..].into())
@@ -197,10 +210,15 @@ fn get_clang_libraries<P: AsRef<Path>>(directory: P) -> Vec<String> {
 }
 
 fn main() {
-    if cfg!(feature="static") {
-        // Find LLVM and Clang static libraries.
-        let directory = find("libclang.a", "LIBCLANG_STATIC_PATH").unwrap();
+    if cfg!(feature="runtime") {
+        if cfg!(feature="static") {
+            panic!("`runtime` and `static` features can't be combined");
+        }
+        return;
+    }
 
+    if cfg!(feature="static") {
+        let directory = find("libclang.a", "LIBCLANG_STATIC_PATH").unwrap();
         print!("cargo:rustc-flags=");
 
         // Specify required LLVM and Clang static libraries.
@@ -221,22 +239,11 @@ fn main() {
             panic!("unsupported operating system for static linking");
         }
     } else {
-        let file = if cfg!(target_os="windows") {
-            // The filename of the `libclang` shared library on Windows is `libclang.dll` instead of
-            // the expected `clang.dll`.
-            "libclang.dll".into()
-        } else {
-            format!("{}clang{}", env::consts::DLL_PREFIX, env::consts::DLL_SUFFIX)
-        };
-
-        // Find the `libclang` shared library.
-        let directory = find(&file, "LIBCLANG_PATH").unwrap();
-
+        let (directory, _) = find_shared_library().unwrap();
         println!("cargo:rustc-link-search={}", directory.display());
         if cfg!(all(target_os="windows", target_env="msvc")) {
             // Find the `libclang` stub static library required for the MSVC toolchain.
             let directory = find("libclang.lib", "LIBCLANG_PATH").unwrap();
-
             println!("cargo:rustc-link-search={}", directory.display());
             println!("cargo:rustc-link-lib=dylib=libclang");
         } else {

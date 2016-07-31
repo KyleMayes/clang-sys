@@ -36,7 +36,9 @@ default.
 By default, this crate will attempt to link to `libclang` dynamically. In this case, this crate
 depends on the `libclang` shared library (`libclang.so` on Linux, `libclang.dylib` on OS X,
 `libclang.dll` on Windows). If you want to link to `libclang` statically instead, enable the
-`static` Cargo feature. In this case, this crate depends on the LLVM and Clang static libraries.
+`static` Cargo feature. In this case, this crate depends on the LLVM and Clang static libraries. If
+you don't want to link to `libclang` at compiletime but instead want to load it at runtime, enable
+the `runtime` Cargo feature.
 
 These libraries can be either be installed as a part of Clang or downloaded
 [here](http://llvm.org/releases/download.html).
@@ -85,3 +87,10 @@ this executable can be found on your system's path or set the `LLVM_CONFIG_PATH`
 variable. The required LLVM and Clang static libraries will be searched for in the same way as the
 shared library is searched for, except the `LIBCLANG_STATIC_PATH` environment variable is used in
 place of the `LIBCLANG_PATH` environment variable.
+
+### Runtime
+
+The `clang_sys::load` function is used to load a `libclang` shared library for use in the thread in
+which it is called. The `clang_sys::unload` function will unload the `libclang` shared library.
+`clang_sys::load` searches for a `libclang` shared library in the same way one is searched for when
+linking to `libclang` dynamically at compiletime.
