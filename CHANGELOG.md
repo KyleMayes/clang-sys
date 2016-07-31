@@ -2,6 +2,7 @@
 
 ### Changed
 - Added `from_raw` method to `CXTypeLayoutError` enum
+- Added implementations of `Deref` for opaque FFI structs
 
 ## [0.10.0] - 2016-7-21
 
