@@ -1,13 +1,9 @@
-## [0.11.0] - UNRELEASED
+## [0.10.0] - UNRELEASED
 
 ### Changed
 - Added `runtime` Cargo feature that links to `libclang` shared library at runtime
 - Added `from_raw` method to `CXTypeLayoutError` enum
 - Added implementations of `Deref` for opaque FFI structs
-
-## [0.10.0] - 2016-7-21
-
-### Changed
 - Changed `Default` implementations for structs to zero out the struct
 
 ## [0.9.0] - 2016-7-21
