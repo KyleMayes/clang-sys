@@ -1,4 +1,4 @@
-## [0.10.1] - UNRELEASED
+## [0.10.1] - 2016-08-21
 
 ### Changed
 - Changed static linking on FreeBSD and OS X to link against `libc++` instead of `libstd++`
