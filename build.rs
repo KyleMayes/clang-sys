@@ -231,11 +231,11 @@ fn main() {
         }
 
         // Specify required system libraries.
-        if(cfg!(target_os="linux")) {
+        if cfg!(target_os="linux") {
             println!("-l ffi -l ncursesw -l stdc++ -l z");
-        } else if (cfg!(target_os="freebsd")) {
+        } else if cfg!(target_os="freebsd") {
             println!("-l ffi -l ncursesw -l c++ -l z");
-        } else if (cfg!(target_os="macos")) {
+        } else if cfg!(target_os="macos") {
             println!("-l ffi -l ncurses -l c++ -l z");
         } else {
             panic!("unsupported operating system for static linking");
