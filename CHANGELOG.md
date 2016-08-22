@@ -1,4 +1,9 @@
-## [0.10.0] - 2016-8-1
+## [0.10.1] - UNRELEASED
+
+### Changed
+- Changed static linking on FreeBSD and OS X to link against `libc++` instead of `libstd++`
+
+## [0.10.0] - 2016-08-01
 
 ### Changed
 - Added `runtime` Cargo feature that links to `libclang` shared library at runtime
@@ -6,19 +11,19 @@
 - Added implementations of `Deref` for opaque FFI structs
 - Changed `Default` implementations for structs to zero out the struct
 
-## [0.9.0] - 2016-7-21
+## [0.9.0] - 2016-07-21
 
 ### Added
 - Added documentation bindings
 
-## [0.8.1] - 2016-7-20
+## [0.8.1] - 2016-07-20
 
 ### Changed
 - Added `CLANG_PATH` environment variable for providing a path to `clang` executable
 - Added usage of `llvm-config` to search for `clang`
 - Added usage of `xcodebuild` to search for `clang` on OS X
 
-## [0.8.0] - 2016-7-18
+## [0.8.0] - 2016-07-18
 
 ### Added
 - Added support for `clang` 3.9.x
@@ -32,13 +37,13 @@
 - Fixed search path parsing on Windows
 - Fixed default search path ordering on OS X
 
-## [0.7.2] - 2016-6-17
+## [0.7.2] - 2016-06-17
 
 ### Fixed
 - Fixed finding of `clang` executables when system has executables matching `clang-*`
   (e.g., `clang-format`)
 
-## [0.7.1] - 2016-6-10
+## [0.7.1] - 2016-06-10
 
 ### Changed
 - Bumped `libc` version to `0.2.12`
@@ -46,12 +51,12 @@
 ### Fixed
 - Fixed finding of `clang` executables suffixed by their version (e.g., `clang-3.5`)
 
-## [0.7.0] - 2016-5-31
+## [0.7.0] - 2016-05-31
 
 ### Changed
 - Changed `Clang` struct `version` field type to `Option<CXVersion>`
 
-## [0.6.0] - 2016-5-26
+## [0.6.0] - 2016-05-26
 
 ### Added
 - Added `support` module
@@ -61,28 +66,28 @@
 - Fixed `libclang` linking on Windows with the MSVC toolchain
 - Improved `libclang` static linking
 
-## [0.5.4] - 2016-5-19
+## [0.5.4] - 20160-5-19
 
 ### Changed
 - Added implementations of `Default` for FFI structs
 
-## [0.5.3] - 2016-5-17
+## [0.5.3] - 2016-05-17
 
 ### Changed
 - Bumped `bitflags` version to `0.7.0`
 
-## [0.5.2] - 2016-5-12
+## [0.5.2] - 2016-05-12
 
 ### Fixed
 - Fixed `libclang` static linking
 
-## [0.5.1] - 2016-5-10
+## [0.5.1] - 2016-05-10
 
 ### Fixed
 - Fixed `libclang` linking on OS X
 - Fixed `libclang` linking on Windows
 
-## [0.5.0] - 2016-5-10
+## [0.5.0] - 2016-05-10
 
 ### Removed
 - Removed `rustc_version` dependency
@@ -94,28 +99,28 @@
 - Improved `libclang` search path
 - Improved `libclang` static linking
 
-## [0.4.2] - 2016-4-20
+## [0.4.2] - 2016-04-20
 
 ### Changed
 - Bumped `libc` version to `0.2.10`
 
-## [0.4.1] - 2016-4-2
+## [0.4.1] - 2016-04-02
 
 ### Changed
 - Bumped `libc` version to `0.2.9`
 - Bumped `rustc_version` version to `0.1.7`
 
-## [0.4.0] - 2016-3-28
+## [0.4.0] - 2016-03-28
 
 ### Removed
 - Removed support for `clang` 3.4.x
 
-## [0.3.1] - 2016-3-21
+## [0.3.1] - 2016-03-21
 
 ### Added
 - Added support for finding `libclang`
 
-## [0.3.0] - 2016-3-16
+## [0.3.0] - 2016-03-16
 
 ### Removed
 - Removed build system types and functions
@@ -127,7 +132,7 @@
 - Bumped `bitflags` version to `0.5.0`
 - Bumped `libc` version to `0.2.8`
 
-## [0.2.1] - 2016-2-13
+## [0.2.1] - 2016-02-13
 
 ### Changed
 - Simplified internal usage of conditional compilation
@@ -135,7 +140,7 @@
 - Bumped `libc` version to `0.2.7`
 - Bumped `rustc_version` version to `0.1.6`
 
-## [0.2.0] - 2016-2-12
+## [0.2.0] - 2016-02-12
 
 ### Added
 - Added support for `clang` 3.8.x
