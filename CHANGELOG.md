@@ -1,3 +1,9 @@
+## [0.11.0] - UNRELEASED
+
+### Changed
+- Changed all enums from Rust enums to typed constants to avoid
+  [undefined behavior](https://github.com/KyleMayes/clang-sys/issues/42)
+
 ## [0.10.1] - 2016-08-21
 
 ### Changed

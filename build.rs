@@ -79,7 +79,7 @@ const SEARCH_WINDOWS: &'static [&'static str] = &[
 /// Searches for a library, returning the directory it can be found in if the search was successful.
 fn find(file: &str, env: &str) -> Result<PathBuf, String> {
     // Search the directory provided by the relevant environment variable, if set.
-    if let Some(directory) = env::var(env).map(|d| Path::new(&d).to_path_buf()).ok() {
+    if let Ok(directory) = env::var(env).map(|d| Path::new(&d).to_path_buf()) {
         if contains(&directory, file) {
             return Ok(directory);
         }

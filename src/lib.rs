@@ -59,8 +59,41 @@ pub type CXInclusionVisitor = extern fn(CXFile, *mut CXSourceLocation, c_uint, C
 // Macros
 //================================================
 
+// cenum! ________________________________________
+
+/// Defines a type-safe C enum as a series of constants.
+macro_rules! cenum {
+    ($(#[$meta:meta])* enum $name:ident {
+        $($(#[$vmeta:meta])* const $variant:ident = $value:expr), +,
+    }) => (
+        #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+        #[repr(C)]
+        pub struct $name(c_int);
+
+        impl $name {
+            //- Constructors ---------------------
+
+            /// Constructs an instance of this C enum from the supplied discriminant if possible.
+            pub fn from_raw(discriminant: c_int) -> Option<$name> {
+                $(if discriminant == $value { return Some($variant); })+
+                None
+            }
+
+            //- Accessors ------------------------
+
+            /// Returns the discriminant for this C enum.
+            pub fn to_raw(self) -> c_int {
+                self.0
+            }
+        }
+
+        $($(#[$vmeta])* pub const $variant: $name = $name($value);)+
+    );
+}
+
 // default! ______________________________________
 
+/// Implements a zeroing implementation of `Default` for the supplied type.
 macro_rules! default {
     (#[$meta:meta] $ty:ty) => {
         #[$meta]
@@ -84,683 +117,668 @@ macro_rules! default {
 // Enums
 //================================================
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXAvailabilityKind {
-    Available = 0,
-    Deprecated = 1,
-    NotAvailable = 2,
-    NotAccessible = 3,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXCallingConv {
-    Default = 0,
-    C = 1,
-    X86StdCall = 2,
-    X86FastCall = 3,
-    X86ThisCall = 4,
-    X86Pascal = 5,
-    AAPCS = 6,
-    AAPCS_VFP = 7,
-    IntelOclBicc = 9,
-    X86_64Win64 = 10,
-    X86_64SysV = 11,
-    #[cfg(feature="gte_clang_3_6")]
-    X86VectorCall = 12,
-    #[cfg(feature="gte_clang_3_9")]
-    Swift = 13,
-    #[cfg(feature="gte_clang_3_9")]
-    PreserveMost = 14,
-    #[cfg(feature="gte_clang_3_9")]
-    PreserveAll = 15,
-    Invalid = 100,
-    Unexposed = 200,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXChildVisitResult {
-    Break = 0,
-    Continue = 1,
-    Recurse = 2,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXCommentInlineCommandRenderKind {
-    Normal = 0,
-    Bold = 1,
-    Monospaced = 2,
-    Emphasized = 3,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXCommentKind {
-    Null = 0,
-    Text = 1,
-    InlineCommand = 2,
-    HTMLStartTag = 3,
-    HTMLEndTag = 4,
-    Paragraph = 5,
-    BlockCommand = 6,
-    ParamCommand = 7,
-    TParamCommand = 8,
-    VerbatimBlockCommand = 9,
-    VerbatimBlockLine = 10,
-    VerbatimLine = 11,
-    FullComment = 12,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXCommentParamPassDirection {
-    In = 0,
-    Out = 1,
-    InOut = 2,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXCompilationDatabase_Error {
-    NoError = 0,
-    CanNotLoadDatabase = 1,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXCompletionChunkKind {
-    Optional = 0,
-    TypedText = 1,
-    Text = 2,
-    Placeholder = 3,
-    Informative = 4,
-    CurrentParameter = 5,
-    LeftParen = 6,
-    RightParen = 7,
-    LeftBracket = 8,
-    RightBracket = 9,
-    LeftBrace = 10,
-    RightBrace = 11,
-    LeftAngle = 12,
-    RightAngle = 13,
-    Comma = 14,
-    ResultType = 15,
-    Colon = 16,
-    SemiColon = 17,
-    Equal = 18,
-    HorizontalSpace = 19,
-    VerticalSpace = 20,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXCursorKind {
-    UnexposedDecl = 1,
-    StructDecl = 2,
-    UnionDecl = 3,
-    ClassDecl = 4,
-    EnumDecl = 5,
-    FieldDecl = 6,
-    EnumConstantDecl = 7,
-    FunctionDecl = 8,
-    VarDecl = 9,
-    ParmDecl = 10,
-    ObjCInterfaceDecl = 11,
-    ObjCCategoryDecl = 12,
-    ObjCProtocolDecl = 13,
-    ObjCPropertyDecl = 14,
-    ObjCIvarDecl = 15,
-    ObjCInstanceMethodDecl = 16,
-    ObjCClassMethodDecl = 17,
-    ObjCImplementationDecl = 18,
-    ObjCCategoryImplDecl = 19,
-    TypedefDecl = 20,
-    CXXMethod = 21,
-    Namespace = 22,
-    LinkageSpec = 23,
-    Constructor = 24,
-    Destructor = 25,
-    ConversionFunction = 26,
-    TemplateTypeParameter = 27,
-    NonTypeTemplateParameter = 28,
-    TemplateTemplateParameter = 29,
-    FunctionTemplate = 30,
-    ClassTemplate = 31,
-    ClassTemplatePartialSpecialization = 32,
-    NamespaceAlias = 33,
-    UsingDirective = 34,
-    UsingDeclaration = 35,
-    TypeAliasDecl = 36,
-    ObjCSynthesizeDecl = 37,
-    ObjCDynamicDecl = 38,
-    CXXAccessSpecifier = 39,
-    ObjCSuperClassRef = 40,
-    ObjCProtocolRef = 41,
-    ObjCClassRef = 42,
-    TypeRef = 43,
-    CXXBaseSpecifier = 44,
-    TemplateRef = 45,
-    NamespaceRef = 46,
-    MemberRef = 47,
-    LabelRef = 48,
-    OverloadedDeclRef = 49,
-    VariableRef = 50,
-    InvalidFile = 70,
-    NoDeclFound = 71,
-    NotImplemented = 72,
-    InvalidCode = 73,
-    UnexposedExpr = 100,
-    DeclRefExpr = 101,
-    MemberRefExpr = 102,
-    CallExpr = 103,
-    ObjCMessageExpr = 104,
-    BlockExpr = 105,
-    IntegerLiteral = 106,
-    FloatingLiteral = 107,
-    ImaginaryLiteral = 108,
-    StringLiteral = 109,
-    CharacterLiteral = 110,
-    ParenExpr = 111,
-    UnaryOperator = 112,
-    ArraySubscriptExpr = 113,
-    BinaryOperator = 114,
-    CompoundAssignOperator = 115,
-    ConditionalOperator = 116,
-    CStyleCastExpr = 117,
-    CompoundLiteralExpr = 118,
-    InitListExpr = 119,
-    AddrLabelExpr = 120,
-    StmtExpr = 121,
-    GenericSelectionExpr = 122,
-    GNUNullExpr = 123,
-    CXXStaticCastExpr = 124,
-    CXXDynamicCastExpr = 125,
-    CXXReinterpretCastExpr = 126,
-    CXXConstCastExpr = 127,
-    CXXFunctionalCastExpr = 128,
-    CXXTypeidExpr = 129,
-    CXXBoolLiteralExpr = 130,
-    CXXNullPtrLiteralExpr = 131,
-    CXXThisExpr = 132,
-    CXXThrowExpr = 133,
-    CXXNewExpr = 134,
-    CXXDeleteExpr = 135,
-    UnaryExpr = 136,
-    ObjCStringLiteral = 137,
-    ObjCEncodeExpr = 138,
-    ObjCSelectorExpr = 139,
-    ObjCProtocolExpr = 140,
-    ObjCBridgedCastExpr = 141,
-    PackExpansionExpr = 142,
-    SizeOfPackExpr = 143,
-    LambdaExpr = 144,
-    ObjCBoolLiteralExpr = 145,
-    ObjCSelfExpr = 146,
-    #[cfg(feature="gte_clang_3_8")]
-    OMPArraySectionExpr = 147,
-    #[cfg(feature="gte_clang_3_9")]
-    ObjCAvailabilityCheckExpr = 148,
-    UnexposedStmt = 200,
-    LabelStmt = 201,
-    CompoundStmt = 202,
-    CaseStmt = 203,
-    DefaultStmt = 204,
-    IfStmt = 205,
-    SwitchStmt = 206,
-    WhileStmt = 207,
-    DoStmt = 208,
-    ForStmt = 209,
-    GotoStmt = 210,
-    IndirectGotoStmt = 211,
-    ContinueStmt = 212,
-    BreakStmt = 213,
-    ReturnStmt = 214,
-    /// Duplicate of `GccAsmStmt`.
-    AsmStmt = 215,
-    ObjCAtTryStmt = 216,
-    ObjCAtCatchStmt = 217,
-    ObjCAtFinallyStmt = 218,
-    ObjCAtThrowStmt = 219,
-    ObjCAtSynchronizedStmt = 220,
-    ObjCAutoreleasePoolStmt = 221,
-    ObjCForCollectionStmt = 222,
-    CXXCatchStmt = 223,
-    CXXTryStmt = 224,
-    CXXForRangeStmt = 225,
-    SEHTryStmt = 226,
-    SEHExceptStmt = 227,
-    SEHFinallyStmt = 228,
-    MSAsmStmt = 229,
-    NullStmt = 230,
-    DeclStmt = 231,
-    OMPParallelDirective = 232,
-    OMPSimdDirective = 233,
-    OMPForDirective = 234,
-    OMPSectionsDirective = 235,
-    OMPSectionDirective = 236,
-    OMPSingleDirective = 237,
-    OMPParallelForDirective = 238,
-    OMPParallelSectionsDirective = 239,
-    OMPTaskDirective = 240,
-    OMPMasterDirective = 241,
-    OMPCriticalDirective = 242,
-    OMPTaskyieldDirective = 243,
-    OMPBarrierDirective = 244,
-    OMPTaskwaitDirective = 245,
-    OMPFlushDirective = 246,
-    SEHLeaveStmt = 247,
-    #[cfg(feature="gte_clang_3_6")]
-    OMPOrderedDirective = 248,
-    #[cfg(feature="gte_clang_3_6")]
-    OMPAtomicDirective = 249,
-    #[cfg(feature="gte_clang_3_6")]
-    OMPForSimdDirective = 250,
-    #[cfg(feature="gte_clang_3_6")]
-    OMPParallelForSimdDirective = 251,
-    #[cfg(feature="gte_clang_3_6")]
-    OMPTargetDirective = 252,
-    #[cfg(feature="gte_clang_3_6")]
-    OMPTeamsDirective = 253,
-    #[cfg(feature="gte_clang_3_7")]
-    OMPTaskgroupDirective = 254,
-    #[cfg(feature="gte_clang_3_7")]
-    OMPCancellationPointDirective = 255,
-    #[cfg(feature="gte_clang_3_7")]
-    OMPCancelDirective = 256,
-    #[cfg(feature="gte_clang_3_8")]
-    OMPTargetDataDirective = 257,
-    #[cfg(feature="gte_clang_3_8")]
-    OMPTaskLoopDirective = 258,
-    #[cfg(feature="gte_clang_3_8")]
-    OMPTaskLoopSimdDirective = 259,
-    #[cfg(feature="gte_clang_3_8")]
-    OMPDistributeDirective = 260,
-    #[cfg(feature="gte_clang_3_9")]
-    OMPTargetEnterDataDirective = 261,
-    #[cfg(feature="gte_clang_3_9")]
-    OMPTargetExitDataDirective = 262,
-    #[cfg(feature="gte_clang_3_9")]
-    OMPTargetParallelDirective = 263,
-    #[cfg(feature="gte_clang_3_9")]
-    OMPTargetParallelForDirective = 264,
-    #[cfg(feature="gte_clang_3_9")]
-    OMPTargetUpdateDirective = 265,
-    #[cfg(feature="gte_clang_3_9")]
-    OMPDistributeParallelForDirective = 266,
-    #[cfg(feature="gte_clang_3_9")]
-    OMPDistributeParallelForSimdDirective = 267,
-    #[cfg(feature="gte_clang_3_9")]
-    OMPDistributeSimdDirective = 268,
-    #[cfg(feature="gte_clang_3_9")]
-    OMPTargetParallelForSimdDirective = 269,
-    TranslationUnit = 300,
-    UnexposedAttr = 400,
-    IBActionAttr = 401,
-    IBOutletAttr = 402,
-    IBOutletCollectionAttr = 403,
-    CXXFinalAttr = 404,
-    CXXOverrideAttr = 405,
-    AnnotateAttr = 406,
-    AsmLabelAttr = 407,
-    PackedAttr = 408,
-    PureAttr = 409,
-    ConstAttr = 410,
-    NoDuplicateAttr = 411,
-    CUDAConstantAttr = 412,
-    CUDADeviceAttr = 413,
-    CUDAGlobalAttr = 414,
-    CUDAHostAttr = 415,
-    #[cfg(feature="gte_clang_3_6")]
-    CUDASharedAttr = 416,
-    #[cfg(feature="gte_clang_3_8")]
-    VisibilityAttr = 417,
-    #[cfg(feature="gte_clang_3_8")]
-    DLLExport = 418,
-    #[cfg(feature="gte_clang_3_8")]
-    DLLImport = 419,
-    PreprocessingDirective = 500,
-    MacroDefinition = 501,
-    /// Duplicate of `MacroInstantiation`.
-    MacroExpansion = 502,
-    InclusionDirective = 503,
-    ModuleImportDecl = 600,
-    #[cfg(feature="gte_clang_3_8")]
-    TypeAliasTemplateDecl = 601,
-    #[cfg(feature="gte_clang_3_9")]
-    StaticAssert = 602,
-    #[cfg(feature="gte_clang_3_7")]
-    OverloadCandidate = 700,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXDiagnosticSeverity {
-    Ignored = 0,
-    Note = 1,
-    Warning = 2,
-    Error = 3,
-    Fatal = 4,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXErrorCode {
-    Success = 0,
-    Failure = 1,
-    Crashed = 2,
-    InvalidArguments = 3,
-    ASTReadError = 4,
-}
-
-#[cfg(feature="gte_clang_3_9")]
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXEvalResultKind {
-    UnExposed = 0,
-    Int = 1 ,
-    Float = 2,
-    ObjCStrLiteral = 3,
-    StrLiteral = 4,
-    CFStr = 5,
-    Other = 6,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXIdxAttrKind {
-    Unexposed = 0,
-    IBAction = 1,
-    IBOutlet = 2,
-    IBOutletCollection = 3,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXIdxEntityCXXTemplateKind {
-    NonTemplate = 0,
-    Template = 1,
-    TemplatePartialSpecialization = 2,
-    TemplateSpecialization = 3,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXIdxEntityKind {
-    Unexposed = 0,
-    Typedef = 1,
-    Function = 2,
-    Variable = 3,
-    Field = 4,
-    EnumConstant = 5,
-    ObjCClass = 6,
-    ObjCProtocol = 7,
-    ObjCCategory = 8,
-    ObjCInstanceMethod = 9,
-    ObjCClassMethod = 10,
-    ObjCProperty = 11,
-    ObjCIvar = 12,
-    Enum = 13,
-    Struct = 14,
-    Union = 15,
-    CXXClass = 16,
-    CXXNamespace = 17,
-    CXXNamespaceAlias = 18,
-    CXXStaticVariable = 19,
-    CXXStaticMethod = 20,
-    CXXInstanceMethod = 21,
-    CXXConstructor = 22,
-    CXXDestructor = 23,
-    CXXConversionFunction = 24,
-    CXXTypeAlias = 25,
-    CXXInterface = 26,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXIdxEntityLanguage {
-    None = 0,
-    C = 1,
-    ObjC = 2,
-    CXX = 3,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXIdxEntityRefKind {
-    Direct = 1,
-    Implicit = 2,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXIdxObjCContainerKind {
-    ForwardRef = 0,
-    Interface = 1,
-    Implementation = 2,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXLanguageKind {
-    Invalid = 0,
-    C = 1,
-    ObjC = 2,
-    CPlusPlus = 3,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXLinkageKind {
-    Invalid = 0,
-    NoLinkage = 1,
-    Internal = 2,
-    UniqueExternal = 3,
-    External = 4,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXLoadDiag_Error {
-    None = 0,
-    Unknown = 1,
-    CannotLoad = 2,
-    InvalidFile = 3,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXRefQualifierKind {
-    None = 0,
-    LValue = 1,
-    RValue = 2,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXResult {
-    Success = 0,
-    Invalid = 1,
-    VisitBreak = 2,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXSaveError {
-    None = 0,
-    Unknown = 1,
-    TranslationErrors = 2,
-    InvalidTU = 3,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXTUResourceUsageKind {
-    AST = 1,
-    Identifiers = 2,
-    Selectors = 3,
-    GlobalCompletionResults = 4,
-    SourceManagerContentCache = 5,
-    AST_SideTables = 6,
-    SourceManager_Membuffer_Malloc = 7,
-    SourceManager_Membuffer_MMap = 8,
-    ExternalASTSource_Membuffer_Malloc = 9,
-    ExternalASTSource_Membuffer_MMap = 10,
-    Preprocessor = 11,
-    PreprocessingRecord = 12,
-    SourceManager_DataStructures = 13,
-    Preprocessor_HeaderSearch = 14,
-}
-
-#[cfg(feature="gte_clang_3_6")]
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXTemplateArgumentKind {
-    Null = 0,
-    Type = 1,
-    Declaration = 2,
-    NullPtr = 3,
-    Integral = 4,
-    Template = 5,
-    TemplateExpansion = 6,
-    Expression = 7,
-    Pack = 8,
-    Invalid = 9,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXTokenKind {
-    Punctuation = 0,
-    Keyword = 1,
-    Identifier = 2,
-    Literal = 3,
-    Comment = 4,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXTypeKind {
-    Invalid = 0,
-    Unexposed = 1,
-    Void = 2,
-    Bool = 3,
-    Char_U = 4,
-    UChar = 5,
-    Char16 = 6,
-    Char32 = 7,
-    UShort = 8,
-    UInt = 9,
-    ULong = 10,
-    ULongLong = 11,
-    UInt128 = 12,
-    Char_S = 13,
-    SChar = 14,
-    WChar = 15,
-    Short = 16,
-    Int = 17,
-    Long = 18,
-    LongLong = 19,
-    Int128 = 20,
-    Float = 21,
-    Double = 22,
-    LongDouble = 23,
-    NullPtr = 24,
-    Overload = 25,
-    Dependent = 26,
-    ObjCId = 27,
-    ObjCClass = 28,
-    ObjCSel = 29,
-    #[cfg(feature="gte_clang_3_9")]
-    Float128 = 30,
-    Complex = 100,
-    Pointer = 101,
-    BlockPointer = 102,
-    LValueReference = 103,
-    RValueReference = 104,
-    Record = 105,
-    Enum = 106,
-    Typedef = 107,
-    ObjCInterface = 108,
-    ObjCObjectPointer = 109,
-    FunctionNoProto = 110,
-    FunctionProto = 111,
-    ConstantArray = 112,
-    Vector = 113,
-    IncompleteArray = 114,
-    VariableArray = 115,
-    DependentSizedArray = 116,
-    MemberPointer = 117,
-    #[cfg(feature="gte_clang_3_8")]
-    Auto = 118,
-    #[cfg(feature="gte_clang_3_9")]
-    Elaborated = 119,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXTypeLayoutError {
-    Invalid = -1,
-    Incomplete = -2,
-    Dependent = -3,
-    NotConstantSize = -4,
-    InvalidFieldName = -5,
-}
-
-impl CXTypeLayoutError {
-    //- Constructors -----------------------------
-
-    /// Converts the supplied C value into the `CXTypeLayoutError` value with the same discriminant,
-    /// if such a value exists.
-    pub fn from_raw(raw: c_longlong) -> Option<CXTypeLayoutError> {
-        if raw >= -5 && raw <= -1 {
-            unsafe { mem::transmute(raw) }
-        } else {
-            None
-        }
+cenum! {
+    enum CXAvailabilityKind {
+        const CXAvailability_Available = 0,
+        const CXAvailability_Deprecated = 1,
+        const CXAvailability_NotAvailable = 2,
+        const CXAvailability_NotAccessible = 3,
     }
 }
 
-#[cfg(feature="gte_clang_3_8")]
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXVisibilityKind {
-    Invalid = 0,
-    Hidden = 1,
-    Protected = 2,
-    Default = 3,
+cenum! {
+    enum CXCallingConv {
+        const CXCallingConv_Default = 0,
+        const CXCallingConv_C = 1,
+        const CXCallingConv_X86StdCall = 2,
+        const CXCallingConv_X86FastCall = 3,
+        const CXCallingConv_X86ThisCall = 4,
+        const CXCallingConv_X86Pascal = 5,
+        const CXCallingConv_AAPCS = 6,
+        const CXCallingConv_AAPCS_VFP = 7,
+        const CXCallingConv_IntelOclBicc = 9,
+        const CXCallingConv_X86_64Win64 = 10,
+        const CXCallingConv_X86_64SysV = 11,
+        /// Only produced by `libclang` 3.6 and later.
+        const CXCallingConv_X86VectorCall = 12,
+        /// Only produced by `libclang` 3.9 and later.
+        const CXCallingConv_Swift = 13,
+        /// Only produced by `libclang` 3.9 and later.
+        const CXCallingConv_PreserveMost = 14,
+        /// Only produced by `libclang` 3.9 and later.
+        const CXCallingConv_PreserveAll = 15,
+        const CXCallingConv_Invalid = 100,
+        const CXCallingConv_Unexposed = 200,
+    }
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CXVisitorResult {
-    Break = 0,
-    Continue = 1,
+cenum! {
+    enum CXChildVisitResult {
+        const CXChildVisit_Break = 0,
+        const CXChildVisit_Continue = 1,
+        const CXChildVisit_Recurse = 2,
+    }
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CX_CXXAccessSpecifier {
-    CXXInvalidAccessSpecifier = 0,
-    CXXPublic = 1,
-    CXXProtected = 2,
-    CXXPrivate = 3,
+cenum! {
+    enum CXCommentInlineCommandRenderKind {
+        const CXCommentInlineCommandRenderKind_Normal = 0,
+        const CXCommentInlineCommandRenderKind_Bold = 1,
+        const CXCommentInlineCommandRenderKind_Monospaced = 2,
+        const CXCommentInlineCommandRenderKind_Emphasized = 3,
+    }
 }
 
-#[cfg(feature="gte_clang_3_6")]
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub enum CX_StorageClass {
-    Invalid = 0,
-    None = 1,
-    Extern = 2,
-    Static = 3,
-    PrivateExtern = 4,
-    OpenCLWorkGroupLocal = 5,
-    Auto = 6,
-    Register = 7,
+cenum! {
+    enum CXCommentKind {
+        const CXComment_Null = 0,
+        const CXComment_Text = 1,
+        const CXComment_InlineCommand = 2,
+        const CXComment_HTMLStartTag = 3,
+        const CXComment_HTMLEndTag = 4,
+        const CXComment_Paragraph = 5,
+        const CXComment_BlockCommand = 6,
+        const CXComment_ParamCommand = 7,
+        const CXComment_TParamCommand = 8,
+        const CXComment_VerbatimBlockCommand = 9,
+        const CXComment_VerbatimBlockLine = 10,
+        const CXComment_VerbatimLine = 11,
+        const CXComment_FullComment = 12,
+    }
+}
+
+cenum! {
+    enum CXCommentParamPassDirection {
+        const CXCommentParamPassDirection_In = 0,
+        const CXCommentParamPassDirection_Out = 1,
+        const CXCommentParamPassDirection_InOut = 2,
+    }
+}
+
+cenum! {
+    enum CXCompilationDatabase_Error {
+        const CXCompilationDatabase_NoError = 0,
+        const CXCompilationDatabase_CanNotLoadDatabase = 1,
+    }
+}
+
+cenum! {
+    enum CXCompletionChunkKind {
+        const CXCompletionChunk_Optional = 0,
+        const CXCompletionChunk_TypedText = 1,
+        const CXCompletionChunk_Text = 2,
+        const CXCompletionChunk_Placeholder = 3,
+        const CXCompletionChunk_Informative = 4,
+        const CXCompletionChunk_CurrentParameter = 5,
+        const CXCompletionChunk_LeftParen = 6,
+        const CXCompletionChunk_RightParen = 7,
+        const CXCompletionChunk_LeftBracket = 8,
+        const CXCompletionChunk_RightBracket = 9,
+        const CXCompletionChunk_LeftBrace = 10,
+        const CXCompletionChunk_RightBrace = 11,
+        const CXCompletionChunk_LeftAngle = 12,
+        const CXCompletionChunk_RightAngle = 13,
+        const CXCompletionChunk_Comma = 14,
+        const CXCompletionChunk_ResultType = 15,
+        const CXCompletionChunk_Colon = 16,
+        const CXCompletionChunk_SemiColon = 17,
+        const CXCompletionChunk_Equal = 18,
+        const CXCompletionChunk_HorizontalSpace = 19,
+        const CXCompletionChunk_VerticalSpace = 20,
+    }
+}
+
+cenum! {
+    enum CXCursorKind {
+        const CXCursor_UnexposedDecl = 1,
+        const CXCursor_StructDecl = 2,
+        const CXCursor_UnionDecl = 3,
+        const CXCursor_ClassDecl = 4,
+        const CXCursor_EnumDecl = 5,
+        const CXCursor_FieldDecl = 6,
+        const CXCursor_EnumConstantDecl = 7,
+        const CXCursor_FunctionDecl = 8,
+        const CXCursor_VarDecl = 9,
+        const CXCursor_ParmDecl = 10,
+        const CXCursor_ObjCInterfaceDecl = 11,
+        const CXCursor_ObjCCategoryDecl = 12,
+        const CXCursor_ObjCProtocolDecl = 13,
+        const CXCursor_ObjCPropertyDecl = 14,
+        const CXCursor_ObjCIvarDecl = 15,
+        const CXCursor_ObjCInstanceMethodDecl = 16,
+        const CXCursor_ObjCClassMethodDecl = 17,
+        const CXCursor_ObjCImplementationDecl = 18,
+        const CXCursor_ObjCCategoryImplDecl = 19,
+        const CXCursor_TypedefDecl = 20,
+        const CXCursor_CXXMethod = 21,
+        const CXCursor_Namespace = 22,
+        const CXCursor_LinkageSpec = 23,
+        const CXCursor_Constructor = 24,
+        const CXCursor_Destructor = 25,
+        const CXCursor_ConversionFunction = 26,
+        const CXCursor_TemplateTypeParameter = 27,
+        const CXCursor_NonTypeTemplateParameter = 28,
+        const CXCursor_TemplateTemplateParameter = 29,
+        const CXCursor_FunctionTemplate = 30,
+        const CXCursor_ClassTemplate = 31,
+        const CXCursor_ClassTemplatePartialSpecialization = 32,
+        const CXCursor_NamespaceAlias = 33,
+        const CXCursor_UsingDirective = 34,
+        const CXCursor_UsingDeclaration = 35,
+        const CXCursor_TypeAliasDecl = 36,
+        const CXCursor_ObjCSynthesizeDecl = 37,
+        const CXCursor_ObjCDynamicDecl = 38,
+        const CXCursor_CXXAccessSpecifier = 39,
+        const CXCursor_ObjCSuperClassRef = 40,
+        const CXCursor_ObjCProtocolRef = 41,
+        const CXCursor_ObjCClassRef = 42,
+        const CXCursor_TypeRef = 43,
+        const CXCursor_CXXBaseSpecifier = 44,
+        const CXCursor_TemplateRef = 45,
+        const CXCursor_NamespaceRef = 46,
+        const CXCursor_MemberRef = 47,
+        const CXCursor_LabelRef = 48,
+        const CXCursor_OverloadedDeclRef = 49,
+        const CXCursor_VariableRef = 50,
+        const CXCursor_InvalidFile = 70,
+        const CXCursor_NoDeclFound = 71,
+        const CXCursor_NotImplemented = 72,
+        const CXCursor_InvalidCode = 73,
+        const CXCursor_UnexposedExpr = 100,
+        const CXCursor_DeclRefExpr = 101,
+        const CXCursor_MemberRefExpr = 102,
+        const CXCursor_CallExpr = 103,
+        const CXCursor_ObjCMessageExpr = 104,
+        const CXCursor_BlockExpr = 105,
+        const CXCursor_IntegerLiteral = 106,
+        const CXCursor_FloatingLiteral = 107,
+        const CXCursor_ImaginaryLiteral = 108,
+        const CXCursor_StringLiteral = 109,
+        const CXCursor_CharacterLiteral = 110,
+        const CXCursor_ParenExpr = 111,
+        const CXCursor_UnaryOperator = 112,
+        const CXCursor_ArraySubscriptExpr = 113,
+        const CXCursor_BinaryOperator = 114,
+        const CXCursor_CompoundAssignOperator = 115,
+        const CXCursor_ConditionalOperator = 116,
+        const CXCursor_CStyleCastExpr = 117,
+        const CXCursor_CompoundLiteralExpr = 118,
+        const CXCursor_InitListExpr = 119,
+        const CXCursor_AddrLabelExpr = 120,
+        const CXCursor_StmtExpr = 121,
+        const CXCursor_GenericSelectionExpr = 122,
+        const CXCursor_GNUNullExpr = 123,
+        const CXCursor_CXXStaticCastExpr = 124,
+        const CXCursor_CXXDynamicCastExpr = 125,
+        const CXCursor_CXXReinterpretCastExpr = 126,
+        const CXCursor_CXXConstCastExpr = 127,
+        const CXCursor_CXXFunctionalCastExpr = 128,
+        const CXCursor_CXXTypeidExpr = 129,
+        const CXCursor_CXXBoolLiteralExpr = 130,
+        const CXCursor_CXXNullPtrLiteralExpr = 131,
+        const CXCursor_CXXThisExpr = 132,
+        const CXCursor_CXXThrowExpr = 133,
+        const CXCursor_CXXNewExpr = 134,
+        const CXCursor_CXXDeleteExpr = 135,
+        const CXCursor_UnaryExpr = 136,
+        const CXCursor_ObjCStringLiteral = 137,
+        const CXCursor_ObjCEncodeExpr = 138,
+        const CXCursor_ObjCSelectorExpr = 139,
+        const CXCursor_ObjCProtocolExpr = 140,
+        const CXCursor_ObjCBridgedCastExpr = 141,
+        const CXCursor_PackExpansionExpr = 142,
+        const CXCursor_SizeOfPackExpr = 143,
+        const CXCursor_LambdaExpr = 144,
+        const CXCursor_ObjCBoolLiteralExpr = 145,
+        const CXCursor_ObjCSelfExpr = 146,
+        /// Only produced by `libclang` 3.8 and later.
+        const CXCursor_OMPArraySectionExpr = 147,
+        /// Only produced by `libclang` 3.9 and later.
+        const CXCursor_ObjCAvailabilityCheckExpr = 148,
+        const CXCursor_UnexposedStmt = 200,
+        const CXCursor_LabelStmt = 201,
+        const CXCursor_CompoundStmt = 202,
+        const CXCursor_CaseStmt = 203,
+        const CXCursor_DefaultStmt = 204,
+        const CXCursor_IfStmt = 205,
+        const CXCursor_SwitchStmt = 206,
+        const CXCursor_WhileStmt = 207,
+        const CXCursor_DoStmt = 208,
+        const CXCursor_ForStmt = 209,
+        const CXCursor_GotoStmt = 210,
+        const CXCursor_IndirectGotoStmt = 211,
+        const CXCursor_ContinueStmt = 212,
+        const CXCursor_BreakStmt = 213,
+        const CXCursor_ReturnStmt = 214,
+        /// Duplicate of `CXCursor_GccAsmStmt`.
+        const CXCursor_AsmStmt = 215,
+        const CXCursor_ObjCAtTryStmt = 216,
+        const CXCursor_ObjCAtCatchStmt = 217,
+        const CXCursor_ObjCAtFinallyStmt = 218,
+        const CXCursor_ObjCAtThrowStmt = 219,
+        const CXCursor_ObjCAtSynchronizedStmt = 220,
+        const CXCursor_ObjCAutoreleasePoolStmt = 221,
+        const CXCursor_ObjCForCollectionStmt = 222,
+        const CXCursor_CXXCatchStmt = 223,
+        const CXCursor_CXXTryStmt = 224,
+        const CXCursor_CXXForRangeStmt = 225,
+        const CXCursor_SEHTryStmt = 226,
+        const CXCursor_SEHExceptStmt = 227,
+        const CXCursor_SEHFinallyStmt = 228,
+        const CXCursor_MSAsmStmt = 229,
+        const CXCursor_NullStmt = 230,
+        const CXCursor_DeclStmt = 231,
+        const CXCursor_OMPParallelDirective = 232,
+        const CXCursor_OMPSimdDirective = 233,
+        const CXCursor_OMPForDirective = 234,
+        const CXCursor_OMPSectionsDirective = 235,
+        const CXCursor_OMPSectionDirective = 236,
+        const CXCursor_OMPSingleDirective = 237,
+        const CXCursor_OMPParallelForDirective = 238,
+        const CXCursor_OMPParallelSectionsDirective = 239,
+        const CXCursor_OMPTaskDirective = 240,
+        const CXCursor_OMPMasterDirective = 241,
+        const CXCursor_OMPCriticalDirective = 242,
+        const CXCursor_OMPTaskyieldDirective = 243,
+        const CXCursor_OMPBarrierDirective = 244,
+        const CXCursor_OMPTaskwaitDirective = 245,
+        const CXCursor_OMPFlushDirective = 246,
+        const CXCursor_SEHLeaveStmt = 247,
+        /// Only produced by `libclang` 3.6 and later.
+        const CXCursor_OMPOrderedDirective = 248,
+        /// Only produced by `libclang` 3.6 and later.
+        const CXCursor_OMPAtomicDirective = 249,
+        /// Only produced by `libclang` 3.6 and later.
+        const CXCursor_OMPForSimdDirective = 250,
+        /// Only produced by `libclang` 3.6 and later.
+        const CXCursor_OMPParallelForSimdDirective = 251,
+        /// Only produced by `libclang` 3.6 and later.
+        const CXCursor_OMPTargetDirective = 252,
+        /// Only produced by `libclang` 3.6 and later.
+        const CXCursor_OMPTeamsDirective = 253,
+        /// Only produced by `libclang` 3.7 and later.
+        const CXCursor_OMPTaskgroupDirective = 254,
+        /// Only produced by `libclang` 3.7 and later.
+        const CXCursor_OMPCancellationPointDirective = 255,
+        /// Only produced by `libclang` 3.7 and later.
+        const CXCursor_OMPCancelDirective = 256,
+        /// Only produced by `libclang` 3.8 and later.
+        const CXCursor_OMPTargetDataDirective = 257,
+        /// Only produced by `libclang` 3.8 and later.
+        const CXCursor_OMPTaskLoopDirective = 258,
+        /// Only produced by `libclang` 3.8 and later.
+        const CXCursor_OMPTaskLoopSimdDirective = 259,
+        /// Only produced by `libclang` 3.8 and later.
+        const CXCursor_OMPDistributeDirective = 260,
+        /// Only produced by `libclang` 3.9 and later.
+        const CXCursor_OMPTargetEnterDataDirective = 261,
+        /// Only produced by `libclang` 3.9 and later.
+        const CXCursor_OMPTargetExitDataDirective = 262,
+        /// Only produced by `libclang` 3.9 and later.
+        const CXCursor_OMPTargetParallelDirective = 263,
+        /// Only produced by `libclang` 3.9 and later.
+        const CXCursor_OMPTargetParallelForDirective = 264,
+        /// Only produced by `libclang` 3.9 and later.
+        const CXCursor_OMPTargetUpdateDirective = 265,
+        /// Only produced by `libclang` 3.9 and later.
+        const CXCursor_OMPDistributeParallelForDirective = 266,
+        /// Only produced by `libclang` 3.9 and later.
+        const CXCursor_OMPDistributeParallelForSimdDirective = 267,
+        /// Only produced by `libclang` 3.9 and later.
+        const CXCursor_OMPDistributeSimdDirective = 268,
+        /// Only produced by `libclang` 3.9 and later.
+        const CXCursor_OMPTargetParallelForSimdDirective = 269,
+        const CXCursor_TranslationUnit = 300,
+        const CXCursor_UnexposedAttr = 400,
+        const CXCursor_IBActionAttr = 401,
+        const CXCursor_IBOutletAttr = 402,
+        const CXCursor_IBOutletCollectionAttr = 403,
+        const CXCursor_CXXFinalAttr = 404,
+        const CXCursor_CXXOverrideAttr = 405,
+        const CXCursor_AnnotateAttr = 406,
+        const CXCursor_AsmLabelAttr = 407,
+        const CXCursor_PackedAttr = 408,
+        const CXCursor_PureAttr = 409,
+        const CXCursor_ConstAttr = 410,
+        const CXCursor_NoDuplicateAttr = 411,
+        const CXCursor_CUDAConstantAttr = 412,
+        const CXCursor_CUDADeviceAttr = 413,
+        const CXCursor_CUDAGlobalAttr = 414,
+        const CXCursor_CUDAHostAttr = 415,
+        /// Only produced by `libclang` 3.6 and later.
+        const CXCursor_CUDASharedAttr = 416,
+        /// Only produced by `libclang` 3.8 and later.
+        const CXCursor_VisibilityAttr = 417,
+        /// Only produced by `libclang` 3.8 and later.
+        const CXCursor_DLLExport = 418,
+        /// Only produced by `libclang` 3.8 and later.
+        const CXCursor_DLLImport = 419,
+        const CXCursor_PreprocessingDirective = 500,
+        const CXCursor_MacroDefinition = 501,
+        /// Duplicate of `CXCursor_MacroInstantiation`.
+        const CXCursor_MacroExpansion = 502,
+        const CXCursor_InclusionDirective = 503,
+        const CXCursor_ModuleImportDecl = 600,
+        /// Only produced by `libclang` 3.8 and later.
+        const CXCursor_TypeAliasTemplateDecl = 601,
+        /// Only produced by `libclang` 3.9 and later.
+        const CXCursor_StaticAssert = 602,
+        /// Only produced by `libclang` 3.7 and later.
+        const CXCursor_OverloadCandidate = 700,
+    }
+}
+
+cenum! {
+    enum CXDiagnosticSeverity {
+        const CXDiagnostic_Ignored = 0,
+        const CXDiagnostic_Note = 1,
+        const CXDiagnostic_Warning = 2,
+        const CXDiagnostic_Error = 3,
+        const CXDiagnostic_Fatal = 4,
+    }
+}
+
+cenum! {
+    enum CXErrorCode {
+        const CXError_Success = 0,
+        const CXError_Failure = 1,
+        const CXError_Crashed = 2,
+        const CXError_InvalidArguments = 3,
+        const CXError_ASTReadError = 4,
+    }
+}
+
+cenum! {
+    enum CXEvalResultKind {
+        const CXEval_UnExposed = 0,
+        const CXEval_Int = 1 ,
+        const CXEval_Float = 2,
+        const CXEval_ObjCStrLiteral = 3,
+        const CXEval_StrLiteral = 4,
+        const CXEval_CFStr = 5,
+        const CXEval_Other = 6,
+    }
+}
+
+cenum! {
+    enum CXIdxAttrKind {
+        const CXIdxAttr_Unexposed = 0,
+        const CXIdxAttr_IBAction = 1,
+        const CXIdxAttr_IBOutlet = 2,
+        const CXIdxAttr_IBOutletCollection = 3,
+    }
+}
+
+cenum! {
+    enum CXIdxEntityCXXTemplateKind {
+        const CXIdxEntity_NonTemplate = 0,
+        const CXIdxEntity_Template = 1,
+        const CXIdxEntity_TemplatePartialSpecialization = 2,
+        const CXIdxEntity_TemplateSpecialization = 3,
+    }
+}
+
+cenum! {
+    enum CXIdxEntityKind {
+        const CXIdxEntity_Unexposed = 0,
+        const CXIdxEntity_Typedef = 1,
+        const CXIdxEntity_Function = 2,
+        const CXIdxEntity_Variable = 3,
+        const CXIdxEntity_Field = 4,
+        const CXIdxEntity_EnumConstant = 5,
+        const CXIdxEntity_ObjCClass = 6,
+        const CXIdxEntity_ObjCProtocol = 7,
+        const CXIdxEntity_ObjCCategory = 8,
+        const CXIdxEntity_ObjCInstanceMethod = 9,
+        const CXIdxEntity_ObjCClassMethod = 10,
+        const CXIdxEntity_ObjCProperty = 11,
+        const CXIdxEntity_ObjCIvar = 12,
+        const CXIdxEntity_Enum = 13,
+        const CXIdxEntity_Struct = 14,
+        const CXIdxEntity_Union = 15,
+        const CXIdxEntity_CXXClass = 16,
+        const CXIdxEntity_CXXNamespace = 17,
+        const CXIdxEntity_CXXNamespaceAlias = 18,
+        const CXIdxEntity_CXXStaticVariable = 19,
+        const CXIdxEntity_CXXStaticMethod = 20,
+        const CXIdxEntity_CXXInstanceMethod = 21,
+        const CXIdxEntity_CXXConstructor = 22,
+        const CXIdxEntity_CXXDestructor = 23,
+        const CXIdxEntity_CXXConversionFunction = 24,
+        const CXIdxEntity_CXXTypeAlias = 25,
+        const CXIdxEntity_CXXInterface = 26,
+    }
+}
+
+cenum! {
+    enum CXIdxEntityLanguage {
+        const CXIdxEntityLang_None = 0,
+        const CXIdxEntityLang_C = 1,
+        const CXIdxEntityLang_ObjC = 2,
+        const CXIdxEntityLang_CXX = 3,
+    }
+}
+
+cenum! {
+    enum CXIdxEntityRefKind {
+        const CXIdxEntityRef_Direct = 1,
+        const CXIdxEntityRef_Implicit = 2,
+    }
+}
+
+cenum! {
+    enum CXIdxObjCContainerKind {
+        const CXIdxObjCContainer_ForwardRef = 0,
+        const CXIdxObjCContainer_Interface = 1,
+        const CXIdxObjCContainer_Implementation = 2,
+    }
+}
+
+cenum! {
+    enum CXLanguageKind {
+        const CXLanguage_Invalid = 0,
+        const CXLanguage_C = 1,
+        const CXLanguage_ObjC = 2,
+        const CXLanguage_CPlusPlus = 3,
+    }
+}
+
+cenum! {
+    enum CXLinkageKind {
+        const CXLinkage_Invalid = 0,
+        const CXLinkage_NoLinkage = 1,
+        const CXLinkage_Internal = 2,
+        const CXLinkage_UniqueExternal = 3,
+        const CXLinkage_External = 4,
+    }
+}
+
+cenum! {
+    enum CXLoadDiag_Error {
+        const CXLoadDiag_None = 0,
+        const CXLoadDiag_Unknown = 1,
+        const CXLoadDiag_CannotLoad = 2,
+        const CXLoadDiag_InvalidFile = 3,
+    }
+}
+
+cenum! {
+    enum CXRefQualifierKind {
+        const CXRefQualifier_None = 0,
+        const CXRefQualifier_LValue = 1,
+        const CXRefQualifier_RValue = 2,
+    }
+}
+
+cenum! {
+    enum CXResult {
+        const CXResult_Success = 0,
+        const CXResult_Invalid = 1,
+        const CXResult_VisitBreak = 2,
+    }
+}
+
+cenum! {
+    enum CXSaveError {
+        const CXSaveError_None = 0,
+        const CXSaveError_Unknown = 1,
+        const CXSaveError_TranslationErrors = 2,
+        const CXSaveError_InvalidTU = 3,
+    }
+}
+
+cenum! {
+    enum CXTUResourceUsageKind {
+        const CXTUResourceUsage_AST = 1,
+        const CXTUResourceUsage_Identifiers = 2,
+        const CXTUResourceUsage_Selectors = 3,
+        const CXTUResourceUsage_GlobalCompletionResults = 4,
+        const CXTUResourceUsage_SourceManagerContentCache = 5,
+        const CXTUResourceUsage_AST_SideTables = 6,
+        const CXTUResourceUsage_SourceManager_Membuffer_Malloc = 7,
+        const CXTUResourceUsage_SourceManager_Membuffer_MMap = 8,
+        const CXTUResourceUsage_ExternalASTSource_Membuffer_Malloc = 9,
+        const CXTUResourceUsage_ExternalASTSource_Membuffer_MMap = 10,
+        const CXTUResourceUsage_Preprocessor = 11,
+        const CXTUResourceUsage_PreprocessingRecord = 12,
+        const CXTUResourceUsage_SourceManager_DataStructures = 13,
+        const CXTUResourceUsage_Preprocessor_HeaderSearch = 14,
+    }
+}
+
+cenum! {
+    #[cfg(feature="gte_clang_3_6")]
+    enum CXTemplateArgumentKind {
+        const CXTemplateArgumentKind_Null = 0,
+        const CXTemplateArgumentKind_Type = 1,
+        const CXTemplateArgumentKind_Declaration = 2,
+        const CXTemplateArgumentKind_NullPtr = 3,
+        const CXTemplateArgumentKind_Integral = 4,
+        const CXTemplateArgumentKind_Template = 5,
+        const CXTemplateArgumentKind_TemplateExpansion = 6,
+        const CXTemplateArgumentKind_Expression = 7,
+        const CXTemplateArgumentKind_Pack = 8,
+        const CXTemplateArgumentKind_Invalid = 9,
+    }
+}
+
+cenum! {
+    enum CXTokenKind {
+        const CXToken_Punctuation = 0,
+        const CXToken_Keyword = 1,
+        const CXToken_Identifier = 2,
+        const CXToken_Literal = 3,
+        const CXToken_Comment = 4,
+    }
+}
+
+cenum! {
+    enum CXTypeKind {
+        const CXType_Invalid = 0,
+        const CXType_Unexposed = 1,
+        const CXType_Void = 2,
+        const CXType_Bool = 3,
+        const CXType_Char_U = 4,
+        const CXType_UChar = 5,
+        const CXType_Char16 = 6,
+        const CXType_Char32 = 7,
+        const CXType_UShort = 8,
+        const CXType_UInt = 9,
+        const CXType_ULong = 10,
+        const CXType_ULongLong = 11,
+        const CXType_UInt128 = 12,
+        const CXType_Char_S = 13,
+        const CXType_SChar = 14,
+        const CXType_WChar = 15,
+        const CXType_Short = 16,
+        const CXType_Int = 17,
+        const CXType_Long = 18,
+        const CXType_LongLong = 19,
+        const CXType_Int128 = 20,
+        const CXType_Float = 21,
+        const CXType_Double = 22,
+        const CXType_LongDouble = 23,
+        const CXType_NullPtr = 24,
+        const CXType_Overload = 25,
+        const CXType_Dependent = 26,
+        const CXType_ObjCId = 27,
+        const CXType_ObjCClass = 28,
+        const CXType_ObjCSel = 29,
+        /// Only produced by `libclang` 3.9 and later.
+        const CXType_Float128 = 30,
+        const CXType_Complex = 100,
+        const CXType_Pointer = 101,
+        const CXType_BlockPointer = 102,
+        const CXType_LValueReference = 103,
+        const CXType_RValueReference = 104,
+        const CXType_Record = 105,
+        const CXType_Enum = 106,
+        const CXType_Typedef = 107,
+        const CXType_ObjCInterface = 108,
+        const CXType_ObjCObjectPointer = 109,
+        const CXType_FunctionNoProto = 110,
+        const CXType_FunctionProto = 111,
+        const CXType_ConstantArray = 112,
+        const CXType_Vector = 113,
+        const CXType_IncompleteArray = 114,
+        const CXType_VariableArray = 115,
+        const CXType_DependentSizedArray = 116,
+        const CXType_MemberPointer = 117,
+        /// Only produced by `libclang` 3.8 and later.
+        const CXType_Auto = 118,
+        /// Only produced by `libclang` 3.9 and later.
+        const CXType_Elaborated = 119,
+    }
+}
+
+cenum! {
+    enum CXTypeLayoutError {
+        const CXTypeLayoutError_Invalid = -1,
+        const CXTypeLayoutError_Incomplete = -2,
+        const CXTypeLayoutError_Dependent = -3,
+        const CXTypeLayoutError_NotConstantSize = -4,
+        const CXTypeLayoutError_InvalidFieldName = -5,
+    }
+}
+
+cenum! {
+    #[cfg(feature="gte_clang_3_8")]
+    enum CXVisibilityKind {
+        const CXVisibility_Invalid = 0,
+        const CXVisibility_Hidden = 1,
+        const CXVisibility_Protected = 2,
+        const CXVisibility_Default = 3,
+    }
+}
+
+cenum! {
+    enum CXVisitorResult {
+        const CXVisit_Break = 0,
+        const CXVisit_Continue = 1,
+    }
+}
+
+cenum! {
+    enum CX_CXXAccessSpecifier {
+        const CX_CXXInvalidAccessSpecifier = 0,
+        const CX_CXXPublic = 1,
+        const CX_CXXProtected = 2,
+        const CX_CXXPrivate = 3,
+    }
+}
+
+cenum! {
+    #[cfg(feature="gte_clang_3_6")]
+    enum CX_StorageClass {
+        const CX_SC_Invalid = 0,
+        const CX_SC_None = 1,
+        const CX_SC_Extern = 2,
+        const CX_SC_Static = 3,
+        const CX_SC_PrivateExtern = 4,
+        const CX_SC_OpenCLWorkGroupLocal = 5,
+        const CX_SC_Auto = 6,
+        const CX_SC_Register = 7,
+    }
 }
 
 //================================================
