@@ -1,4 +1,4 @@
-## [0.11.0] - UNRELEASED
+## [0.11.0] - 2016-10-07
 
 ### Changed
 - Changed all enums from Rust enums to typed constants to avoid
