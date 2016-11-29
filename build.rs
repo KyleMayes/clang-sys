@@ -245,8 +245,15 @@ fn main() {
         println!("cargo:rustc-link-search={}", directory.display());
         if cfg!(all(target_os="windows", target_env="msvc")) {
             // Find the `libclang` stub static library required for the MSVC toolchain.
-            let directory = find("libclang.lib", "LIBCLANG_PATH").unwrap();
-            println!("cargo:rustc-link-search={}", directory.display());
+            let libdir = if !directory.ends_with("bin") {
+                directory.clone()
+            } else {
+                directory.parent().unwrap().join("lib")
+            };
+            assert!(libdir.join("libclang.lib").exists(),
+                    "using dll file from {}, libclang.lib must be available in {}",
+                    directory.display(), libdir.display());
+            println!("cargo:rustc-link-search={}", libdir.display());
             println!("cargo:rustc-link-lib=dylib=libclang");
         } else {
             println!("cargo:rustc-link-lib=dylib=clang");
