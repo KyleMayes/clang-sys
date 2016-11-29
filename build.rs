@@ -142,13 +142,13 @@ fn find(files: &[String], env: &str) -> Result<PathBuf, String> {
 /// Searches for a `libclang` shared library, returning the name of the shared library and the
 /// directory it can be found in if the search was successful.
 pub fn find_shared_library() -> Result<PathBuf, String> {
-    let files = if cfg!(target_os="windows") {
-        // The filename of the `libclang` shared library on Windows is `libclang.dll` instead of
-        // the expected `clang.dll`.
-        ["libclang.dll".into()]
-    } else {
-        [format!("{}clang{}", env::consts::DLL_PREFIX, env::consts::DLL_SUFFIX)]
-    };
+    let mut files = vec![];
+    if cfg!(target_os="windows") {
+        // The official LLVM build on Windows uses `libclang.dll` instead of `clang.dll`.
+        // However, unofficial builds like MINGW builds still use `clang.dll`.
+        files.push("libclang.dll".into());
+    }
+    files.push(format!("{}clang{}", env::consts::DLL_PREFIX, env::consts::DLL_SUFFIX));
     find(&files, "LIBCLANG_PATH")
 }
 
