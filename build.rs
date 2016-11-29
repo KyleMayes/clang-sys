@@ -32,9 +32,14 @@ use glob::{MatchOptions};
 // * LIBCLANG_PATH - provides a path to a directory containing a `libclang` shared library
 // * LIBCLANG_STATIC_PATH - provides a path to a directory containing LLVM and Clang static libraries
 
-/// Returns whether the supplied directory contains the supplied file.
-fn contains<D: AsRef<Path>>(directory: D, file: &str) -> bool {
-    directory.as_ref().join(file).exists()
+/// Returns Some(file) if the supplied directory contains the supplied file, None otherwise.
+fn contains<D: AsRef<Path>>(directory: D, file: &str) -> Option<PathBuf> {
+    let file = directory.as_ref().join(file);
+    if file.exists() {
+        Some(file)
+    } else {
+        None
+    }
 }
 
 /// Runs a console command, returning the output if the command was successfully executed.
@@ -78,8 +83,8 @@ const SEARCH_WINDOWS: &'static [&'static str] = &[
 fn find(file: &str, env: &str) -> Result<PathBuf, String> {
     macro_rules! check_contains {
         ($dir:ident) => {
-            if contains(&$dir, file) {
-                return Ok($dir);
+            if let Some(file) = contains(&$dir, file) {
+                return Ok(file);
             }
             // On Windows, dll file may be found in `bin` directory while
             // lib file is usually found in `lib` directory. To keep things
@@ -87,8 +92,8 @@ fn find(file: &str, env: &str) -> Result<PathBuf, String> {
             // the list, so search bin directory in addition here.
             if cfg!(target_os="windows") && $dir.ends_with("lib") {
                 let alt = $dir.parent().unwrap().join("bin");
-                if contains(&alt, file) {
-                    return Ok(alt);
+                if let Some(file) = contains(&alt, file) {
+                    return Ok(file);
                 }
             }
         }
@@ -104,12 +109,12 @@ fn find(file: &str, env: &str) -> Result<PathBuf, String> {
     if let Some(output) = run_llvm_config(&["--prefix"]) {
         let directory = Path::new(output.lines().next().unwrap()).to_path_buf();
         let bin = directory.join("bin");
-        if contains(&bin, file) {
-            return Ok(bin);
+        if let Some(file) = contains(&bin, file) {
+            return Ok(file);
         }
         let lib = directory.join("lib");
-        if contains(&lib, file) {
-            return Ok(lib);
+        if let Some(file) = contains(&lib, file) {
+            return Ok(file);
         }
     }
 
@@ -143,7 +148,7 @@ fn find(file: &str, env: &str) -> Result<PathBuf, String> {
 
 /// Searches for a `libclang` shared library, returning the name of the shared library and the
 /// directory it can be found in if the search was successful.
-pub fn find_shared_library() -> Result<(PathBuf, String), String> {
+pub fn find_shared_library() -> Result<PathBuf, String> {
     let file = if cfg!(target_os="windows") {
         // The filename of the `libclang` shared library on Windows is `libclang.dll` instead of
         // the expected `clang.dll`.
@@ -151,7 +156,7 @@ pub fn find_shared_library() -> Result<(PathBuf, String), String> {
     } else {
         format!("{}clang{}", env::consts::DLL_PREFIX, env::consts::DLL_SUFFIX)
     };
-    find(&file, "LIBCLANG_PATH").map(|d| (d, file))
+    find(&file, "LIBCLANG_PATH")
 }
 
 /// Returns the name of an LLVM or Clang library from a path.
@@ -211,7 +216,8 @@ fn main() {
     }
 
     if cfg!(feature="static") {
-        let directory = find("libclang.a", "LIBCLANG_STATIC_PATH").unwrap();
+        let file = find("libclang.a", "LIBCLANG_STATIC_PATH").unwrap();
+        let directory = file.parent().unwrap();
         print!("cargo:rustc-flags=");
 
         // Specify required LLVM and Clang static libraries.
@@ -234,12 +240,13 @@ fn main() {
             panic!("unsupported operating system for static linking");
         }
     } else {
-        let (directory, _) = find_shared_library().unwrap();
+        let dllfile = find_shared_library().unwrap();
+        let directory = dllfile.parent().unwrap();
         println!("cargo:rustc-link-search={}", directory.display());
         if cfg!(all(target_os="windows", target_env="msvc")) {
             // Find the `libclang` stub static library required for the MSVC toolchain.
             let libdir = if !directory.ends_with("bin") {
-                directory.clone()
+                directory.to_owned()
             } else {
                 directory.parent().unwrap().join("lib")
             };
