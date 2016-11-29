@@ -32,14 +32,10 @@ use glob::{MatchOptions};
 // * LIBCLANG_PATH - provides a path to a directory containing a `libclang` shared library
 // * LIBCLANG_STATIC_PATH - provides a path to a directory containing LLVM and Clang static libraries
 
-/// Returns Some(file) if the supplied directory contains the supplied file, None otherwise.
-fn contains<D: AsRef<Path>>(directory: D, file: &str) -> Option<PathBuf> {
-    let file = directory.as_ref().join(file);
-    if file.exists() {
-        Some(file)
-    } else {
-        None
-    }
+/// Returns Some(path of founded file) if the supplied directory contains any of
+/// the supplied files, None otherwise.
+fn contains<D: AsRef<Path>>(directory: D, files: &[String]) -> Option<PathBuf> {
+    files.iter().map(|file| directory.as_ref().join(file)).find(|file| file.exists())
 }
 
 /// Runs a console command, returning the output if the command was successfully executed.
@@ -80,10 +76,10 @@ const SEARCH_WINDOWS: &'static [&'static str] = &[
 ];
 
 /// Searches for a library, returning the directory it can be found in if the search was successful.
-fn find(file: &str, env: &str) -> Result<PathBuf, String> {
+fn find(files: &[String], env: &str) -> Result<PathBuf, String> {
     macro_rules! check_contains {
         ($dir:ident) => {
-            if let Some(file) = contains(&$dir, file) {
+            if let Some(file) = contains(&$dir, files) {
                 return Ok(file);
             }
             // On Windows, dll file may be found in `bin` directory while
@@ -92,7 +88,7 @@ fn find(file: &str, env: &str) -> Result<PathBuf, String> {
             // the list, so search bin directory in addition here.
             if cfg!(target_os="windows") && $dir.ends_with("lib") {
                 let alt = $dir.parent().unwrap().join("bin");
-                if let Some(file) = contains(&alt, file) {
+                if let Some(file) = contains(&alt, files) {
                     return Ok(file);
                 }
             }
@@ -109,11 +105,11 @@ fn find(file: &str, env: &str) -> Result<PathBuf, String> {
     if let Some(output) = run_llvm_config(&["--prefix"]) {
         let directory = Path::new(output.lines().next().unwrap()).to_path_buf();
         let bin = directory.join("bin");
-        if let Some(file) = contains(&bin, file) {
+        if let Some(file) = contains(&bin, files) {
             return Ok(file);
         }
         let lib = directory.join("lib");
-        if let Some(file) = contains(&lib, file) {
+        if let Some(file) = contains(&lib, files) {
             return Ok(file);
         }
     }
@@ -138,25 +134,22 @@ fn find(file: &str, env: &str) -> Result<PathBuf, String> {
             }
         }
     }
-    let message = format!(
-        "couldn't find '{0}', set the {1} environment variable to a path where '{0}' can be found",
-        file,
-        env,
-    );
-    Err(message)
+    Err(format!(concat!("couldn't find any file in [{}], set the {} environment ",
+                        "variable to a path where on of them can be found"),
+                files.join(", "), env))
 }
 
 /// Searches for a `libclang` shared library, returning the name of the shared library and the
 /// directory it can be found in if the search was successful.
 pub fn find_shared_library() -> Result<PathBuf, String> {
-    let file = if cfg!(target_os="windows") {
+    let files = if cfg!(target_os="windows") {
         // The filename of the `libclang` shared library on Windows is `libclang.dll` instead of
         // the expected `clang.dll`.
-        "libclang.dll".into()
+        ["libclang.dll".into()]
     } else {
-        format!("{}clang{}", env::consts::DLL_PREFIX, env::consts::DLL_SUFFIX)
+        [format!("{}clang{}", env::consts::DLL_PREFIX, env::consts::DLL_SUFFIX)]
     };
-    find(&file, "LIBCLANG_PATH")
+    find(&files, "LIBCLANG_PATH")
 }
 
 /// Returns the name of an LLVM or Clang library from a path.
@@ -216,7 +209,7 @@ fn main() {
     }
 
     if cfg!(feature="static") {
-        let file = find("libclang.a", "LIBCLANG_STATIC_PATH").unwrap();
+        let file = find(&["libclang.a".into()], "LIBCLANG_STATIC_PATH").unwrap();
         let directory = file.parent().unwrap();
         print!("cargo:rustc-flags=");
 
