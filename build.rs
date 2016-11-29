@@ -74,6 +74,7 @@ const SEARCH_OSX: &'static [&'static str] = &[
 const SEARCH_WINDOWS: &'static [&'static str] = &[
     "C:\\LLVM\\lib",
     "C:\\Program Files*\\LLVM\\lib",
+    "C:\\msys*\\mingw*\\lib",
 ];
 
 /// Searches for a library, returning the directory it can be found in if the search was successful.
