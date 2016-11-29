@@ -70,38 +70,33 @@ const SEARCH_OSX: &'static [&'static str] = &[
 
 /// Backup search directory globs for Windows.
 const SEARCH_WINDOWS: &'static [&'static str] = &[
-    "C:\\LLVM\\bin",
     "C:\\LLVM\\lib",
-    "C:\\Program Files*\\LLVM\\bin",
     "C:\\Program Files*\\LLVM\\lib",
 ];
 
 /// Searches for a library, returning the directory it can be found in if the search was successful.
 fn find(file: &str, env: &str) -> Result<PathBuf, String> {
-    // Search the directory provided by the relevant environment variable, if set.
-    if let Ok(directory) = env::var(env).map(|d| Path::new(&d).to_path_buf()) {
-        if contains(&directory, file) {
-            return Ok(directory);
-        }
-
-        // On Windows, `libclang.dll` is usually found in the LLVM `bin` directory while
-        // `libclang.lib` is usually found in the LLVM `lib` directory. Search the other if one is
-        // specified with `LIBCLANG_PATH`.
-        if cfg!(target_os="windows") {
-            let suffix = if directory.ends_with("lib") {
-                Some("bin")
-            } else if directory.ends_with("bin") {
-                Some("lib")
-            } else {
-                None
-            };
-            if let Some(suffix) = suffix {
-                let alternative = directory.parent().unwrap().join(suffix);
-                if contains(&alternative, file) {
-                    return Ok(alternative);
+    macro_rules! check_contains {
+        ($dir:ident) => {
+            if contains(&$dir, file) {
+                return Ok($dir);
+            }
+            // On Windows, dll file may be found in `bin` directory while
+            // lib file is usually found in `lib` directory. To keep things
+            // consistent with other platforms, we only include lib dirs in
+            // the list, so search bin directory in addition here.
+            if cfg!(target_os="windows") && $dir.ends_with("lib") {
+                let alt = $dir.parent().unwrap().join("bin");
+                if contains(&alt, file) {
+                    return Ok(alt);
                 }
             }
         }
+    }
+
+    // Search the directory provided by the relevant environment variable, if set.
+    if let Ok(directory) = env::var(env).map(|d| Path::new(&d).to_path_buf()) {
+        check_contains!(directory);
     }
 
     // Search the `bin` and `lib` subdirectories in the directory returned by
@@ -134,9 +129,7 @@ fn find(file: &str, env: &str) -> Result<PathBuf, String> {
         options.require_literal_separator = true;
         if let Ok(paths) = glob::glob_with(pattern, &options) {
             for path in paths.filter_map(Result::ok).filter(|p| p.is_dir()) {
-                if contains(&path, file) {
-                    return Ok(path);
-                }
+                check_contains!(path);
             }
         }
     }
