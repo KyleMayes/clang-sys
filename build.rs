@@ -21,6 +21,7 @@
 extern crate glob;
 
 use std::env;
+use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::{Command};
 
@@ -243,10 +244,22 @@ fn main() {
             } else {
                 directory.parent().unwrap().join("lib")
             };
-            assert!(libdir.join("libclang.lib").exists(),
-                    "using dll file from {}, libclang.lib must be available in {}",
-                    directory.display(), libdir.display());
-            println!("cargo:rustc-link-search={}", libdir.display());
+            if libdir.join("libclang.lib").exists() {
+                println!("cargo:rustc-link-search={}", libdir.display());
+            } else if libdir.join("libclang.dll.a").exists() {
+                // MSYS and MinGW use libclang.dll.a instead of libclang.lib.
+                // It is linkable with MSVC linker, but Rust doesn't recognize
+                // that suffix, so we need to copy it with a different name.
+                // XXX Maybe we can just hardlink or symlink it?
+                let outdir = env::var("OUT_DIR").unwrap();
+                fs::copy(libdir.join("libclang.dll.a"),
+                         Path::new(&outdir).join("libclang.lib")).unwrap();
+                println!("cargo:rustc-link-search=native={}", outdir);
+            } else {
+                panic!(concat!("using dll file from {}, libclang.lib or ",
+                               "libclang.dll.a must be available in {}"),
+                       directory.display(), libdir.display());
+            }
             println!("cargo:rustc-link-lib=dylib=libclang");
         } else {
             println!("cargo:rustc-link-lib=dylib=clang");
