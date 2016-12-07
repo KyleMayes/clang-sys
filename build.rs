@@ -33,8 +33,7 @@ use glob::{MatchOptions};
 // * LIBCLANG_PATH - provides a path to a directory containing a `libclang` shared library
 // * LIBCLANG_STATIC_PATH - provides a path to a directory containing LLVM and Clang static libraries
 
-/// Returns Some(path of founded file) if the supplied directory contains any of
-/// the supplied files, None otherwise.
+/// Returns a path to one of the supplied files if such a file can be found in the supplied directory.
 fn contains<D: AsRef<Path>>(directory: D, files: &[String]) -> Option<PathBuf> {
     files.iter().map(|file| directory.as_ref().join(file)).find(|file| file.exists())
 }
@@ -74,36 +73,38 @@ const SEARCH_OSX: &'static [&'static str] = &[
 const SEARCH_WINDOWS: &'static [&'static str] = &[
     "C:\\LLVM\\lib",
     "C:\\Program Files*\\LLVM\\lib",
-    "C:\\msys*\\mingw*\\lib",
+    "C:\\MSYS*\\MinGW*\\lib",
 ];
 
 /// Searches for a library, returning the directory it can be found in if the search was successful.
 fn find(files: &[String], env: &str) -> Result<PathBuf, String> {
-    macro_rules! check_contains {
-        ($dir:ident) => {
-            if let Some(file) = contains(&$dir, files) {
+    /// Searches the supplied directory and, on Windows, any relevant sibling directories.
+    macro_rules! search_directory {
+        ($directory:ident) => {
+            if let Some(file) = contains(&$directory, files) {
                 return Ok(file);
             }
-            // On Windows, dll file may be found in `bin` directory while
-            // lib file is usually found in `lib` directory. To keep things
-            // consistent with other platforms, we only include lib dirs in
-            // the list, so search bin directory in addition here.
-            if cfg!(target_os="windows") && $dir.ends_with("lib") {
-                let alt = $dir.parent().unwrap().join("bin");
-                if let Some(file) = contains(&alt, files) {
+
+            // On Windows, `libclang.dll` is usually found in the LLVM `bin` directory while
+            // `libclang.lib` is usually found in the LLVM `lib` directory. To keep things
+            // consistent with other platforms, only LLVM `lib` directories are included in the
+            // backup search directory globs so we need to search the LLVM `bin` directory here.
+            if cfg!(target_os="windows") && $directory.ends_with("lib") {
+                let sibling = $directory.parent().unwrap().join("bin");
+                if let Some(file) = contains(&sibling, files) {
                     return Ok(file);
                 }
             }
         }
     }
 
-    // Search the directory provided by the relevant environment variable, if set.
+    // Search the directory provided by the relevant environment variable if it is set.
     if let Ok(directory) = env::var(env).map(|d| Path::new(&d).to_path_buf()) {
-        check_contains!(directory);
+        search_directory!(directory);
     }
 
     // Search the `bin` and `lib` subdirectories in the directory returned by
-    // `llvm-config --prefix`, if `llvm-config` is available.
+    // `llvm-config --prefix` if `llvm-config` is available.
     if let Some(output) = run_llvm_config(&["--prefix"]) {
         let directory = Path::new(output.lines().next().unwrap()).to_path_buf();
         let bin = directory.join("bin");
@@ -132,29 +133,34 @@ fn find(files: &[String], env: &str) -> Result<PathBuf, String> {
         options.require_literal_separator = true;
         if let Ok(paths) = glob::glob_with(pattern, &options) {
             for path in paths.filter_map(Result::ok).filter(|p| p.is_dir()) {
-                check_contains!(path);
+                search_directory!(path);
             }
         }
     }
-    Err(format!(concat!("couldn't find any file in [{}], set the {} environment ",
-                        "variable to a path where on of them can be found"),
-                files.join(", "), env))
+
+    let message = format!(
+        "couldn't find any of {}, set the {} environment variable to a path where one of these \
+         files can be found",
+        files.iter().map(|f| format!("'{}'", f)).collect::<Vec<_>>().join(", "),
+        env,
+    );
+    Err(message)
 }
 
-/// Searches for a `libclang` shared library, returning the name of the shared library and the
-/// directory it can be found in if the search was successful.
+/// Searches for a `libclang` shared library, returning the path to such a shared library if the
+/// search was successful.
 pub fn find_shared_library() -> Result<PathBuf, String> {
     let mut files = vec![];
     if cfg!(target_os="windows") {
-        // The official LLVM build on Windows uses `libclang.dll` instead of `clang.dll`.
-        // However, unofficial builds like MINGW builds still use `clang.dll`.
+        // The official LLVM build uses `libclang.dll` on Windows instead of `clang.dll`. However,
+        // unofficial builds such as MinGW use `clang.dll`.
         files.push("libclang.dll".into());
     }
     files.push(format!("{}clang{}", env::consts::DLL_PREFIX, env::consts::DLL_SUFFIX));
     find(&files, "LIBCLANG_PATH")
 }
 
-/// Returns the name of an LLVM or Clang library from a path.
+/// Returns the name of an LLVM or Clang library from a path to such a library.
 fn get_library_name(path: &Path) -> Option<String> {
     path.file_stem().map(|l| l.to_string_lossy()[3..].into())
 }
@@ -162,8 +168,8 @@ fn get_library_name(path: &Path) -> Option<String> {
 /// Returns the LLVM libraries required to link to `libclang` statically.
 fn get_llvm_libraries() -> Vec<String> {
     run_llvm_config(&["--libs"]).expect(
-        "couldn't execute `llvm-config --libs`, set the LLVM_CONFIG_PATH environment variable to \
-         a path to an `llvm-config` executable"
+        "couldn't execute `llvm-config --libs`, set the LLVM_CONFIG_PATH environment variable to a \
+         path to an `llvm-config` executable"
     ).split_whitespace().filter_map(|p| {
         // Depending on the version of `llvm-config` in use, listed libraries may be in one of two
         // forms, a full path to the library or simply prefixed with `-l`.
@@ -202,68 +208,78 @@ fn get_clang_libraries<P: AsRef<Path>>(directory: P) -> Vec<String> {
     }
 }
 
+/// Find and link to `libclang` statically.
+fn link_static() {
+    let file = find(&["libclang.a".into()], "LIBCLANG_STATIC_PATH").unwrap();
+    let directory = file.parent().unwrap();
+    print!("cargo:rustc-flags=");
+
+    // Specify required LLVM and Clang static libraries.
+    print!("-L {} ", directory.display());
+    for library in get_llvm_libraries() {
+        print!("-l static={} ", library);
+    }
+    for library in get_clang_libraries(&directory) {
+        print!("-l static={} ", library);
+    }
+
+    // Specify required system libraries.
+    if cfg!(target_os="freebsd") {
+        println!("-l ffi -l ncursesw -l c++ -l z");
+    } else if cfg!(target_os="linux") {
+        println!("-l ffi -l ncursesw -l stdc++ -l z");
+    } else if cfg!(target_os="macos") {
+        println!("-l ffi -l ncurses -l c++ -l z");
+    } else {
+        panic!("unsupported operating system for static linking");
+    }
+}
+
+/// Find and link to `libclang` dynamically.
+fn link_dynamic() {
+    let file = find_shared_library().unwrap();
+    let directory = file.parent().unwrap();
+    println!("cargo:rustc-link-search={}", directory.display());
+
+    if cfg!(all(target_os="windows", target_env="msvc")) {
+        // Find the `libclang` stub static library required for the MSVC toolchain.
+        let libdir = if !directory.ends_with("bin") {
+            directory.to_owned()
+        } else {
+            directory.parent().unwrap().join("lib")
+        };
+        if libdir.join("libclang.lib").exists() {
+            println!("cargo:rustc-link-search={}", libdir.display());
+        } else if libdir.join("libclang.dll.a").exists() {
+            // MSYS and MinGW use `libclang.dll.a` instead of `libclang.lib`. It is linkable with
+            // the MSVC linker, but Rust doesn't recognize the `.a` suffix, so we need to copy it
+            // with a different name.
+            //
+            // FIXME: Maybe we can just hardlink or symlink it?
+            let out = env::var("OUT_DIR").unwrap();
+            fs::copy(libdir.join("libclang.dll.a"), Path::new(&out).join("libclang.lib")).unwrap();
+            println!("cargo:rustc-link-search=native={}", out);
+        } else {
+            panic!(
+                "using '{}', so 'libclang.lib' or 'libclang.dll.a' must be available in {}",
+                file.display(),
+                libdir.display(),
+            );
+        }
+        println!("cargo:rustc-link-lib=dylib=libclang");
+    } else {
+        println!("cargo:rustc-link-lib=dylib=clang");
+    }
+}
+
 fn main() {
     if cfg!(feature="runtime") {
         if cfg!(feature="static") {
             panic!("`runtime` and `static` features can't be combined");
         }
-        return;
-    }
-
-    if cfg!(feature="static") {
-        let file = find(&["libclang.a".into()], "LIBCLANG_STATIC_PATH").unwrap();
-        let directory = file.parent().unwrap();
-        print!("cargo:rustc-flags=");
-
-        // Specify required LLVM and Clang static libraries.
-        print!("-L {} ", directory.display());
-        for library in get_llvm_libraries() {
-            print!("-l static={} ", library);
-        }
-        for library in get_clang_libraries(&directory) {
-            print!("-l static={} ", library);
-        }
-
-        // Specify required system libraries.
-        if cfg!(target_os="linux") {
-            println!("-l ffi -l ncursesw -l stdc++ -l z");
-        } else if cfg!(target_os="freebsd") {
-            println!("-l ffi -l ncursesw -l c++ -l z");
-        } else if cfg!(target_os="macos") {
-            println!("-l ffi -l ncurses -l c++ -l z");
-        } else {
-            panic!("unsupported operating system for static linking");
-        }
+    } else if cfg!(feature="static") {
+        link_static();
     } else {
-        let dllfile = find_shared_library().unwrap();
-        let directory = dllfile.parent().unwrap();
-        println!("cargo:rustc-link-search={}", directory.display());
-        if cfg!(all(target_os="windows", target_env="msvc")) {
-            // Find the `libclang` stub static library required for the MSVC toolchain.
-            let libdir = if !directory.ends_with("bin") {
-                directory.to_owned()
-            } else {
-                directory.parent().unwrap().join("lib")
-            };
-            if libdir.join("libclang.lib").exists() {
-                println!("cargo:rustc-link-search={}", libdir.display());
-            } else if libdir.join("libclang.dll.a").exists() {
-                // MSYS and MinGW use libclang.dll.a instead of libclang.lib.
-                // It is linkable with MSVC linker, but Rust doesn't recognize
-                // that suffix, so we need to copy it with a different name.
-                // XXX Maybe we can just hardlink or symlink it?
-                let outdir = env::var("OUT_DIR").unwrap();
-                fs::copy(libdir.join("libclang.dll.a"),
-                         Path::new(&outdir).join("libclang.lib")).unwrap();
-                println!("cargo:rustc-link-search=native={}", outdir);
-            } else {
-                panic!(concat!("using dll file from {}, libclang.lib or ",
-                               "libclang.dll.a must be available in {}"),
-                       directory.display(), libdir.display());
-            }
-            println!("cargo:rustc-link-lib=dylib=libclang");
-        } else {
-            println!("cargo:rustc-link-lib=dylib=clang");
-        }
+        link_dynamic();
     }
 }
