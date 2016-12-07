@@ -104,7 +104,7 @@ macro_rules! link {
                 return Err("a `libclang` shared library has already been loaded".into());
             }
 
-            let file = try!(build::find_shared_library().map(|(d, f)| d.join(f)));
+            let file = try!(build::find_shared_library());
             let library = libloading::Library::new(&file).map_err(|_| {
                 format!("'{}' could not be opened", file.display())
             });
