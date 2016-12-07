@@ -1,3 +1,8 @@
+## [0.11.1] - UNRELEASED
+
+### Added
+- Added support for linking to Clang on Windows from unofficial LLVM sources such as MSYS and MinGW
+
 ## [0.11.0] - 2016-10-07
 
 ### Changed
