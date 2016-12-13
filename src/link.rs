@@ -20,45 +20,27 @@
 
 #[cfg(feature="runtime")]
 macro_rules! link {
-    (@IMPL: #[cfg($cfg:meta)] fn $name:ident($($pname:ident: $pty:ty), *) $(-> $ret:ty)*) => (
+    (@LOAD: #[cfg($cfg:meta)] fn $name:ident($($pname:ident: $pty:ty), *) $(-> $ret:ty)*) => (
         #[cfg($cfg)]
-        pub fn $name(library: &mut super::SharedLibrary, allow_failure: bool) -> Result<(), String> {
-            let symbol = unsafe { library.library.get(stringify!($name).as_bytes()) }.map_err(|_| {
-                format!("could not load `{}`", stringify!($name))
-            });
-            let symbol = if allow_failure {
-                symbol.ok().map(|s| *s)
-            } else {
-                Some(*try!(symbol))
-            };
-            library.functions.$name = symbol;
-            Ok(())
+        pub fn $name(library: &mut super::SharedLibrary) {
+            let symbol = unsafe { library.library.get(stringify!($name).as_bytes()) }.ok();
+            library.functions.$name = symbol.map(|s| *s);
         }
 
         #[cfg(not($cfg))]
-        pub fn $name(_: &mut super::SharedLibrary, _: bool) -> Result<(), String> {
-            Ok(())
-        }
+        pub fn $name(_: &mut super::SharedLibrary) {}
     );
 
-    (@IMPL: fn $name:ident($($pname:ident: $pty:ty), *) $(-> $ret:ty)*) => (
-        pub fn $name(library: &mut super::SharedLibrary, allow_failure: bool) -> Result<(), String> {
-            let symbol = unsafe { library.library.get(stringify!($name).as_bytes()) }.map_err(|_| {
-                format!("could not load `{}`", stringify!($name))
-            });
-            let symbol = if allow_failure {
-                symbol.ok().map(|s| *s)
-            } else {
-                Some(*try!(symbol))
-            };
-            library.functions.$name = symbol;
-            Ok(())
+    (@LOAD: fn $name:ident($($pname:ident: $pty:ty), *) $(-> $ret:ty)*) => (
+        pub fn $name(library: &mut super::SharedLibrary) {
+            let symbol = unsafe { library.library.get(stringify!($name).as_bytes()) }.ok();
+            library.functions.$name = symbol.map(|s| *s);
         }
     );
 
     ($($(#[cfg($cfg:meta)])* pub fn $name:ident($($pname:ident: $pty:ty), *) $(-> $ret:ty)*;)+) => (
         use std::cell::{RefCell};
-        use std::sync::{Mutex};
+        use std::sync::{Arc, Mutex};
 
         /// The set of functions loaded dynamically.
         #[derive(Debug)]
@@ -87,45 +69,68 @@ macro_rules! link {
             }
         }
 
-        lazy_static!(static ref LOADED: Mutex<bool> = Mutex::new(false););
-        thread_local!(static LIBRARY: RefCell<Option<SharedLibrary>> = RefCell::new(None));
+        thread_local!(static LIBRARY: RefCell<Option<Arc<SharedLibrary>>> = RefCell::new(None));
 
-        $($(#[cfg($cfg)])* pub unsafe fn $name($($pname: $pty), *) $(-> $ret)* {
-            let f = LIBRARY.with(|l| l.borrow().as_ref().map(|l| {
-                l.functions.$name.expect("Function not loaded!")
-            }));
-            (f.expect("a `libclang` shared library was not loaded on this thread"))($($pname), *)
-        })+
+        /// Whether `libclang` is loaded on this thread.
+        pub fn is_loaded() -> bool {
+            LIBRARY.with(|l| l.borrow().is_some())
+        }
+
+        $(
+            $(#[cfg($cfg)])* pub unsafe fn $name($($pname: $pty), *) $(-> $ret)* {
+                let f = LIBRARY.with(|l| l.borrow().as_ref().map(|l| {
+                    l.functions.$name.expect("Function not loaded!")
+                }));
+                (f.expect("a `libclang` shared library was not loaded on this thread"))($($pname), *)
+            }
+
+            $(#[cfg($cfg)])* pub mod $name {
+                use super::LIBRARY;
+                pub fn is_loaded() -> bool {
+                    LIBRARY.with(|l| l.borrow().as_ref().map_or(false, |l| {
+                        l.functions.$name.is_some()
+                    }))
+                }
+            }
+        )+
 
         #[path="../build.rs"]
         mod build;
 
         mod load {
-            $(link!(@IMPL: $(#[cfg($cfg)])* fn $name($($pname: $pty), *) $(-> $ret)*);)+
+            $(link!(@LOAD: $(#[cfg($cfg)])* fn $name($($pname: $pty), *) $(-> $ret)*);)+
         }
+
         /// Loads a `libclang` shared library for use in the current thread.
         ///
         /// # Failures
         ///
         /// * a `libclang` shared library has already been loaded
         /// * a `libclang` shared library could not be found
-        /// * a `libclang` shared library symbol could not be loaded
+        ///
+        /// Note that this tries to find all the symbols. To check if a symbol
+        /// has been found or not, you can use `clang_Foo::is_loaded()`.
         #[allow(dead_code)]
         pub fn load() -> Result<(), String> {
-            let mut loaded = LOADED.lock().unwrap();
-            if *loaded {
-                return Err("a `libclang` shared library has already been loaded".into());
-            }
-
-            let file = try!(build::find_shared_library());
-            let library = libloading::Library::new(&file).map_err(|_| {
-                format!("'{}' could not be opened", file.display())
-            });
-            let mut library = SharedLibrary::new(try!(library));
-            $(try!(load::$name(&mut library, false));)+
-            LIBRARY.with(|l| *l.borrow_mut() = Some(library));
-            *loaded = true;
+            let lib = Arc::new(try!(load_manually()));
+            LIBRARY.with(|l| *l.borrow_mut() = Some(lib));
             Ok(())
+        }
+
+        /// Gets the library from tls. This, along with `set_library`, allows
+        /// reusing the same library across threads.
+        pub fn get_library() -> Option<Arc<SharedLibrary>> {
+            LIBRARY.with(|l| {
+                l.borrow_mut().clone()
+            })
+        }
+
+        /// Sets the current library from tls, and returns the previous one.
+        pub fn set_library(lib: Option<Arc<SharedLibrary>>) -> Option<Arc<SharedLibrary>> {
+            LIBRARY.with(|l| {
+                let mut l = l.borrow_mut();
+                mem::replace(&mut *l, lib)
+            })
         }
 
         /// Tries to load a libclang library manually, returning the
@@ -139,7 +144,7 @@ macro_rules! link {
                 format!("'{}' could not be opened", file.display())
             });
             let mut library = SharedLibrary::new(try!(library));
-            $(try!(load::$name(&mut library, true));)+
+            $(load::$name(&mut library);)+
 
             Ok(library)
         }
@@ -150,17 +155,13 @@ macro_rules! link {
         ///
         /// * a `libclang` shared library is not in use in the current thread
         pub fn unload() -> Result<(), String> {
-            let mut loaded = LOADED.lock().unwrap();
-            LIBRARY.with(|l| {
-                let mut library = l.borrow_mut();
-                if library.is_some() {
-                    *library = None;
-                    *loaded = false;
-               	    Ok(())
-                } else {
-                    Err("a `libclang` shared library is not in use in the current thread".into())
-                }
-            })
+            let l = set_library(None);
+
+            if l.is_some() {
+                Ok(())
+            } else {
+                Err("a `libclang` shared library is not in use in the current thread".into())
+            }
         }
     )
 }
