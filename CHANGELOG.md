@@ -1,3 +1,8 @@
+## [0.12.0] - UNRELEASED
+
+### Changed
+- Altered the runtime linking API to allow for testing the presence of functions
+
 ## [0.11.1] - 2016-12-07
 
 ### Added
