@@ -209,6 +209,7 @@ fn get_clang_libraries<P: AsRef<Path>>(directory: P) -> Vec<String> {
 }
 
 /// Find and link to `libclang` statically.
+#[cfg_attr(feature="runtime", allow(dead_code))]
 fn link_static() {
     let file = find(&["libclang.a".into()], "LIBCLANG_STATIC_PATH").unwrap();
     let directory = file.parent().unwrap();
@@ -236,6 +237,7 @@ fn link_static() {
 }
 
 /// Find and link to `libclang` dynamically.
+#[cfg_attr(feature="runtime", allow(dead_code))]
 fn link_dynamic() {
     let file = find_shared_library().unwrap();
     let directory = file.parent().unwrap();
@@ -272,6 +274,7 @@ fn link_dynamic() {
     }
 }
 
+#[cfg_attr(feature="runtime", allow(dead_code))]
 fn main() {
     if cfg!(feature="runtime") {
         if cfg!(feature="static") {
