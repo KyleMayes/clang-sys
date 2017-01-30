@@ -1,4 +1,4 @@
-## [0.13.0] - UNRELEASED
+## [0.13.0] - 2017-01-29
 
 ### Changed
 - Changed all opaque pointers types from tuple structs to raw pointers to avoid
