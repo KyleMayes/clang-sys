@@ -65,28 +65,9 @@ macro_rules! cenum {
     ($(#[$meta:meta])* enum $name:ident {
         $($(#[$vmeta:meta])* const $variant:ident = $value:expr), +,
     }) => (
-        #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-        #[repr(C)]
-        pub struct $name(c_int);
+        pub type $name = c_int;
 
-        impl $name {
-            //- Constructors ---------------------
-
-            /// Constructs an instance of this C enum from the supplied discriminant if possible.
-            pub fn from_raw(discriminant: c_int) -> Option<$name> {
-                $(if discriminant == $value { return Some($variant); })+
-                None
-            }
-
-            //- Accessors ------------------------
-
-            /// Returns the discriminant for this C enum.
-            pub fn to_raw(self) -> c_int {
-                self.0
-            }
-        }
-
-        $($(#[$vmeta])* pub const $variant: $name = $name($value);)+
+        $($(#[$vmeta])* pub const $variant: $name = $value;)+
     );
 }
 
