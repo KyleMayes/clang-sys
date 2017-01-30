@@ -1,4 +1,4 @@
-## [0.14.0] - UNRELEASED
+## [0.14.0] - 2017-01-30
 
 ### Changed
 - Changed all enum types from tuple structs to raw integers to avoid
