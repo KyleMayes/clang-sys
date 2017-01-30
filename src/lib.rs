@@ -45,7 +45,6 @@ pub mod support;
 mod link;
 
 use std::mem;
-use std::ptr;
 
 use libc::{c_char, c_int, c_longlong, c_uint, c_ulong, c_ulonglong, c_void, time_t};
 
@@ -947,27 +946,7 @@ bitflags! {
 
 // Opaque ________________________________________
 
-macro_rules! opaque {
-    ($name:ident) => (
-        #[derive(Copy, Clone, Debug)]
-        #[repr(C)]
-        pub struct $name(pub *mut c_void);
-
-        impl Default for $name {
-            fn default() -> $name {
-                $name(ptr::null_mut())
-            }
-        }
-
-        impl std::ops::Deref for $name {
-            type Target = *mut c_void;
-
-            fn deref(&self) -> &Self::Target {
-                &self.0
-            }
-        }
-    );
-}
+macro_rules! opaque { ($name:ident) => (pub type $name = *mut c_void;); }
 
 opaque!(CXCompilationDatabase);
 opaque!(CXCompileCommand);
