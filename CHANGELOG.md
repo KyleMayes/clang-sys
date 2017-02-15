@@ -1,5 +1,8 @@
 ## [0.15.0] - UNRELEASED
 
+### Added
+- Added support for `clang` 4.0.x
+
 ### Changed
 - Changed functions in the `Functions` struct to be `unsafe` (`runtime` feature only)
 - Changed `Clang::find` method to ignore directories and non-executable files
