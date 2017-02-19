@@ -14,6 +14,8 @@
 
 //! Finds and links to the required `libclang` libraries.
 
+#![allow(unused_attributes)]
+
 #![cfg_attr(feature="clippy", feature(plugin))]
 #![cfg_attr(feature="clippy", plugin(clippy))]
 #![cfg_attr(feature="clippy", warn(clippy))]
@@ -47,7 +49,7 @@ fn run(command: &str, arguments: &[&str]) -> Option<String> {
 
 /// Runs `llvm-config`, returning the output if the command was successfully executed.
 fn run_llvm_config(arguments: &[&str]) -> Option<String> {
-    run(&env::var("LLVM_CONFIG_PATH").unwrap_or("llvm-config".into()), arguments)
+    run(&env::var("LLVM_CONFIG_PATH").unwrap_or_else(|_| "llvm-config".into()), arguments)
 }
 
 /// Backup search directory globs for FreeBSD and Linux.
