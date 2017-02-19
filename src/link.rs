@@ -42,7 +42,7 @@ macro_rules! link {
         /// The set of functions loaded dynamically.
         #[derive(Debug)]
         pub struct Functions {
-            $($(#[cfg($cfg)])* pub $name: Option<extern fn($($pname: $pty), *) $(-> $ret)*>,)+
+            $($(#[cfg($cfg)])* pub $name: Option<unsafe extern fn($($pname: $pty), *) $(-> $ret)*>,)+
         }
 
         impl Default for Functions {

@@ -1,3 +1,8 @@
+## [0.15.0] - UNRELEASED
+
+### Changed
+- Changed functions in the `Functions` struct to be `unsafe` (`runtime` feature only)
+
 ## [0.14.0] - 2017-01-30
 
 ### Changed
