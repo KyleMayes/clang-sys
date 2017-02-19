@@ -28,14 +28,13 @@ gte_clang_3_7 = []
 gte_clang_3_8 = []
 gte_clang_3_9 = []
 
-runtime = ["lazy_static", "libloading"]
+runtime = ["libloading"]
 static = []
 
 [dependencies]
 
 bitflags = "0.7.0"
 glob = "0.2.11"
-lazy_static = { version = "0.2.1", optional = true }
 libc = "0.2.14"
 libloading = { version = "0.3.0", optional = true }
 

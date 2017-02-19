@@ -30,9 +30,6 @@
 
 #[macro_use]
 extern crate bitflags;
-#[cfg(feature="runtime")]
-#[macro_use]
-extern crate lazy_static;
 
 extern crate glob;
 extern crate libc;
