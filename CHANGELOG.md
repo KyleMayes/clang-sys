@@ -3,6 +3,7 @@
 ### Changed
 - Changed functions in the `Functions` struct to be `unsafe` (`runtime` feature only)
 - Changed `Clang::find` method to ignore directories and non-executable files
+- Changed `Clang::find` to skip dynamic libraries for an incorrect architecture on FreeBSD and Linux
 - Bumped `bitflags` version to `0.7.0`
 
 ## [0.14.0] - 2017-01-30

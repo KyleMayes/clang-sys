@@ -23,7 +23,8 @@
 extern crate glob;
 
 use std::env;
-use std::fs;
+use std::fs::{self, File};
+use std::io::{Read};
 use std::path::{Path, PathBuf};
 use std::process::{Command};
 
@@ -78,13 +79,58 @@ const SEARCH_WINDOWS: &'static [&'static str] = &[
     "C:\\MSYS*\\MinGW*\\lib",
 ];
 
+/// Indicates the type of library being searched for.
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+enum Library {
+    Dynamic,
+    Static,
+}
+
+impl Library {
+    /// Checks whether the supplied file is a valid library for the architecture.
+    fn check(&self, file: &PathBuf) -> Result<(), String> {
+        if cfg!(any(target_os="freebsd", target_os="linux")) {
+            if *self == Library::Static {
+                return Ok(());
+            }
+            let mut file = try!(File::open(file).map_err(|e| e.to_string()));
+            let mut elf = [0; 5];
+            try!(file.read_exact(&mut elf).map_err(|e| e.to_string()));
+            if elf[..4] != [127, 69, 76, 70] {
+                return Err("invalid ELF header".into());
+            }
+            if cfg!(target_pointer_width="32") && elf[4] != 1 {
+                return Err("invalid ELF class (64-bit)".into());
+            }
+            if cfg!(target_pointer_width="64") && elf[4] != 2 {
+                return Err("invalid ELF class (32-bit)".into());
+            }
+            Ok(())
+        } else {
+            Ok(())
+        }
+    }
+}
+
 /// Searches for a library, returning the directory it can be found in if the search was successful.
-fn find(files: &[String], env: &str) -> Result<PathBuf, String> {
+fn find(library: Library, files: &[String], env: &str) -> Result<PathBuf, String> {
+    let mut skipped = vec![];
+
+    /// Attempts to return the supplied file.
+    macro_rules! try_file {
+        ($file:expr) => ({
+            match library.check(&$file) {
+                Ok(_) => return Ok($file),
+                Err(message) => skipped.push(format!("({}: {})", $file.display(), message)),
+            }
+        });
+    }
+
     /// Searches the supplied directory and, on Windows, any relevant sibling directories.
     macro_rules! search_directory {
         ($directory:ident) => {
             if let Some(file) = contains(&$directory, files) {
-                return Ok(file);
+                try_file!(file);
             }
 
             // On Windows, `libclang.dll` is usually found in the LLVM `bin` directory while
@@ -94,7 +140,7 @@ fn find(files: &[String], env: &str) -> Result<PathBuf, String> {
             if cfg!(target_os="windows") && $directory.ends_with("lib") {
                 let sibling = $directory.parent().unwrap().join("bin");
                 if let Some(file) = contains(&sibling, files) {
-                    return Ok(file);
+                    try_file!(file);
                 }
             }
         }
@@ -111,11 +157,11 @@ fn find(files: &[String], env: &str) -> Result<PathBuf, String> {
         let directory = Path::new(output.lines().next().unwrap()).to_path_buf();
         let bin = directory.join("bin");
         if let Some(file) = contains(&bin, files) {
-            return Ok(file);
+            try_file!(file);
         }
         let lib = directory.join("lib");
         if let Some(file) = contains(&lib, files) {
-            return Ok(file);
+            try_file!(file);
         }
     }
 
@@ -141,10 +187,11 @@ fn find(files: &[String], env: &str) -> Result<PathBuf, String> {
     }
 
     let message = format!(
-        "couldn't find any of {}, set the {} environment variable to a path where one of these \
-         files can be found",
+        "couldn't find any of [{}], set the {} environment variable to a path where one of these \
+         files can be found (skipped: [{}])",
         files.iter().map(|f| format!("'{}'", f)).collect::<Vec<_>>().join(", "),
         env,
+        skipped.join(", "),
     );
     Err(message)
 }
@@ -159,7 +206,7 @@ pub fn find_shared_library() -> Result<PathBuf, String> {
         files.push("libclang.dll".into());
     }
     files.push(format!("{}clang{}", env::consts::DLL_PREFIX, env::consts::DLL_SUFFIX));
-    find(&files, "LIBCLANG_PATH")
+    find(Library::Dynamic, &files, "LIBCLANG_PATH")
 }
 
 /// Returns the name of an LLVM or Clang library from a path to such a library.
@@ -213,7 +260,7 @@ fn get_clang_libraries<P: AsRef<Path>>(directory: P) -> Vec<String> {
 /// Find and link to `libclang` statically.
 #[cfg_attr(feature="runtime", allow(dead_code))]
 fn link_static() {
-    let file = find(&["libclang.a".into()], "LIBCLANG_STATIC_PATH").unwrap();
+    let file = find(Library::Static, &["libclang.a".into()], "LIBCLANG_STATIC_PATH").unwrap();
     let directory = file.parent().unwrap();
     print!("cargo:rustc-flags=");
 
