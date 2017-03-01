@@ -57,7 +57,7 @@ pub type CXInclusionVisitor = extern fn(CXFile, *mut CXSourceLocation, c_uint, C
 
 // cenum! ________________________________________
 
-/// Defines a type-safe C enum as a series of constants.
+/// Defines a C enum as a series of constants.
 macro_rules! cenum {
     ($(#[$meta:meta])* enum $name:ident {
         $($(#[$vmeta:meta])* const $variant:ident = $value:expr), +,
