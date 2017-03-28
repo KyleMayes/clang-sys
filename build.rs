@@ -49,8 +49,18 @@ fn run(command: &str, arguments: &[&str]) -> Option<String> {
 }
 
 /// Runs `llvm-config`, returning the output if the command was successfully executed.
-fn run_llvm_config(arguments: &[&str]) -> Option<String> {
-    run(&env::var("LLVM_CONFIG_PATH").unwrap_or_else(|_| "llvm-config".into()), arguments)
+fn run_llvm_config(arguments: &[&str]) -> Result<String, String> {
+    match run(&env::var("LLVM_CONFIG_PATH").unwrap_or_else(|_| "llvm-config".into()), arguments) {
+        Some(output) => Ok(output),
+        None => {
+            let message = format!(
+                "couldn't execute `llvm-config {}`, set the LLVM_CONFIG_PATH environment variable \
+                to a path to a valid `llvm-config` executable",
+                arguments.join(" "),
+            );
+            Err(message)
+        },
+    }
 }
 
 /// Backup search directory globs for FreeBSD and Linux.
@@ -153,7 +163,7 @@ fn find(library: Library, files: &[String], env: &str) -> Result<PathBuf, String
 
     // Search the `bin` and `lib` subdirectories in the directory returned by
     // `llvm-config --prefix` if `llvm-config` is available.
-    if let Some(output) = run_llvm_config(&["--prefix"]) {
+    if let Ok(output) = run_llvm_config(&["--prefix"]) {
         let directory = Path::new(output.lines().next().unwrap()).to_path_buf();
         let bin = directory.join("bin");
         if let Some(file) = contains(&bin, files) {
@@ -216,10 +226,7 @@ fn get_library_name(path: &Path) -> Option<String> {
 
 /// Returns the LLVM libraries required to link to `libclang` statically.
 fn get_llvm_libraries() -> Vec<String> {
-    run_llvm_config(&["--libs"]).expect(
-        "couldn't execute `llvm-config --libs`, set the LLVM_CONFIG_PATH environment variable to a \
-         path to an `llvm-config` executable"
-    ).split_whitespace().filter_map(|p| {
+    run_llvm_config(&["--libs"]).unwrap().split_whitespace().filter_map(|p| {
         // Depending on the version of `llvm-config` in use, listed libraries may be in one of two
         // forms, a full path to the library or simply prefixed with `-l`.
         if p.starts_with("-l") {
@@ -264,12 +271,15 @@ fn link_static() {
     let directory = file.parent().unwrap();
     print!("cargo:rustc-flags=");
 
-    // Specify required LLVM and Clang static libraries.
+    // Specify required Clang static libraries.
     print!("-L {} ", directory.display());
-    for library in get_llvm_libraries() {
+    for library in get_clang_libraries(directory) {
         print!("-l static={} ", library);
     }
-    for library in get_clang_libraries(&directory) {
+
+    // Specify required LLVM static libraries.
+    print!("-L {} ", run_llvm_config(&["--libdir"]).unwrap().trim_right());
+    for library in get_llvm_libraries() {
         print!("-l static={} ", library);
     }
 
