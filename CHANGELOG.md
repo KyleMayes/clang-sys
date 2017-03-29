@@ -1,4 +1,4 @@
-## [0.15.1] - UNRELEASED
+## [0.15.1] - 2017-03-29
 
 ### Fixed
 - Fixed static linking when libraries are in [different directories](https://github.com/KyleMayes/clang-sys/issues/50)
