@@ -29,6 +29,8 @@ function llvm_download() {
 
 if [ "${TRAVIS_OS_NAME}" == "linux" ]; then
     llvm_download linux-gnu-ubuntu-14.04
+    export LD_LIBRARY_PATH=`pwd`/llvm/lib:$LD_LIBRARY_PATH
 else
     llvm_download apple-darwin
+    export DYLD_LIBRARY_PATH=`pwd`/llvm/lib:$DYLD_LIBRARY_PATH
 fi
