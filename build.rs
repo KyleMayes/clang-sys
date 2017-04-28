@@ -12,7 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//! Finds and links to the required `libclang` libraries.
+//! Finds the required `libclang` libraries and links to them.
+//!
+//! # Environment Variables
+//!
+//! This build script can make use of several environment variables to help it find the required
+//! static or dynamic libraries.
+//!
+//! * LLVM_CONFIG_PATH - provides a path to an `llvm-config` executable
+//! * LIBCLANG_PATH - provides a path to a directory containing a `libclang` shared library
+//! * LIBCLANG_STATIC_PATH - provides a path to a directory containing LLVM and Clang static libraries
 
 #![allow(unused_attributes)]
 
@@ -29,12 +38,6 @@ use std::path::{Path, PathBuf};
 use std::process::{Command};
 
 use glob::{MatchOptions};
-
-// Environment variables:
-//
-// * LLVM_CONFIG_PATH - provides a path to an `llvm-config` executable
-// * LIBCLANG_PATH - provides a path to a directory containing a `libclang` shared library
-// * LIBCLANG_STATIC_PATH - provides a path to a directory containing LLVM and Clang static libraries
 
 /// Returns a path to one of the supplied files if such a file can be found in the supplied directory.
 fn contains<D: AsRef<Path>>(directory: D, files: &[String]) -> Option<PathBuf> {
@@ -209,17 +212,17 @@ fn find(library: Library, files: &[String], env: &str) -> Result<PathBuf, String
 /// Searches for a `libclang` shared library, returning the path to such a shared library if the
 /// search was successful.
 pub fn find_shared_library() -> Result<PathBuf, String> {
-    let mut files = vec![];
+    let mut files = vec![format!("{}clang{}", env::consts::DLL_PREFIX, env::consts::DLL_SUFFIX)];
+    if cfg!(target_os="linux") {
+        // Some Linux distributions don't create a `libclang.so` symlink.
+        //
+        // FIXME: We should improve our detection and selection of versioned libraries.
+        files.push("libclang.so.1".into());
+    }
     if cfg!(target_os="windows") {
         // The official LLVM build uses `libclang.dll` on Windows instead of `clang.dll`. However,
         // unofficial builds such as MinGW use `clang.dll`.
         files.push("libclang.dll".into());
-    }
-    files.push(format!("{}clang{}", env::consts::DLL_PREFIX, env::consts::DLL_SUFFIX));
-    if cfg!(target_os = "linux") {
-        // On some linux distros, they don't symlink to libclang.so, but
-        // libclang.so.1.
-        files.push("libclang.so.1".into());
     }
     find(Library::Dynamic, &files, "LIBCLANG_PATH")
 }
