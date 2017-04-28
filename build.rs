@@ -150,13 +150,18 @@ fn find(files: &[String], env: &str) -> Result<PathBuf, String> {
 /// Searches for a `libclang` shared library, returning the path to such a shared library if the
 /// search was successful.
 pub fn find_shared_library() -> Result<PathBuf, String> {
-    let mut files = vec![];
+    let mut files = vec![format!("{}clang{}", env::consts::DLL_PREFIX, env::consts::DLL_SUFFIX)];
+    if cfg!(target_os="linux") {
+        // Some Linux distributions don't create a `libclang.so` symlink.
+        //
+        // FIXME: We should improve our detection and selection of versioned libraries.
+        files.push("libclang.so.1".into());
+    }
     if cfg!(target_os="windows") {
         // The official LLVM build uses `libclang.dll` on Windows instead of `clang.dll`. However,
         // unofficial builds such as MinGW use `clang.dll`.
         files.push("libclang.dll".into());
     }
-    files.push(format!("{}clang{}", env::consts::DLL_PREFIX, env::consts::DLL_SUFFIX));
     find(&files, "LIBCLANG_PATH")
 }
 
