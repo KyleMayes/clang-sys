@@ -216,6 +216,11 @@ pub fn find_shared_library() -> Result<PathBuf, String> {
         files.push("libclang.dll".into());
     }
     files.push(format!("{}clang{}", env::consts::DLL_PREFIX, env::consts::DLL_SUFFIX));
+    if cfg!(target_os = "linux") {
+        // On some linux distros, they don't symlink to libclang.so, but
+        // libclang.so.1.
+        files.push("libclang.so.1".into());
+    }
     find(Library::Dynamic, &files, "LIBCLANG_PATH")
 }
 
