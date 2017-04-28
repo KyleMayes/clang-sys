@@ -1,4 +1,4 @@
-## [0.15.2] - UNRELEASED
+## [0.15.2] - 2017-04-28
 
 ### Fixed
 - Fixed finding of `libclang.so.1` on Linux
