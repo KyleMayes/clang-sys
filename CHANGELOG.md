@@ -1,3 +1,8 @@
+## [0.16.0] - UNRELEASED
+
+### Changed
+- Bumped `libloading` version to `0.4.0`
+
 ## [0.15.2] - 2017-04-28
 
 ### Fixed
