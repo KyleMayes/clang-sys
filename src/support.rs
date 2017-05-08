@@ -132,9 +132,9 @@ fn is_executable(path: &Path) -> io::Result<bool> {
     use libc;
     use std::ffi::CString;
     use std::os::unix::ffi::OsStrExt;
-    let cpath = CString::new(path.as_os_str().as_bytes())?;
-    let res = unsafe { libc::access(cpath.as_ptr(), libc::X_OK) };
-    Ok(res == 0)
+
+    let path = CString::new(path.as_os_str().as_bytes())?;
+    unsafe { Ok(libc::access(path.as_ptr(), libc::X_OK) == 0) }
 }
 
 #[cfg(not(unix))]
