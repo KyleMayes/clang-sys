@@ -1,4 +1,4 @@
-## [0.17.0] - UNRELEASED
+## [0.17.0] - 2017-05-08
 
 ### Changed
 - Change storage type of include search paths from `Vec<PathBuf>` to `Option<Vec<PathBuf>>`
