@@ -39,34 +39,34 @@ use std::process::{Command};
 
 use glob::{MatchOptions};
 
-/// Returns a path to one of the supplied files if such a file can be found in the supplied directory.
-fn contains<D: AsRef<Path>>(directory: D, files: &[String]) -> Option<PathBuf> {
-    fn extract_version(path: &PathBuf) -> Vec<u32> {
-        path.to_str()
-            .unwrap_or("")
-            .split('.')
-            .map(|s| s.parse::<u32>().unwrap_or(0))
-            .collect()
-    }
+/// Returns the components of the version appended to the supplied file.
+fn parse_version(file: &Path) -> Vec<u32> {
+    let string = file.to_str().unwrap_or("");
+    let components = string.split('.').skip(2);
+    components.map(|s| s.parse::<u32>().unwrap_or(0)).collect()
+}
 
+/// Returns a path to one of the supplied files if such a file can be found in the supplied directory.
+fn contains(directory: &Path, files: &[String]) -> Option<PathBuf> {
+    // Join the directory to the files to obtain our glob patterns.
+    let patterns = files.iter().filter_map(|f| directory.join(f).to_str().map(ToOwned::to_owned));
+
+    // Prevent wildcards from matching path separators.
     let mut options = MatchOptions::new();
-    options.case_sensitive = false;
     options.require_literal_separator = true;
 
-    let mut found: Vec<PathBuf> = Vec::new();
-
-    for file in files {
-        if let Some(file_pattern) = directory.as_ref().join(file).to_str() {
-            if let Ok(paths) = glob::glob_with(file_pattern, &options) {
-                for path in paths.filter_map(Result::ok) {
-                    found.push(path);
-                }
-            }
+    // Collect any files that match the glob patterns.
+    let mut matches = patterns.flat_map(|p| {
+        if let Ok(paths) = glob::glob_with(&p, &options) {
+            paths.filter_map(Result::ok).collect()
+        } else {
+            vec![]
         }
-    };
+    }).collect::<Vec<_>>();
 
-    found.sort_by_key(|k| extract_version(k));
-    found.pop()
+    // Sort the matches by their version, preferring shorter and higher versions.
+    matches.sort_by_key(|m| parse_version(m));
+    matches.pop()
 }
 
 /// Runs a console command, returning the output if the command was successfully executed.
@@ -238,9 +238,9 @@ fn find(library: Library, files: &[String], env: &str) -> Result<PathBuf, String
 /// search was successful.
 pub fn find_shared_library() -> Result<PathBuf, String> {
     let mut files = vec![format!("{}clang{}", env::consts::DLL_PREFIX, env::consts::DLL_SUFFIX)];
-    if cfg!(any(target_os="linux", target_os="openbsd")) {
-        // Some Linux distributions don't create a `libclang.so` symlink.
-        //
+    if cfg!(any(target_os="freebsd", target_os="linux", target_os="openbsd")) {
+        // Some BSDs and Linux distributions don't create a `libclang.so` symlink, so we need to
+        // look for any versioned files (e.g., `libclang.so.3.9`).
         files.push("libclang.so.*".into());
     }
     if cfg!(target_os="windows") {
