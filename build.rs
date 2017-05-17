@@ -182,6 +182,25 @@ fn find(library: Library, files: &[String], env: &str) -> Result<PathBuf, String
                 }
             }
         }
+        // On Windows, libclang.dll is usually put in bin directory while
+        // libclang.lib is placed under lib directory. So we try to search
+        // both directories here.
+        if cfg!(target_os="windows") {
+            let dir_path = Path::new(&directory);
+            let alternative_dir = if dir_path.ends_with("lib") {
+                Some("bin")
+            } else if dir_path.ends_with("bin") {
+                Some("lib")
+            } else {
+                None
+            };
+            if let Some(dir) = alternative_dir {
+                let alternative_path = dir_path.parent().unwrap().join(dir);
+                if contains(&alternative_path, file) {
+                    return Some(alternative_path.into_os_string().into_string().unwrap());
+                }
+            }
+        }
     }
 
     // Search the directory provided by the relevant environment variable if it is set.
