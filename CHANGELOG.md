@@ -1,4 +1,4 @@
-## [0.18.0] - UNRELEASED
+## [0.18.0] - 2017-05-16
 
 ### Changed
 - Improved finding of versioned libraries (e.g., `libclang.so.3.9`)
