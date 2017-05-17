@@ -41,7 +41,32 @@ use glob::{MatchOptions};
 
 /// Returns a path to one of the supplied files if such a file can be found in the supplied directory.
 fn contains<D: AsRef<Path>>(directory: D, files: &[String]) -> Option<PathBuf> {
-    files.iter().map(|file| directory.as_ref().join(file)).find(|file| file.exists())
+    fn extract_version(path: &PathBuf) -> Vec<u32> {
+        path.to_str()
+            .unwrap_or("")
+            .split('.')
+            .map(|s| s.parse::<u32>().unwrap_or(0))
+            .collect()
+    }
+
+    let mut options = MatchOptions::new();
+    options.case_sensitive = false;
+    options.require_literal_separator = true;
+
+    let mut found: Vec<PathBuf> = Vec::new();
+
+    for file in files {
+        if let Some(file_pattern) = directory.as_ref().join(file).to_str() {
+            if let Ok(paths) = glob::glob_with(file_pattern, &options) {
+                for path in paths.filter_map(Result::ok) {
+                    found.push(path);
+                }
+            }
+        }
+    };
+
+    found.sort_by_key(|k| extract_version(k));
+    found.pop()
 }
 
 /// Runs a console command, returning the output if the command was successfully executed.
@@ -213,11 +238,10 @@ fn find(library: Library, files: &[String], env: &str) -> Result<PathBuf, String
 /// search was successful.
 pub fn find_shared_library() -> Result<PathBuf, String> {
     let mut files = vec![format!("{}clang{}", env::consts::DLL_PREFIX, env::consts::DLL_SUFFIX)];
-    if cfg!(target_os="linux") {
+    if cfg!(any(target_os="linux", target_os="openbsd")) {
         // Some Linux distributions don't create a `libclang.so` symlink.
         //
-        // FIXME: We should improve our detection and selection of versioned libraries.
-        files.push("libclang.so.1".into());
+        files.push("libclang.so.*".into());
     }
     if cfg!(target_os="windows") {
         // The official LLVM build uses `libclang.dll` on Windows instead of `clang.dll`. However,
