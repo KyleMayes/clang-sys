@@ -59,7 +59,7 @@ pub struct Clang {
 impl Clang {
     //- Constructors -----------------------------
 
-    fn new(path: PathBuf, args: &Vec<String>) -> Clang {
+    fn new(path: PathBuf, args: &[String]) -> Clang {
         let version = parse_version(&path);
         let c_search_paths = parse_search_paths(&path, "c", args);
         let cpp_search_paths = parse_search_paths(&path, "c++", args);
@@ -78,7 +78,7 @@ impl Clang {
     /// first directory searched. Then, the directory returned by `llvm-config --bindir` is
     /// searched. On OS X systems, `xcodebuild -find clang` will next be queried. Last, the
     /// directories in the system's `PATH` are searched.
-    pub fn find(path: Option<&Path>, args: &Vec<String>) -> Option<Clang> {
+    pub fn find(path: Option<&Path>, args: &[String]) -> Option<Clang> {
         if let Ok(path) = env::var("CLANG_PATH") {
             return Some(Clang::new(path.into(), args));
         }
@@ -179,12 +179,10 @@ fn parse_version(path: &Path) -> Option<CXVersion> {
 }
 
 /// Parses the search paths from the output of a `clang` executable if possible.
-fn parse_search_paths(path: &Path, language: &str, args: &Vec<String>) -> Option<Vec<PathBuf>> {
-    let clang_args = vec!["-E", "-x", language, "-", "-v"];
-    let mut clang_args_temp: Vec<String> = clang_args.into_iter().map(|s| s.to_owned()).collect();
-    clang_args_temp.extend(args.iter().cloned());
-    let clang_args_ref: Vec<&str> = clang_args_temp.iter().map(|s| &**s).collect();
-    let output = run_clang(path, &clang_args_ref).1;
+fn parse_search_paths(path: &Path, language: &str, args: &[String]) -> Option<Vec<PathBuf>> {
+    let mut clang_args = vec!["-E", "-x", language, "-", "-v"];
+    clang_args.extend(args.iter().map(|s| &**s));
+    let output = run_clang(path, &clang_args).1;
     let start = try_opt!(output.find("#include <...> search starts here:")) + 34;
     let end = try_opt!(output.find("End of search list."));
     let paths = output[start..end].replace("(framework directory)", "");
