@@ -13,6 +13,7 @@ description = "Rust bindings for libclang."
 documentation = "https://kylemayes.github.io/clang-sys/3_5/clang_sys"
 repository = "https://github.com/KyleMayes/clang-sys"
 
+links = "clang"
 build = "build.rs"
 
 [features]
