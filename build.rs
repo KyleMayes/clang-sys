@@ -379,6 +379,6 @@ fn main() {
 
     if let Ok(output) = run_llvm_config(&["--includedir"]) {
         let directory = Path::new(output.trim_right());
-        println!("cargo:include={}", directory.join("clang-c").display());
+        println!("cargo:include={}", directory.display());
     }
 }
