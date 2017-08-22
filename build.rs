@@ -253,7 +253,16 @@ pub fn find_shared_library() -> Result<PathBuf, String> {
 
 /// Returns the name of an LLVM or Clang library from a path to such a library.
 fn get_library_name(path: &Path) -> Option<String> {
-    path.file_stem().map(|l| l.to_string_lossy()[3..].into())
+    if let Some(path) = path.file_stem() {
+        let path_string = path.to_string_lossy();
+        if path_string.starts_with("lib") {
+            Some(path_string[3..].to_owned())
+        } else {
+            Some(path_string.to_string())
+        }
+    } else {
+        None
+    }
 }
 
 /// Returns the LLVM libraries required to link to `libclang` statically.
