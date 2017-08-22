@@ -311,31 +311,30 @@ fn link_static() {
     let static_lib_file_name = if cfg!(target_os="windows") {"libclang.lib"} else {"libclang.a"};
     let file = find(Library::Static, &[static_lib_file_name.into()], "LIBCLANG_STATIC_PATH").unwrap();
     let directory = file.parent().unwrap();
-    print!("cargo:rustc-flags=");
 
     // Specify required Clang static libraries.
-    print!("-L {} ", directory.display());
+    println!("cargo:rustc-link-search=native={}", directory.display());
     for library in get_clang_libraries(directory) {
-        print!("-l static={} ", library);
+        println!("cargo:rustc-link-lib=static={}", library);
     }
 
     // Specify required LLVM static libraries.
     let llvm_supports_static = run_llvm_config(&["--shared-mode"])
         .map(|mode|mode.trim()=="static").unwrap_or(false);
 
-    print!("-L {} ", run_llvm_config(&["--libdir"]).unwrap().trim_right());
+    println!("cargo:rustc-link-search=native={}", run_llvm_config(&["--libdir"]).unwrap().trim_right());
     for library in get_llvm_libraries() {
-        print!("-l {}{} ", if llvm_supports_static {"static="} else {""}, library);
+        println!("cargo:rustc-link-lib={}{}", if llvm_supports_static {"static="} else {""}, library);
     }
 
     // Specify required system libraries.
     // MSVC doesn't need this, as it tracks deps inside .lib files
     if cfg!(target_os="freebsd") {
-        println!("-l ffi -l ncursesw -l c++ -l z");
+        println!("cargo:rustc-flags=-l ffi -l ncursesw -l c++ -l z");
     } else if cfg!(target_os="linux") {
-        println!("-l ffi -l ncursesw -l stdc++ -l z");
+        println!("cargo:rustc-flags=-l ffi -l ncursesw -l stdc++ -l z");
     } else if cfg!(target_os="macos") {
-        println!("-l ffi -l ncurses -l c++ -l z");
+        println!("cargo:rustc-flags=-l ffi -l ncurses -l c++ -l z");
     }
 }
 
