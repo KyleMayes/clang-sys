@@ -329,14 +329,13 @@ fn link_static() {
     }
 
     // Specify required system libraries.
+    // MSVC doesn't need this, as it tracks deps inside .lib files
     if cfg!(target_os="freebsd") {
         println!("-l ffi -l ncursesw -l c++ -l z");
     } else if cfg!(target_os="linux") {
         println!("-l ffi -l ncursesw -l stdc++ -l z");
     } else if cfg!(target_os="macos") {
         println!("-l ffi -l ncurses -l c++ -l z");
-    } else {
-        panic!("unsupported operating system for static linking");
     }
 }
 
