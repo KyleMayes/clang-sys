@@ -308,7 +308,8 @@ fn get_clang_libraries<P: AsRef<Path>>(directory: P) -> Vec<String> {
 /// Find and link to `libclang` statically.
 #[cfg_attr(feature="runtime", allow(dead_code))]
 fn link_static() {
-    let file = find(Library::Static, &["libclang.a".into()], "LIBCLANG_STATIC_PATH").unwrap();
+    let static_lib_file_name = if cfg!(target_os="windows") {"libclang.lib"} else {"libclang.a"};
+    let file = find(Library::Static, &[static_lib_file_name.into()], "LIBCLANG_STATIC_PATH").unwrap();
     let directory = file.parent().unwrap();
     print!("cargo:rustc-flags=");
 
