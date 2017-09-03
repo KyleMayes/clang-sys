@@ -310,9 +310,12 @@ fn link_static() {
     }
 
     // Specify required LLVM static libraries.
+    let llvm_supports_static = run_llvm_config(&["--shared-mode"])
+        .map(|mode|mode.trim()=="static").unwrap_or(false);
+
     print!("-L {} ", run_llvm_config(&["--libdir"]).unwrap().trim_right());
     for library in get_llvm_libraries() {
-        print!("-l static={} ", library);
+        print!("-l {}{} ", if llvm_supports_static {"static="} else {""}, library);
     }
 
     // Specify required system libraries.
