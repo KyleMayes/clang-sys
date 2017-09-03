@@ -1,6 +1,7 @@
-## [0.18.1] - UNRELEASED
+## [0.19.0] - UNRELEASED
 
 ### Added
+- Added support for `clang` 5.0.x
 - Added `clang` as a link target of this package
 - Added dummy implementations of `is_loaded` for builds with the `static` Cargo feature enabled
 
