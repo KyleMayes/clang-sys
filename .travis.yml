@@ -23,6 +23,11 @@ matrix:
     - os: osx
       env: LLVM_VERSION=4.0 CLANG_VERSION=clang_4_0
 
+cache:
+  directories:
+    - $HOME/.cargo
+    - $HOME/.llvm
+
 before_install: . ./ci/before_install.sh
 
 script: . ./ci/script.sh
