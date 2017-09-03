@@ -253,16 +253,14 @@ pub fn find_shared_library() -> Result<PathBuf, String> {
 
 /// Returns the name of an LLVM or Clang library from a path to such a library.
 fn get_library_name(path: &Path) -> Option<String> {
-    if let Some(path) = path.file_stem() {
-        let path_string = path.to_string_lossy();
-        if path_string.starts_with("lib") {
-            Some(path_string[3..].to_owned())
+    path.file_stem().map(|p| {
+        let string = p.to_string_lossy();
+        if string.starts_with("lib") {
+            string[3..].to_owned()
         } else {
-            Some(path_string.to_string())
+            string.to_string()
         }
-    } else {
-        None
-    }
+    })
 }
 
 /// Returns the LLVM libraries required to link to `libclang` statically.
@@ -308,8 +306,8 @@ fn get_clang_libraries<P: AsRef<Path>>(directory: P) -> Vec<String> {
 /// Find and link to `libclang` statically.
 #[cfg_attr(feature="runtime", allow(dead_code))]
 fn link_static() {
-    let static_lib_file_name = if cfg!(target_os="windows") {"libclang.lib"} else {"libclang.a"};
-    let file = find(Library::Static, &[static_lib_file_name.into()], "LIBCLANG_STATIC_PATH").unwrap();
+    let name = if cfg!(target_os="windows") { "libclang.lib" } else { "libclang.a" };
+    let file = find(Library::Static, &[name.into()], "LIBCLANG_STATIC_PATH").unwrap();
     let directory = file.parent().unwrap();
 
     // Specify required Clang static libraries.
@@ -318,17 +316,18 @@ fn link_static() {
         println!("cargo:rustc-link-lib=static={}", library);
     }
 
-    // Specify required LLVM static libraries.
-    let llvm_supports_static = run_llvm_config(&["--shared-mode"])
-        .map(|mode|mode.trim()=="static").unwrap_or(false);
+    // Determine the shared mode used by LLVM.
+    let mode = run_llvm_config(&["--shared-mode"]).map(|m| m.trim().to_owned());
+    let prefix = if mode.ok().map_or(false, |m| m == "static") { "static" } else { "" };
 
+    // Specify required LLVM static libraries.
     println!("cargo:rustc-link-search=native={}", run_llvm_config(&["--libdir"]).unwrap().trim_right());
     for library in get_llvm_libraries() {
-        println!("cargo:rustc-link-lib={}{}", if llvm_supports_static {"static="} else {""}, library);
+        println!("cargo:rustc-link-lib={}{}", prefix, library);
     }
 
     // Specify required system libraries.
-    // MSVC doesn't need this, as it tracks deps inside .lib files
+    // MSVC doesn't need this, as it tracks dependencies inside `.lib` files.
     if cfg!(target_os="freebsd") {
         println!("cargo:rustc-flags=-l ffi -l ncursesw -l c++ -l z");
     } else if cfg!(target_os="linux") {
