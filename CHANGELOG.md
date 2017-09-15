@@ -1,4 +1,4 @@
-## [0.20.0] - UNRELEASED
+## [0.20.0] - 2017-09-14
 
 ### Added
 - Added support for `clang` 5.0.x
