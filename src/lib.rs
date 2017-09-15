@@ -1536,7 +1536,7 @@ link! {
     pub fn clang_Cursor_isBitField(cursor: CXCursor) -> c_uint;
     pub fn clang_Cursor_isDynamicCall(cursor: CXCursor) -> c_int;
     #[cfg(feature="gte_clang_5_0")]
-    pub fn clang_Cursor_isExternalSymbol(cursor: CXCursor, language: CXString, from: CXString, generated: c_uint) -> c_uint;
+    pub fn clang_Cursor_isExternalSymbol(cursor: CXCursor, language: *mut CXString, from: *mut CXString, generated: *mut c_uint) -> c_uint;
     #[cfg(feature="gte_clang_3_9")]
     pub fn clang_Cursor_isFunctionInlined(cursor: CXCursor) -> c_uint;
     #[cfg(feature="gte_clang_3_9")]
