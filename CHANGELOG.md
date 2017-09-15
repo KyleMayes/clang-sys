@@ -1,9 +1,15 @@
-## [0.19.0] - UNRELEASED
+## [0.20.0] - UNRELEASED
 
 ### Added
 - Added support for `clang` 5.0.x
 - Added `clang` as a link target of this package
 - Added dummy implementations of `is_loaded` for builds with the `static` Cargo feature enabled
+
+## [0.19.0] - 2017-07-02
+
+### Changed
+- Bumped `bitflags` version to `0.9.1`
+- Added `args` parameter to `Clang::new` function which passes arguments to the Clang executable
 
 ## [0.18.0] - 2017-05-16
 
