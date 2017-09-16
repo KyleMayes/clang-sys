@@ -318,7 +318,7 @@ fn link_static() {
 
     // Determine the shared mode used by LLVM.
     let mode = run_llvm_config(&["--shared-mode"]).map(|m| m.trim().to_owned());
-    let prefix = if mode.ok().map_or(false, |m| m == "static") { "static" } else { "" };
+    let prefix = if mode.ok().map_or(false, |m| m == "static") { "static=" } else { "" };
 
     // Specify required LLVM static libraries.
     println!("cargo:rustc-link-search=native={}", run_llvm_config(&["--libdir"]).unwrap().trim_right());
