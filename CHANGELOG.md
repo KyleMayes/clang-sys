@@ -1,4 +1,4 @@
-## [0.20.1] - UNRELEASED
+## [0.20.1] - 2017-09-16
 
 ### Fixed
 - Fixed static linking
