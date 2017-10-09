@@ -30,9 +30,6 @@
 #![cfg_attr(feature="clippy", plugin(clippy))]
 #![cfg_attr(feature="clippy", warn(clippy))]
 
-#[macro_use]
-extern crate bitflags;
-
 extern crate glob;
 extern crate libc;
 #[cfg(feature="runtime")]
@@ -63,6 +60,13 @@ pub type CXInclusionVisitor = extern fn(CXFile, *mut CXSourceLocation, c_uint, C
 macro_rules! cenum {
     ($(#[$meta:meta])* enum $name:ident {
         $($(#[$vmeta:meta])* const $variant:ident = $value:expr), +,
+    }) => (
+        pub type $name = c_int;
+
+        $($(#[$vmeta])* pub const $variant: $name = $value;)+
+    );
+    ($(#[$meta:meta])* enum $name:ident {
+        $($(#[$vmeta:meta])* const $variant:ident = $value:expr); +;
     }) => (
         pub type $name = c_int;
 
@@ -890,18 +894,16 @@ cenum! {
 // Flags
 //================================================
 
-bitflags! {
-    #[repr(C)]
-    pub struct CXCodeComplete_Flags: c_uint {
+cenum! {
+    enum CXCodeComplete_Flags {
         const CXCodeComplete_IncludeMacros = 1;
         const CXCodeComplete_IncludeCodePatterns = 2;
         const CXCodeComplete_IncludeBriefComments = 4;
     }
 }
 
-bitflags! {
-    #[repr(C)]
-    pub struct CXCompletionContext: c_uint {
+cenum! {
+    enum CXCompletionContext {
         const CXCompletionContext_Unexposed = 0;
         const CXCompletionContext_AnyType = 1;
         const CXCompletionContext_AnyValue = 2;
@@ -929,9 +931,8 @@ bitflags! {
     }
 }
 
-bitflags! {
-    #[repr(C)]
-    pub struct CXDiagnosticDisplayOptions: c_uint {
+cenum! {
+    enum CXDiagnosticDisplayOptions {
         const CXDiagnostic_DisplaySourceLocation = 1;
         const CXDiagnostic_DisplayColumn = 2;
         const CXDiagnostic_DisplaySourceRanges = 4;
@@ -941,9 +942,8 @@ bitflags! {
     }
 }
 
-bitflags! {
-    #[repr(C)]
-    pub struct CXGlobalOptFlags: c_uint {
+cenum! {
+    enum CXGlobalOptFlags {
         const CXGlobalOpt_None = 0;
         const CXGlobalOpt_ThreadBackgroundPriorityForIndexing = 1;
         const CXGlobalOpt_ThreadBackgroundPriorityForEditing = 2;
@@ -951,16 +951,14 @@ bitflags! {
     }
 }
 
-bitflags! {
-    #[repr(C)]
-    pub struct CXIdxDeclInfoFlags: c_uint {
+cenum! {
+    enum CXIdxDeclInfoFlags {
         const CXIdxDeclFlag_Skipped = 1;
     }
 }
 
-bitflags! {
-    #[repr(C)]
-    pub struct CXIndexOptFlags: c_uint {
+cenum! {
+    enum CXIndexOptFlags {
         const CXIndexOptNone = 0;
         const CXIndexOptSuppressRedundantRefs = 1;
         const CXIndexOptIndexFunctionLocalSymbols = 2;
@@ -970,18 +968,16 @@ bitflags! {
     }
 }
 
-bitflags! {
-    #[repr(C)]
-    pub struct CXNameRefFlags: c_uint {
+cenum! {
+    enum CXNameRefFlags {
         const CXNameRange_WantQualifier = 1;
         const CXNameRange_WantTemplateArgs = 2;
         const CXNameRange_WantSinglePiece = 4;
     }
 }
 
-bitflags! {
-    #[repr(C)]
-    pub struct CXObjCDeclQualifierKind: c_uint {
+cenum! {
+    enum CXObjCDeclQualifierKind {
         const CXObjCDeclQualifier_None = 0;
         const CXObjCDeclQualifier_In = 1;
         const CXObjCDeclQualifier_Inout = 2;
@@ -992,9 +988,8 @@ bitflags! {
     }
 }
 
-bitflags! {
-    #[repr(C)]
-    pub struct CXObjCPropertyAttrKind: c_uint {
+cenum! {
+    enum CXObjCPropertyAttrKind {
         const CXObjCPropertyAttr_noattr = 0;
         const CXObjCPropertyAttr_readonly = 1;
         const CXObjCPropertyAttr_getter = 2;
@@ -1013,23 +1008,20 @@ bitflags! {
     }
 }
 
-bitflags! {
-    #[repr(C)]
-    pub struct CXReparse_Flags: c_uint {
+cenum! {
+    enum CXReparse_Flags {
         const CXReparse_None = 0;
     }
 }
 
-bitflags! {
-    #[repr(C)]
-    pub struct CXSaveTranslationUnit_Flags: c_uint {
+cenum! {
+    enum CXSaveTranslationUnit_Flags {
         const CXSaveTranslationUnit_None = 0;
     }
 }
 
-bitflags! {
-    #[repr(C)]
-    pub struct CXTranslationUnit_Flags: c_uint {
+cenum! {
+    enum CXTranslationUnit_Flags {
         const CXTranslationUnit_None = 0;
         const CXTranslationUnit_DetailedPreprocessingRecord = 1;
         const CXTranslationUnit_Incomplete = 2;
