@@ -1,3 +1,8 @@
+## [0.21.0] - 2017-10-10
+
+### Fixed
+* Fixed soundness of flags in Linux32.
+
 ## [0.20.1] - 2017-09-16
 
 ### Fixed
