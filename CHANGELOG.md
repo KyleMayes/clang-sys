@@ -1,3 +1,8 @@
+## [0.21.0] - 2017-10-11
+
+### Changed
+* Replaced `bitflags` usage with constants which avoids crashes on 32-bit Linux platforms
+
 ## [0.20.1] - 2017-09-16
 
 ### Fixed
