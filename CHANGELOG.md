@@ -1,3 +1,8 @@
+## [0.21.1] - UNRELEASED
+
+### Fixed
+* Fixed compilation failures on the beta and nightly channels caused by a [compiler bug](https://github.com/KyleMayes/clang-sys/pull/69)
+
 ## [0.21.0] - 2017-10-11
 
 ### Changed
