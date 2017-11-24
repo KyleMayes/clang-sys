@@ -103,7 +103,7 @@ fn run_llvm_config(arguments: &[&str]) -> Result<String, String> {
 }
 
 /// Backup search directory globs for FreeBSD and Linux.
-const SEARCH_LINUX: &'static [&'static str] = &[
+const SEARCH_LINUX: &[&str] = &[
     "/usr/lib*",
     "/usr/lib*/*",
     "/usr/lib*/*/*",
@@ -114,7 +114,7 @@ const SEARCH_LINUX: &'static [&'static str] = &[
 ];
 
 /// Backup search directory globs for OS X.
-const SEARCH_OSX: &'static [&'static str] = &[
+const SEARCH_OSX: &[&str] = &[
     "/usr/local/opt/llvm*/lib",
     "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib",
     "/Library/Developer/CommandLineTools/usr/lib",
@@ -122,7 +122,7 @@ const SEARCH_OSX: &'static [&'static str] = &[
 ];
 
 /// Backup search directory globs for Windows.
-const SEARCH_WINDOWS: &'static [&'static str] = &[
+const SEARCH_WINDOWS: &[&str] = &[
     "C:\\LLVM\\lib",
     "C:\\Program Files*\\LLVM\\lib",
     "C:\\MSYS*\\MinGW*\\lib",
@@ -289,7 +289,7 @@ fn get_llvm_libraries() -> Vec<String> {
 }
 
 /// Clang libraries required to link to `libclang` 3.5 and later statically.
-const CLANG_LIBRARIES: &'static [&'static str] = &[
+const CLANG_LIBRARIES: &[&str] = &[
     "clang",
     "clangAST",
     "clangAnalysis",
