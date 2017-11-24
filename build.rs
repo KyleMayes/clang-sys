@@ -39,11 +39,22 @@ use std::process::{Command};
 
 use glob::{MatchOptions};
 
+/// Returns the version in the supplied file if one can be found.
+fn find_version(file: &str) -> Option<&str> {
+    if file.starts_with("libclang.so.") {
+        Some(&file[12..])
+    } else if file.starts_with("libclang-") {
+        Some(&file[9..])
+    } else {
+        None
+    }
+}
+
 /// Returns the components of the version appended to the supplied file.
 fn parse_version(file: &Path) -> Vec<u32> {
-    let string = file.to_str().unwrap_or("");
-    let components = string.split('.').skip(2);
-    components.map(|s| s.parse::<u32>().unwrap_or(0)).collect()
+    let file = file.file_name().and_then(|f| f.to_str()).unwrap_or("");
+    let version = find_version(file).unwrap_or("");
+    version.split('.').map(|s| s.parse::<u32>().unwrap_or(0)).collect()
 }
 
 /// Returns a path to one of the supplied files if such a file can be found in the supplied directory.
@@ -240,8 +251,9 @@ pub fn find_shared_library() -> Result<PathBuf, String> {
     let mut files = vec![format!("{}clang{}", env::consts::DLL_PREFIX, env::consts::DLL_SUFFIX)];
     if cfg!(any(target_os="freebsd", target_os="linux", target_os="openbsd")) {
         // Some BSDs and Linux distributions don't create a `libclang.so` symlink, so we need to
-        // look for any versioned files (e.g., `libclang.so.3.9`).
+        // look for any versioned files (e.g., `libclang.so.3.9` or `libclang-3.9.so`).
         files.push("libclang.so.*".into());
+        files.push("libclang-*.so".into());
     }
     if cfg!(target_os="windows") {
         // The official LLVM build uses `libclang.dll` on Windows instead of `clang.dll`. However,

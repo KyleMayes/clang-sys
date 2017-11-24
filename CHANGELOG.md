@@ -1,5 +1,8 @@
 ## [0.21.1] - UNRELEASED
 
+### Changed
+- Improved finding of versioned libraries (e.g., `libclang-3.9.so`)
+
 ### Fixed
 * Fixed compilation failures on the beta and nightly channels caused by a [compiler bug](https://github.com/KyleMayes/clang-sys/pull/69)
 
