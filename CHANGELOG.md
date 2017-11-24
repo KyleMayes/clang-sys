@@ -1,4 +1,4 @@
-## [0.21.1] - UNRELEASED
+## [0.21.1] - 2017-11-24
 
 ### Changed
 - Improved finding of versioned libraries (e.g., `libclang-3.9.so`)
