@@ -24,7 +24,10 @@ macro_rules! link {
         #[cfg($cfg)]
         pub fn $name(library: &mut super::SharedLibrary) {
             let symbol = unsafe { library.library.get(stringify!($name).as_bytes()) }.ok();
-            library.functions.$name = symbol.map(|s| *s);
+            library.functions.$name = match symbol {
+                Some(s) => *s,
+                None => None,
+            };
         }
 
         #[cfg(not($cfg))]
