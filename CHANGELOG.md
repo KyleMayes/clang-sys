@@ -2,6 +2,7 @@
 
 ### Changed
 - Added original errors to error messages
+- Added support for searching for libraries in `LD_LIBRARY_PATH` directories
 
 ## [0.21.1] - 2017-11-24
 
