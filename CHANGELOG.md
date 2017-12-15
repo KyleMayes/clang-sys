@@ -1,3 +1,8 @@
+## [0.21.2] - UNRELEASED
+
+### Changed
+- Added original errors to error messages
+
 ## [0.21.1] - 2017-11-24
 
 ### Changed
