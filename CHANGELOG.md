@@ -1,4 +1,4 @@
-## [0.22.0] - UNRELEASED
+## [0.22.0] - 2018-03-11
 
 ### Added
 - Added support for `clang` 6.0.x
