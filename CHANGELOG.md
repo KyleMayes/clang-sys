@@ -2,6 +2,8 @@
 
 ### Added
 - Added support for `clang` 6.0.x
+- Bumped `libc` version to `0.2.39`
+- Bumped `libloading` version to `0.5.0`
 
 ## [0.21.2] - 2018-02-17
 
