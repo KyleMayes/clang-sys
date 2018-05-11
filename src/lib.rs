@@ -1391,6 +1391,16 @@ pub struct CXStringSet {
 
 default!(#[cfg(feature="gte_clang_3_8")] CXStringSet);
 
+#[cfg(feature="gte_clang_6_0")]
+#[derive(Copy, Clone, Debug)]
+#[repr(C)]
+pub struct CXStringSet {
+    pub Strings: *mut CXString,
+    pub Count: c_uint,
+}
+
+default!(#[cfg(feature="gte_clang_6_0")] CXStringSet);
+
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct CXTUResourceUsage {
