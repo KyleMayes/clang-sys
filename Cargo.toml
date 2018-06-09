@@ -44,10 +44,6 @@ glob = "0.2.11"
 libc = "0.2.39"
 libloading = { version = "0.5.0", optional = true }
 
-clippy = { version = "0.0.*", optional = true }
-
 [build-dependencies]
 
 glob = "0.2.11"
-
-clippy = { version = "0.0.*", optional = true }

@@ -25,10 +25,6 @@
 
 #![allow(unused_attributes)]
 
-#![cfg_attr(feature="clippy", feature(plugin))]
-#![cfg_attr(feature="clippy", plugin(clippy))]
-#![cfg_attr(feature="clippy", warn(clippy))]
-
 extern crate glob;
 
 use std::env;
