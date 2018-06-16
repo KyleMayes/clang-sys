@@ -1,4 +1,4 @@
-## [0.23.0] - UNRELEASED
+## [0.23.0] - 2018-06-16
 
 ### Changed
 - Changed `Clang::find` to skip dynamic libraries for an incorrect architecture on Windows
