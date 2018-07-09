@@ -1,3 +1,8 @@
+## [0.24.0] - UNRELEASED
+
+### Added
+- Added support for `clang` 7.0.x
+
 ## [0.23.0] - 2018-06-16
 
 ### Changed
