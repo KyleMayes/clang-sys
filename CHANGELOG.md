@@ -1,5 +1,8 @@
 ## [0.24.0] - UNRELEASED
 
+### Changed
+- Reworked finding of libraries (see `README.md` for details)
+
 ### Added
 - Added support for `clang` 7.0.x
 

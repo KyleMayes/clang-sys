@@ -51,21 +51,22 @@ the `runtime` Cargo feature.
 These libraries can be either be installed as a part of Clang or downloaded
 [here](http://llvm.org/releases/download.html).
 
-**Note:** This crate supports finding versioned instances of `libclang.so` (e.g.,
-`libclang.so.3.9` or `libclang-3.9.so`). In the case where there are multiple instances to choose
-from, this crate will prefer an unversioned instance first, then the version with the shortest and
-highest version. For example, the following instances of `libclang.so` are listed in descending
-order of preference:
-
-1. `libclang.so`
-2. `libclang.so.4`
-3. `libclang.so.4.0`
-4. `libclang.so.3`
-5. `libclang.so.3.9`
-
 **Note:** The downloads for LLVM and Clang 3.8 and later do not include the `libclang.a` static
 library. This means you cannot link to any of these versions of `libclang` statically unless you
 build it from source.
+
+### Versioned Dependencies
+
+This crate supports finding versioned instances of `libclang.so` (e.g.,`libclang-3.9.so`).
+In the case where there are multiple instances to choose from, this crate will prefer instances with
+higher versions. For example, the following instances of `libclang.so` are listed in descending
+order of preference:
+
+1. `libclang-4.0.so`
+2. `libclang-4.so`
+3. `libclang-3.9.so`
+4. `libclang-3.so`
+5. `libclang.so`
 
 ## Environment Variables
 
@@ -83,11 +84,12 @@ and executables:
 
 ### Dynamic
 
-First, the `libclang` shared library will be searched for in the directory provided by the
-`LIBCLANG_PATH` environment variable if it was set. If this fails, the directory returned by
-`llvm-config --libdir` will be searched. Failing that, the directories in the `LD_LIBRARY_PATH`
-environment variable will be searched. If none of these approaches is successful, a list of likely
-directories will be searched (e.g., `/usr/local/lib` on Linux).
+`libclang` shared libraries will be searched for in the following directories:
+
+* the directory provided by the `LIBCLANG_PATH` environment variable
+* the directory returned by `llvm-config --libdir`
+* the directories provided by `LD_LIBRARY_PATH` environment variable
+* a list of likely directories for the target platform (e.g., `/usr/local/lib` on Linux)
 
 On Linux, running an executable that has been dynamically linked to `libclang` may require you to
 add a path to `libclang.so` to the `LD_LIBRARY_PATH` environment variable. The same is true on OS
@@ -101,8 +103,8 @@ On Windows, running an executable that has been dynamically linked to `libclang`
 
 The availability of `llvm-config` is not optional for static linking. Ensure that an instance of
 this executable can be found on your system's path or set the `LLVM_CONFIG_PATH` environment
-variable. The required LLVM and Clang static libraries will be searched for in the same way as the
-shared library is searched for, except the `LIBCLANG_STATIC_PATH` environment variable is used in
+variable. The required LLVM and Clang static libraries will be searched for in the same way as
+shared libraries are searched for, except the `LIBCLANG_STATIC_PATH` environment variable is used in
 place of the `LIBCLANG_PATH` environment variable.
 
 ### Runtime
