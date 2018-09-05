@@ -87,9 +87,10 @@ and executables:
 `libclang` shared libraries will be searched for in the following directories:
 
 * the directory provided by the `LIBCLANG_PATH` environment variable
-* the directory returned by `llvm-config --libdir`
+* the `bin` and `lib` directories in the directory provided by `llvm-config --libdir`
 * the directories provided by `LD_LIBRARY_PATH` environment variable
 * a list of likely directories for the target platform (e.g., `/usr/local/lib` on Linux)
+* **macOS only:** the toolchain directory in the directory provided by `xcode-select --print-path`
 
 On Linux, running an executable that has been dynamically linked to `libclang` may require you to
 add a path to `libclang.so` to the `LD_LIBRARY_PATH` environment variable. The same is true on OS

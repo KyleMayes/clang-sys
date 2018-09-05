@@ -98,7 +98,16 @@ pub fn search_libclang_directories(files: &[String], variable: &str) -> Vec<(Pat
 
     let mut found = vec![];
 
-    // Search the `bin` and `lib` subdirectories in directory provided by `llvm-config --prefix`.
+    // Search the toolchain directory in the directory provided by `xcode-select --print-path`.
+    if cfg!(target_os="macos") {
+        if let Some(output) = run_command("xcode-select", &["--print-path"]) {
+            let directory = Path::new(output.lines().next().unwrap()).to_path_buf();
+            let directory = directory.join("Toolchains/XcodeDefault.xctoolchain/usr/lib");
+            found.extend(search_directory(&directory, files));
+        }
+    }
+
+    // Search the `bin` and `lib` directories in directory provided by `llvm-config --prefix`.
     if let Ok(output) = run_llvm_config(&["--prefix"]) {
         let directory = Path::new(output.lines().next().unwrap()).to_path_buf();
         found.extend(search_directory(&directory.join("bin"), files));
