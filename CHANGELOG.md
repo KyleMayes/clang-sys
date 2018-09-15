@@ -1,4 +1,4 @@
-## [0.24.0] - UNRELEASED
+## [0.24.0] - 2018-09-15
 
 ### Changed
 - Reworked finding of libraries (see `README.md` for details)
