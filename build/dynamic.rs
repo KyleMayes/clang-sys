@@ -102,8 +102,9 @@ fn search_libclang_directories() -> Result<Vec<(PathBuf, String, Vec<u32>)>, Str
 
     if cfg!(any(target_os="freebsd", target_os="linux", target_os="openbsd")) {
         // Some BSDs and Linux distributions don't create a `libclang.so` symlink, so we need to
-        // look for versioned files (e.g., `libclang-3.9.so`).
+        // look for versioned files (e.g., `libclang-3.9.so` or `libclang.so.7.0`).
         files.push("libclang-*.so".into());
+        files.push("libclang.so.*".into());
     }
 
     if cfg!(target_os="windows") {
