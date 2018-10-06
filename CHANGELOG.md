@@ -1,4 +1,4 @@
-## [0.25.0] - UNRELEASED
+## [0.25.0] - 2018-10-06
 
 ### Changed
 - Added support for versioned libraries on BSDs
