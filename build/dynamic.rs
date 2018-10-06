@@ -100,10 +100,16 @@ fn parse_version(filename: &str) -> Vec<u32> {
 fn search_libclang_directories() -> Result<Vec<(PathBuf, String, Vec<u32>)>, String> {
     let mut files = vec![format!("{}clang{}", env::consts::DLL_PREFIX, env::consts::DLL_SUFFIX)];
 
-    if cfg!(any(target_os="freebsd", target_os="linux", target_os="openbsd")) {
-        // Some BSDs and Linux distributions don't create a `libclang.so` symlink, so we need to
+    if cfg!(target_os="linux") {
+        // Some Linux distributions don't create a `libclang.so` symlink, so we need to
         // look for versioned files (e.g., `libclang-3.9.so`).
         files.push("libclang-*.so".into());
+    }
+
+    if cfg!(any(target_os="openbsd", target_os="freebsd", target_os="netbsd")) {
+        // Some BSDs distributions don't create a `libclang.so` symlink either, but use
+        // a different naming scheme for versioned files (e.g., `libclang.so.7.0`).
+        files.push("libclang.so.*".into());
     }
 
     if cfg!(target_os="windows") {
@@ -186,7 +192,11 @@ pub fn link() {
 
         println!("cargo:rustc-link-lib=dylib=libclang");
     } else {
-        let name = filename.replace("lib", "").replace(".so", "");
+        let filename = filename.replace("lib", "");
+        let name = match filename.find(".so") {
+            None => &filename,
+            Some(n) => &filename[0..n],
+        };
         println!("cargo:rustc-link-lib=dylib={}", name);
     }
 }
