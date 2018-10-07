@@ -97,17 +97,25 @@ fn parse_version(filename: &str) -> Vec<u32> {
 }
 
 /// Returns the paths to, the filenames, and the versions of the `libclang` shared libraries.
-fn search_libclang_directories() -> Result<Vec<(PathBuf, String, Vec<u32>)>, String> {
+fn search_libclang_directories(runtime: bool) -> Result<Vec<(PathBuf, String, Vec<u32>)>, String> {
     let mut files = vec![format!("{}clang{}", env::consts::DLL_PREFIX, env::consts::DLL_SUFFIX)];
 
     if cfg!(target_os="linux") {
         // Some Linux distributions don't create a `libclang.so` symlink, so we need to
         // look for versioned files (e.g., `libclang-3.9.so`).
         files.push("libclang-*.so".into());
+
+        // Some Linux distributions don't create a `libclang.so` symlink and don't have
+        // versioned files as described above, so we need to look for suffix versioned
+        // files (e.g., `libclang.so.1`). However, `ld` cannot link to these files, so
+        // this will only be included when linking at runtime.
+        if runtime {
+            files.push("libclang.so.*".into());
+        }
     }
 
     if cfg!(any(target_os="openbsd", target_os="freebsd", target_os="netbsd")) {
-        // Some BSDs distributions don't create a `libclang.so` symlink either, but use
+        // Some BSD distributions don't create a `libclang.so` symlink either, but use
         // a different naming scheme for versioned files (e.g., `libclang.so.7.0`).
         files.push("libclang.so.*".into());
     }
@@ -147,8 +155,8 @@ fn search_libclang_directories() -> Result<Vec<(PathBuf, String, Vec<u32>)>, Str
 }
 
 /// Returns the directory and filename of the "best" available `libclang` shared library.
-pub fn find() -> Result<(PathBuf, String), String> {
-    search_libclang_directories()?.iter()
+pub fn find(runtime: bool) -> Result<(PathBuf, String), String> {
+    search_libclang_directories(runtime)?.iter()
         .max_by_key(|f| &f.2)
         .cloned()
         .map(|(path, filename, _)| (path, filename))
@@ -160,7 +168,7 @@ pub fn find() -> Result<(PathBuf, String), String> {
 pub fn link() {
     use std::fs;
 
-    let (directory, filename) = find().unwrap();
+    let (directory, filename) = find(false).unwrap();
     println!("cargo:rustc-link-search={}", directory.display());
 
     if cfg!(all(target_os="windows", target_env="msvc")) {
@@ -192,11 +200,14 @@ pub fn link() {
 
         println!("cargo:rustc-link-lib=dylib=libclang");
     } else {
-        let filename = filename.replace("lib", "");
-        let name = match filename.find(".so") {
-            None => &filename,
-            Some(n) => &filename[0..n],
+        let name = filename.replace("lib", "");
+
+        // Strip trailing version numbers (e.g., the `.7.0` in `libclang.so.7.0`).
+        let name = match name.find(".so") {
+            None => &name,
+            Some(index) => &name[0..index],
         };
+
         println!("cargo:rustc-link-lib=dylib={}", name);
     }
 }

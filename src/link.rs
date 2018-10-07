@@ -119,7 +119,7 @@ macro_rules! link {
                 pub mod dynamic { include!(concat!(env!("OUT_DIR"), "/dynamic.rs")); }
             }
 
-            let (directory, filename) = try!(build::dynamic::find());
+            let (directory, filename) = try!(build::dynamic::find(true));
             let path = directory.join(filename);
 
             let library = libloading::Library::new(&path).map_err(|e| {
