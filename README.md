@@ -68,6 +68,12 @@ order of preference:
 4. `libclang-3.so`
 5. `libclang.so`
 
+**Note:** On BSD distributions, versioned instances of `libclang.so` matching the pattern
+`libclang.so.*` (e.g., `libclang.so.7.0`) are also included.
+
+**Note:** On Linux distributions when the `runtime` features is enabled, versioned instances of
+`libclang.so` matching the pattern `libclang.so.*` (e.g., `libclang.so.1`) are also included.
+
 ## Environment Variables
 
 The following environment variables, if set, are used by this crate to find the required libraries
