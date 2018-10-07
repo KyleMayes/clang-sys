@@ -1,4 +1,4 @@
-## [0.26.0] - UNRELEASED
+## [0.26.0] - 2018-10-07
 
 ### Changed
 - Added support for finding libraries with version suffixes on Linux when using runtime linking (e.g., `libclang.so.1`)
