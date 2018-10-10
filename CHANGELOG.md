@@ -1,4 +1,4 @@
-## [0.26.1] - UNRELEASED
+## [0.26.1] - 2018-10-10
 
 ### Fixed
 - Fixed support for finding libraries in `bin` directories on Windows
