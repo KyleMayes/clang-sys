@@ -88,12 +88,29 @@ fn search_directory(directory: &Path, filenames: &[String]) -> Vec<(PathBuf, Str
     }).collect::<Vec<_>>()
 }
 
+/// Returns the paths to and the filenames of the files matching the supplied filename patterns in
+/// the supplied directory, checking any relevant sibling directories.
+fn search_directories(directory: &Path, filenames: &[String]) -> Vec<(PathBuf, String)> {
+    let mut results = search_directory(directory, filenames);
+
+    // On Windows, `libclang.dll` is usually found in the LLVM `bin` directory while
+    // `libclang.lib` is usually found in the LLVM `lib` directory. To keep things
+    // consistent with other platforms, only LLVM `lib` directories are included in the
+    // backup search directory globs so we need to search the LLVM `bin` directory here.
+    if cfg!(target_os="windows") && directory.ends_with("lib") {
+        let sibling = directory.parent().unwrap().join("bin");
+        results.extend(search_directory(&sibling, filenames).into_iter());
+    }
+
+    results
+}
+
 /// Returns the paths to and the filenames of the `libclang` static or dynamic libraries matching
 /// the supplied filename patterns.
 pub fn search_libclang_directories(files: &[String], variable: &str) -> Vec<(PathBuf, String)> {
     // Search the directory provided by the relevant environment variable.
     if let Ok(directory) = env::var(variable).map(|d| Path::new(&d).to_path_buf()) {
-        return search_directory(&directory, files);
+        return search_directories(&directory, files);
     }
 
     let mut found = vec![];
@@ -103,21 +120,21 @@ pub fn search_libclang_directories(files: &[String], variable: &str) -> Vec<(Pat
         if let Some(output) = run_command("xcode-select", &["--print-path"]) {
             let directory = Path::new(output.lines().next().unwrap()).to_path_buf();
             let directory = directory.join("Toolchains/XcodeDefault.xctoolchain/usr/lib");
-            found.extend(search_directory(&directory, files));
+            found.extend(search_directories(&directory, files));
         }
     }
 
     // Search the `bin` and `lib` directories in directory provided by `llvm-config --prefix`.
     if let Ok(output) = run_llvm_config(&["--prefix"]) {
         let directory = Path::new(output.lines().next().unwrap()).to_path_buf();
-        found.extend(search_directory(&directory.join("bin"), files));
-        found.extend(search_directory(&directory.join("lib"), files));
+        found.extend(search_directories(&directory.join("bin"), files));
+        found.extend(search_directories(&directory.join("lib"), files));
     }
 
     // Search the directories provided by the `LD_LIBRARY_PATH` environment variable.
     if let Ok(path) = env::var("LD_LIBRARY_PATH") {
         for directory in path.split(':').map(Path::new) {
-            found.extend(search_directory(&directory, files));
+            found.extend(search_directories(&directory, files));
         }
     }
 
@@ -139,7 +156,7 @@ pub fn search_libclang_directories(files: &[String], variable: &str) -> Vec<(Pat
     for directory in directories.iter().rev() {
         if let Ok(directories) = glob::glob_with(directory, &options) {
             for directory in directories.filter_map(Result::ok).filter(|p| p.is_dir()) {
-                found.extend(search_directory(&directory, files));
+                found.extend(search_directories(&directory, files));
             }
         }
     }
