@@ -14,7 +14,7 @@ rust: stable
 
 env:
   - LLVM_VERSION=3.5 CLANG_VERSION=clang_3_5
-  - LLVM_VERSION=5.0 CLANG_VERSION=clang_5_0
+  - LLVM_VERSION=7.0 CLANG_VERSION=clang_7_0
 
 cache:
   directories:
