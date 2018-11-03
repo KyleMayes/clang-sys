@@ -1,3 +1,8 @@
+## [0.26.2] - UNRELEASED
+
+### Fixed
+- Fixed dynamic linking on macOS
+
 ## [0.26.1] - 2018-10-10
 
 ### Fixed
