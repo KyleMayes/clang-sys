@@ -1,4 +1,4 @@
-## [0.26.3] - UNRELEASED
+## [0.26.3] - 2018-11-14
 
 ### Changed
 - Disable default features of `libc` dependency
