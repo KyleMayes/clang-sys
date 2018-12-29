@@ -1,3 +1,8 @@
+## [0.26.4] - UNRELEASED
+
+### Changed
+- Added shared library path to `SharedLibrary` struct
+
 ## [0.26.3] - 2018-11-14
 
 ### Changed
