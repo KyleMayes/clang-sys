@@ -1,4 +1,4 @@
-## [0.27.0] - UNRELEASED
+## [0.27.0] - 2019-01-10
 
 ### Changed
 - Added version detection for libraries without versions embedded in the filename
