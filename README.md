@@ -55,24 +55,34 @@ These libraries can be either be installed as a part of Clang or downloaded
 library. This means you cannot link to any of these versions of `libclang` statically unless you
 build it from source.
 
-### Versioned Dependencies
+### Dynamic
 
-This crate supports finding versioned instances of `libclang.so` (e.g.,`libclang-3.9.so`).
-In the case where there are multiple instances to choose from, this crate will prefer instances with
-higher versions. For example, the following instances of `libclang.so` are listed in descending
-order of preference:
+#### Versions
 
-1. `libclang-4.0.so`
-2. `libclang-4.so`
-3. `libclang-3.9.so`
-4. `libclang-3.so`
-5. `libclang.so`
+This crate supports finding instances of the `libclang` shared library that have versions embedded
+in the filename when attempting to link to `libclang` dynamically. The following filename patterns
+are included in the search:
 
-**Note:** On BSD distributions, versioned instances of `libclang.so` matching the pattern
-`libclang.so.*` (e.g., `libclang.so.7.0`) are also included.
+ * Linux distributions:<br>
+   `libclang-*.so` (e.g., `libclang-4.0.so`)
+ * BSD distributions:<br>
+   `libclang.so.*` (e.g., `libclang.so.4.0`)
+ * Linux distributions with the `runtime` feature enabled:<br>
+   `libclang.so.*` (e.g., `libclang.so.1`)
 
-**Note:** On Linux distributions when the `runtime` features is enabled, versioned instances of
-`libclang.so` matching the pattern `libclang.so.*` (e.g., `libclang.so.1`) are also included.
+#### Selection
+
+In the case where there are multiple instances of `libclang.so` to choose from, this crate will
+prefer the instance with the highest version. The version of an instance of `libclang.so` is
+determined by loading the instance and inspecting it.
+
+For example, the following list displays a list of candidate instances listed in descending order of
+preference.
+
+1. `libclang.so.1` (version determined as 6.0)
+2. `libclang.so` (version determined as 5.0)
+3. `libclang-3.9.so` (version determined as 3.9)
+4. `libclang-3.so` (version determined as 3.8)
 
 ## Environment Variables
 

@@ -1,3 +1,8 @@
+## [0.27.0] - UNRELEASED
+
+### Changed
+- Added version detection for libraries without versions embedded in the filename
+
 ## [0.26.4] - 2018-12-29
 
 ### Changed
