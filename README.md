@@ -84,6 +84,10 @@ preference.
 3. `libclang-3.9.so` (version determined as 3.9)
 4. `libclang-3.so` (version determined as 3.8)
 
+To enforce that the selected instance has a version at least as high as the requested version,
+enable the `assert-minimum` feature. This feature will cause the build to fail with a descriptive
+error message indicating that the `libclang` instances found do not meet the minimum version.
+
 ## Environment Variables
 
 The following environment variables, if set, are used by this crate to find the required libraries

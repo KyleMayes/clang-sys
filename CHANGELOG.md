@@ -3,6 +3,9 @@
 ### Changed
 - Added version detection for libraries without versions embedded in the filename
 
+### Added
+- Added `assert-minimum` feature (see `README.md` for details)
+
 ## [0.26.4] - 2018-12-29
 
 ### Changed
