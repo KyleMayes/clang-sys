@@ -1,4 +1,4 @@
-## [0.28.0] - UNRELEASED
+## [0.28.0] - 2019-02-17
 
 ### Changed
 - Changed `llvm-config` to be first search candidate on macOS
