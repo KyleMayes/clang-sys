@@ -1,5 +1,8 @@
 ## [0.28.0] - UNRELEASED
 
+### Added
+- Added support for `clang` 8.0.x
+
 ### Removed
 - Removed `assert-minimum` feature
 - Removed version detection for libraries without versions embedded in the filename
