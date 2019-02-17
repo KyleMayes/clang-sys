@@ -37,7 +37,6 @@ gte_clang_5_0 = []
 gte_clang_6_0 = []
 gte_clang_7_0 = []
 
-assert-minimum = []
 runtime = ["libloading"]
 static = []
 

@@ -176,50 +176,13 @@ fn search_libclang_directories(runtime: bool) -> Result<Vec<(PathBuf, String, Ve
     Err(message)
 }
 
-/// Returns the requested minimum version.
-fn get_minimum() -> &'static [u32] {
-    macro_rules! test {
-        ($feature:expr, $version:expr) => {
-            if cfg!(feature=$feature) {
-                return $version;
-            }
-        };
-    }
-
-    test!("clang_7_0", &[7, 0]);
-    test!("clang_6_0", &[6, 0]);
-    test!("clang_5_0", &[5, 0]);
-    test!("clang_4_0", &[4, 0]);
-    test!("clang_3_9", &[3, 9]);
-    test!("clang_3_8", &[3, 8]);
-    test!("clang_3_7", &[3, 7]);
-    test!("clang_3_6", &[3, 6]);
-    &[3, 5]
-}
-
 /// Returns the directory and filename of the "best" available `libclang` shared library.
 pub fn find(runtime: bool) -> Result<(PathBuf, String), String> {
-    let candidates = search_libclang_directories(runtime)?;
-    let (path, filename, version) = candidates.iter()
+    search_libclang_directories(runtime)?.iter()
         .max_by_key(|f| &f.2)
         .cloned()
-        .expect("unreachable");
-
-    // Assert that the selected version is at least as high as the requested version.
-    let minimum = get_minimum();
-    if cfg!(feature="assert-minimum") && &version[..] < minimum {
-        return Err(format!(
-            "couldn't find any valid shared libraries with a minimum version of {:?} \
-            (invalid: [{}])",
-            minimum,
-            candidates.iter()
-                .map(|c| format!("({}: {:?})", c.0.join(&c.1).display(), c.2))
-                .collect::<Vec<_>>()
-                .join(", "),
-        ));
-    }
-
-    Ok((path, filename))
+        .map(|(path, filename, _)| (path, filename))
+        .ok_or_else(|| "unreachable".into())
 }
 
 /// Find and link to `libclang` dynamically.

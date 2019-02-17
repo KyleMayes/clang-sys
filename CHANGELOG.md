@@ -1,3 +1,8 @@
+## [0.28.0] - UNRELEASED
+
+### Removed
+- Removed `assert-minimum` feature
+
 ## [0.27.0] - 2019-01-10
 
 ### Changed
