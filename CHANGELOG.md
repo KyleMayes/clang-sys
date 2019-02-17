@@ -2,6 +2,7 @@
 
 ### Removed
 - Removed `assert-minimum` feature
+- Removed version detection for libraries without versions embedded in the filename
 
 ## [0.27.0] - 2019-01-10
 

@@ -12,14 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-extern crate libloading;
-
 use std::env;
 use std::fs::{File};
 use std::io::{Read, Seek, SeekFrom};
 use std::path::{Path, PathBuf};
-
-use self::libloading::{Library};
 
 use super::common;
 
@@ -87,38 +83,17 @@ fn validate_header(path: &Path) -> Result<(), String> {
     }
 }
 
-/// Determines the version of the supplied `libclang` shared library by loading functions only
-/// available on certain versions.
-fn determine_version(path: &Path) -> Result<Vec<u32>, String> {
-    let library = Library::new(&path).map_err(|e| {
-        format!(
-            "the `libclang` shared library at {} could not be opened: {}",
-            path.display(),
-            e,
-        )
-    })?;
+/// Returns the components of the version in the supplied `libclang` shared library filename.
+fn parse_version(filename: &str) -> Vec<u32> {
+    let version = if filename.starts_with("libclang.so.") {
+        &filename[12..]
+    } else if filename.starts_with("libclang-") {
+        &filename[9..filename.len() - 3]
+    } else {
+        return vec![];
+    };
 
-    macro_rules! test {
-        ($fn:expr, $version:expr) => {
-            if library.get::<unsafe extern fn()>($fn).is_ok() {
-                return Ok($version);
-            }
-        };
-    }
-
-    unsafe {
-        test!(b"clang_File_tryGetRealPathName", vec![7, 0]);
-        test!(b"clang_CXIndex_setInvocationEmissionPathOption", vec![6, 0]);
-        test!(b"clang_Cursor_isExternalSymbol", vec![5, 0]);
-        test!(b"clang_EvalResult_getAsLongLong", vec![4, 0]);
-        test!(b"clang_CXXConstructor_isConvertingConstructor", vec![3, 9]);
-        test!(b"clang_CXXField_isMutable", vec![3, 8]);
-        test!(b"clang_Cursor_getOffsetOfField", vec![3, 7]);
-        test!(b"clang_Cursor_getStorageClass", vec![3, 6]);
-        test!(b"clang_Type_getNumTemplateArguments", vec![3, 5]);
-    }
-
-    Ok(vec![])
+    version.split('.').map(|s| s.parse().unwrap_or(0)).collect()
 }
 
 /// Returns the paths to, the filenames, and the versions of the `libclang` shared libraries.
@@ -156,8 +131,11 @@ fn search_libclang_directories(runtime: bool) -> Result<Vec<(PathBuf, String, Ve
     let mut invalid = vec![];
     for (directory, filename) in common::search_libclang_directories(&files, "LIBCLANG_PATH") {
         let path = directory.join(&filename);
-        match validate_header(&path).and_then(|_| determine_version(&path)) {
-            Ok(version) => valid.push((directory, filename, version)),
+        match validate_header(&path) {
+            Ok(()) => {
+                let version = parse_version(&filename);
+                valid.push((directory, filename, version))
+            },
             Err(message) => invalid.push(format!("({}: {})", path.display(), message)),
         }
     }
