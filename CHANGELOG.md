@@ -1,5 +1,8 @@
 ## [0.28.0] - UNRELEASED
 
+### Changed
+- Changed `llvm-config` to be first search candidate on macOS
+
 ### Added
 - Added support for `clang` 8.0.x
 
