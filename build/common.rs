@@ -28,7 +28,7 @@ const DIRECTORIES_LINUX: &[&str] = &[
     "/usr/local/lib*",
     "/usr/local/lib*/*",
     "/usr/local/lib*/*/*",
-    "/usr/local/llvm*/lib",
+    "/usr/local/llvm*/lib*",
 ];
 
 /// `libclang` directory patterns for OS X.
@@ -120,6 +120,7 @@ pub fn search_libclang_directories(files: &[String], variable: &str) -> Vec<(Pat
         let directory = Path::new(output.lines().next().unwrap()).to_path_buf();
         found.extend(search_directories(&directory.join("bin"), files));
         found.extend(search_directories(&directory.join("lib"), files));
+        found.extend(search_directories(&directory.join("lib64"), files));
     }
 
     // Search the toolchain directory in the directory provided by `xcode-select --print-path`.
