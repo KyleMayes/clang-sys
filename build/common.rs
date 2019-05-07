@@ -77,7 +77,7 @@ fn search_directory(directory: &Path, filenames: &[String]) -> Vec<(PathBuf, Str
     options.require_literal_separator = true;
 
     paths.flat_map(|p| {
-        if let Ok(paths) = glob::glob_with(&p, &options) {
+        if let Ok(paths) = glob::glob_with(&p, options) {
             paths.filter_map(Result::ok).collect()
         } else {
             vec![]
@@ -155,7 +155,7 @@ pub fn search_libclang_directories(files: &[String], variable: &str) -> Vec<(Pat
     options.case_sensitive = false;
     options.require_literal_separator = true;
     for directory in directories.iter().rev() {
-        if let Ok(directories) = glob::glob_with(directory, &options) {
+        if let Ok(directories) = glob::glob_with(directory, options) {
             for directory in directories.filter_map(Result::ok).filter(|p| p.is_dir()) {
                 found.extend(search_directories(&directory, files));
             }

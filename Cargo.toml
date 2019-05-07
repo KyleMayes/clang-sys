@@ -44,10 +44,10 @@ static = []
 
 [dependencies]
 
-glob = "0.2.11"
+glob = "0.3"
 libc = { version = "0.2.39", default-features = false }
 libloading = { version = "0.5.0", optional = true }
 
 [build-dependencies]
 
-glob = "0.2.11"
+glob = "0.3"
