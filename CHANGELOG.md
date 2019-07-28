@@ -1,3 +1,8 @@
+## [0.28.1] - UNRELEASED
+
+### Changed
+- Bumped `glob` version to `0.3.0`
+
 ## [0.28.0] - 2019-02-17
 
 ### Changed
