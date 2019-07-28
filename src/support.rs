@@ -28,8 +28,6 @@ use super::CXVersion;
 // Macros
 //================================================
 
-// try_opt! ______________________________________
-
 macro_rules! try_opt {
     ($option:expr) => {{
         match $option {
@@ -50,37 +48,35 @@ pub struct Clang {
     pub path: PathBuf,
     /// The version of this `clang` executable if it could be parsed.
     pub version: Option<CXVersion>,
-    /// The directories searched by this `clang` executable for C headers if they could be parsed.
+    /// The directories searched by this `clang` executable for C headers if
+    /// they could be parsed.
     pub c_search_paths: Option<Vec<PathBuf>>,
-    /// The directories searched by this `clang` executable for C++ headers if they could be parsed.
+    /// The directories searched by this `clang` executable for C++ headers if
+    /// they could be parsed.
     pub cpp_search_paths: Option<Vec<PathBuf>>,
 }
 
 impl Clang {
-    //- Constructors -----------------------------
-
-    fn new(path: PathBuf, args: &[String]) -> Clang {
-        let version = parse_version(&path);
-        let c_search_paths = parse_search_paths(&path, "c", args);
-        let cpp_search_paths = parse_search_paths(&path, "c++", args);
-        Clang {
-            path,
-            version,
-            c_search_paths,
-            cpp_search_paths,
+    fn new(path: impl AsRef<Path>, args: &[String]) -> Self {
+        Self {
+            path: path.as_ref().into(),
+            version: parse_version(path.as_ref()),
+            c_search_paths: parse_search_paths(path.as_ref(), "c", args),
+            cpp_search_paths: parse_search_paths(path.as_ref(), "c++", args),
         }
     }
 
     /// Returns a `clang` executable if one can be found.
     ///
-    /// If the `CLANG_PATH` environment variable is set, that is the instance of `clang` used.
-    /// Otherwise, a series of directories are searched. First, If a path is supplied, that is the
-    /// first directory searched. Then, the directory returned by `llvm-config --bindir` is
-    /// searched. On macOS systems, `xcodebuild -find clang` will next be queried. Last, the
+    /// If the `CLANG_PATH` environment variable is set, that is the instance of
+    /// `clang` used. Otherwise, a series of directories are searched. First, if
+    /// a path is supplied, that is the first directory searched. Then, the
+    /// directory returned by `llvm-config --bindir` is searched. On macOS
+    /// systems, `xcodebuild -find clang` will next be queried. Last, the
     /// directories in the system's `PATH` are searched.
     pub fn find(path: Option<&Path>, args: &[String]) -> Option<Clang> {
         if let Ok(path) = env::var("CLANG_PATH") {
-            return Some(Clang::new(path.into(), args));
+            return Some(Clang::new(path, args));
         }
 
         let mut paths = vec![];
@@ -105,6 +101,7 @@ impl Clang {
                 return Some(Clang::new(path, args));
             }
         }
+
         None
     }
 }
@@ -113,8 +110,8 @@ impl Clang {
 // Functions
 //================================================
 
-/// Returns the first match to the supplied glob patterns in the supplied directory if there are any
-/// matches.
+/// Returns the first match to the supplied glob patterns in the supplied
+/// directory if there are any matches.
 fn find(directory: &Path, patterns: &[&str]) -> Option<PathBuf> {
     for pattern in patterns {
         let pattern = directory.join(pattern).to_string_lossy().into_owned();
@@ -127,12 +124,12 @@ fn find(directory: &Path, patterns: &[&str]) -> Option<PathBuf> {
             }
         }
     }
+
     None
 }
 
 #[cfg(unix)]
 fn is_executable(path: &Path) -> io::Result<bool> {
-    use libc;
     use std::ffi::CString;
     use std::os::unix::ffi::OsStrExt;
 
@@ -145,7 +142,8 @@ fn is_executable(_: &Path) -> io::Result<bool> {
     Ok(true)
 }
 
-/// Attempts to run an executable, returning the `stdout` and `stderr` output if successful.
+/// Attempts to run an executable, returning the `stdout` and `stderr` output if
+/// successful.
 fn run(executable: &str, arguments: &[&str]) -> Result<(String, String), String> {
     Command::new(executable)
         .args(arguments)

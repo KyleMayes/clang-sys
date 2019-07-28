@@ -36,8 +36,9 @@ fn get_llvm_libraries() -> Vec<String> {
         .unwrap()
         .split_whitespace()
         .filter_map(|p| {
-            // Depending on the version of `llvm-config` in use, listed libraries may be in one of two
-            // forms, a full path to the library or simply prefixed with `-l`.
+            // Depending on the version of `llvm-config` in use, listed
+            // libraries may be in one of two forms, a full path to the library
+            // or simply prefixed with `-l`.
             if p.starts_with("-l") {
                 Some(p[2..].into())
             } else {
@@ -87,6 +88,7 @@ fn find() -> PathBuf {
     } else {
         "libclang.a"
     };
+
     let files = common::search_libclang_directories(&[name.into()], "LIBCLANG_STATIC_PATH");
     if let Some((directory, _)) = files.into_iter().nth(0) {
         directory
@@ -116,7 +118,7 @@ pub fn link() {
     // Specify required LLVM static libraries.
     println!(
         "cargo:rustc-link-search=native={}",
-        common::run_llvm_config(&["--libdir"]).unwrap().trim_right()
+        common::run_llvm_config(&["--libdir"]).unwrap().trim_end()
     );
     for library in get_llvm_libraries() {
         println!("cargo:rustc-link-lib={}{}", prefix, library);

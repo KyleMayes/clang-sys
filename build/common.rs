@@ -46,28 +46,29 @@ const DIRECTORIES_WINDOWS: &[&str] = &[
     "C:\\MSYS*\\MinGW*\\lib",
 ];
 
-/// Executes the supplied console command, returning the `stdout` output if the command was
-/// successfully executed.
+/// Executes the supplied console command, returning the `stdout` output if the
+/// command was successfully executed.
 fn run_command(command: &str, arguments: &[&str]) -> Option<String> {
     let output = Command::new(command).args(arguments).output().ok()?;
     Some(String::from_utf8_lossy(&output.stdout).into_owned())
 }
 
-/// Executes `llvm-config`, returning the `stdout` output if the command was successfully executed.
+/// Executes `llvm-config`, returning the `stdout` output if the command was
+/// successfully executed.
 pub fn run_llvm_config(arguments: &[&str]) -> Result<String, String> {
     let command = env::var("LLVM_CONFIG_PATH").unwrap_or_else(|_| "llvm-config".into());
     match run_command(&command, arguments) {
         Some(output) => Ok(output),
         None => Err(format!(
-            "couldn't execute `llvm-config {}`, set the LLVM_CONFIG_PATH environment variable to a \
-            path to a valid `llvm-config` executable",
+            "couldn't execute `llvm-config {}`, set the LLVM_CONFIG_PATH \
+             environment variable to a path to a valid `llvm-config` executable",
             arguments.join(" "),
         )),
     }
 }
 
-/// Returns the paths to and the filenames of the files matching the supplied filename patterns in
-/// the supplied directory.
+/// Returns the paths to and the filenames of the files matching the supplied
+/// filename patterns in the supplied directory.
 fn search_directory(directory: &Path, filenames: &[String]) -> Vec<(PathBuf, String)> {
     // Join the directory to the filename patterns to obtain the path patterns.
     let paths = filenames
@@ -93,15 +94,17 @@ fn search_directory(directory: &Path, filenames: &[String]) -> Vec<(PathBuf, Str
         .collect::<Vec<_>>()
 }
 
-/// Returns the paths to and the filenames of the files matching the supplied filename patterns in
-/// the supplied directory, checking any relevant sibling directories.
+/// Returns the paths to and the filenames of the files matching the supplied
+/// filename patterns in the supplied directory, checking any relevant sibling
+/// directories.
 fn search_directories(directory: &Path, filenames: &[String]) -> Vec<(PathBuf, String)> {
     let mut results = search_directory(directory, filenames);
 
-    // On Windows, `libclang.dll` is usually found in the LLVM `bin` directory while
-    // `libclang.lib` is usually found in the LLVM `lib` directory. To keep things
-    // consistent with other platforms, only LLVM `lib` directories are included in the
-    // backup search directory globs so we need to search the LLVM `bin` directory here.
+    // On Windows, `libclang.dll` is usually found in the LLVM `bin` directory
+    // while `libclang.lib` is usually found in the LLVM `lib` directory. To
+    // keep things consistent with other platforms, only LLVM `lib` directories
+    // are included in the backup search directory globs so we need to search
+    // the LLVM `bin` directory here.
     if cfg!(target_os = "windows") && directory.ends_with("lib") {
         let sibling = directory.parent().unwrap().join("bin");
         results.extend(search_directory(&sibling, filenames).into_iter());
@@ -110,8 +113,8 @@ fn search_directories(directory: &Path, filenames: &[String]) -> Vec<(PathBuf, S
     results
 }
 
-/// Returns the paths to and the filenames of the `libclang` static or dynamic libraries matching
-/// the supplied filename patterns.
+/// Returns the paths to and the filenames of the `libclang` static or dynamic
+/// libraries matching the supplied filename patterns.
 pub fn search_libclang_directories(files: &[String], variable: &str) -> Vec<(PathBuf, String)> {
     // Search the directory provided by the relevant environment variable.
     if let Ok(directory) = env::var(variable).map(|d| Path::new(&d).to_path_buf()) {
@@ -120,7 +123,8 @@ pub fn search_libclang_directories(files: &[String], variable: &str) -> Vec<(Pat
 
     let mut found = vec![];
 
-    // Search the `bin` and `lib` directories in directory provided by `llvm-config --prefix`.
+    // Search the `bin` and `lib` directories in directory provided by
+    // `llvm-config --prefix`.
     if let Ok(output) = run_llvm_config(&["--prefix"]) {
         let directory = Path::new(output.lines().next().unwrap()).to_path_buf();
         found.extend(search_directories(&directory.join("bin"), files));
@@ -128,7 +132,8 @@ pub fn search_libclang_directories(files: &[String], variable: &str) -> Vec<(Pat
         found.extend(search_directories(&directory.join("lib64"), files));
     }
 
-    // Search the toolchain directory in the directory provided by `xcode-select --print-path`.
+    // Search the toolchain directory in the directory provided by
+    // `xcode-select --print-path`.
     if cfg!(target_os = "macos") {
         if let Some(output) = run_command("xcode-select", &["--print-path"]) {
             let directory = Path::new(output.lines().next().unwrap()).to_path_buf();
@@ -137,7 +142,8 @@ pub fn search_libclang_directories(files: &[String], variable: &str) -> Vec<(Pat
         }
     }
 
-    // Search the directories provided by the `LD_LIBRARY_PATH` environment variable.
+    // Search the directories provided by the `LD_LIBRARY_PATH` environment
+    // variable.
     if let Ok(path) = env::var("LD_LIBRARY_PATH") {
         for directory in path.split(':').map(Path::new) {
             found.extend(search_directories(&directory, files));

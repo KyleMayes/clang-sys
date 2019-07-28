@@ -77,7 +77,7 @@ fn main() {
     }
 
     if let Ok(output) = common::run_llvm_config(&["--includedir"]) {
-        let directory = Path::new(output.trim_right());
+        let directory = Path::new(output.trim_end());
         println!("cargo:include={}", directory.display());
     }
 }

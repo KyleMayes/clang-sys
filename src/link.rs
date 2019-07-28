@@ -16,8 +16,6 @@
 // Macros
 //================================================
 
-// link! _________________________________________
-
 #[cfg(feature = "runtime")]
 macro_rules! link {
     (@LOAD: #[cfg($cfg:meta)] fn $name:ident($($pname:ident: $pty:ty), *) $(-> $ret:ty)*) => (
@@ -58,10 +56,8 @@ macro_rules! link {
         }
 
         impl SharedLibrary {
-            //- Constructors -----------------------------
-
-            fn new(library: libloading::Library, path: PathBuf) -> SharedLibrary {
-                SharedLibrary { library, path, functions: Functions::default() }
+            fn new(library: libloading::Library, path: PathBuf) -> Self {
+                Self { library, path, functions: Functions::default() }
             }
 
             pub fn path(&self) -> &Path {

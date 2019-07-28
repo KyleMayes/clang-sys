@@ -41,9 +41,7 @@ mod link;
 
 use std::mem;
 
-#[cfg(feature = "gte_clang_6_0")]
-use libc::size_t;
-use libc::{c_char, c_int, c_longlong, c_uint, c_ulong, c_ulonglong, c_void, time_t};
+use libc::*;
 
 pub type CXClientData = *mut c_void;
 pub type CXCursorVisitor = extern "C" fn(CXCursor, CXCursor, CXClientData) -> CXChildVisitResult;
@@ -54,8 +52,6 @@ pub type CXInclusionVisitor = extern "C" fn(CXFile, *mut CXSourceLocation, c_uin
 //================================================
 // Macros
 //================================================
-
-// cenum! ________________________________________
 
 /// Defines a C enum as a series of constants.
 macro_rules! cenum {
@@ -74,8 +70,6 @@ macro_rules! cenum {
         $($(#[$vmeta])* pub const $variant: $name = $value;)+
     );
 }
-
-// default! ______________________________________
 
 /// Implements a zeroing implementation of `Default` for the supplied type.
 macro_rules! default {
