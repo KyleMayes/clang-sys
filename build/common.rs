@@ -49,22 +49,44 @@ const DIRECTORIES_WINDOWS: &[&str] = &[
 /// Executes the supplied console command, returning the `stdout` output if the
 /// command was successfully executed.
 fn run_command(command: &str, arguments: &[&str]) -> Option<String> {
-    let output = Command::new(command).args(arguments).output().ok()?;
+    macro_rules! warn {
+        ($error:expr) => {
+            println!(
+                "cargo:warning=couldn't execute `{} {}` ({})",
+                command,
+                arguments.join(" "),
+                $error,
+            );
+        };
+    }
+
+    let output = match Command::new(command).args(arguments).output() {
+        Ok(output) => output,
+        Err(error) => {
+            warn!(format!("error: {}", error));
+            return None;
+        }
+    };
+
+    if !output.status.success() {
+        warn!(format!("exit code: {}", output.status));
+        return None;
+    }
+
     Some(String::from_utf8_lossy(&output.stdout).into_owned())
 }
 
 /// Executes `llvm-config`, returning the `stdout` output if the command was
 /// successfully executed.
-pub fn run_llvm_config(arguments: &[&str]) -> Result<String, String> {
-    let command = env::var("LLVM_CONFIG_PATH").unwrap_or_else(|_| "llvm-config".into());
-    match run_command(&command, arguments) {
-        Some(output) => Ok(output),
-        None => Err(format!(
-            "couldn't execute `llvm-config {}`, set the LLVM_CONFIG_PATH \
-             environment variable to a path to a valid `llvm-config` executable",
-            arguments.join(" "),
-        )),
+pub fn run_llvm_config(arguments: &[&str]) -> Option<String> {
+    let path = env::var("LLVM_CONFIG_PATH").unwrap_or_else(|_| "llvm-config".into());
+
+    let output = run_command(&path, arguments);
+    if output.is_none() {
+        println!("cargo:warning=set the LLVM_CONFIG_PATH environment variable to a valid `llvm-config` executable");
     }
+
+    output
 }
 
 /// Returns the paths to and the filenames of the files matching the supplied
@@ -134,7 +156,7 @@ pub fn search_libclang_directories(files: &[String], variable: &str) -> Vec<(Pat
 
     // Search the `bin` and `lib` directories in directory provided by
     // `llvm-config --prefix`.
-    if let Ok(output) = run_llvm_config(&["--prefix"]) {
+    if let Some(output) = run_llvm_config(&["--prefix"]) {
         let directory = Path::new(output.lines().next().unwrap()).to_path_buf();
         found.extend(search_directories(&directory.join("bin"), files));
         found.extend(search_directories(&directory.join("lib"), files));

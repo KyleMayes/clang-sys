@@ -2,6 +2,7 @@
 
 ### Changed
 - Bumped `glob` version to `0.3.0`
+- Improved error message when an invocation of an executable is not successful
 
 ### Fixed
 - Fixed

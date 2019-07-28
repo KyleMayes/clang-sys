@@ -76,7 +76,7 @@ fn main() {
         dynamic::link();
     }
 
-    if let Ok(output) = common::run_llvm_config(&["--includedir"]) {
+    if let Some(output) = common::run_llvm_config(&["--includedir"]) {
         let directory = Path::new(output.trim_end());
         println!("cargo:include={}", directory.display());
     }

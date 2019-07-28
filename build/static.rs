@@ -109,7 +109,7 @@ pub fn link() {
 
     // Determine the shared mode used by LLVM.
     let mode = common::run_llvm_config(&["--shared-mode"]).map(|m| m.trim().to_owned());
-    let prefix = if mode.ok().map_or(false, |m| m == "static") {
+    let prefix = if mode.map_or(false, |m| m == "static") {
         "static="
     } else {
         ""
