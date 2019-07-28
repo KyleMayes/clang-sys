@@ -3,6 +3,11 @@
 ### Changed
 - Bumped `glob` version to `0.3.0`
 
+### Fixed
+- Fixed
+  [`libclang-cpp`](https://github.com/llvm-mirror/clang/commit/90d6722bdcbc2af52306f7e948c556ad6185ac48)
+  being linked instead of `libclang`
+
 ## [0.28.0] - 2019-02-17
 
 ### Changed

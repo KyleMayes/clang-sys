@@ -89,6 +89,15 @@ fn search_directory(directory: &Path, filenames: &[String]) -> Vec<(PathBuf, Str
         })
         .filter_map(|p| {
             let filename = p.file_name().and_then(|f| f.to_str())?;
+
+            // The `libclang_shared` library has been renamed to `libclang-cpp`
+            // in Clang 10. This can cause instances of this library (e.g.,
+            // `libclang-cpp.so.10`) to be matched by patterns looking for
+            // instances of `libclang`.
+            if filename.contains("-cpp.") {
+                return None;
+            }
+
             Some((directory.to_owned(), filename.into()))
         })
         .collect::<Vec<_>>()
