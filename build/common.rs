@@ -16,9 +16,9 @@ extern crate glob;
 
 use std::env;
 use std::path::{Path, PathBuf};
-use std::process::{Command};
+use std::process::Command;
 
-use glob::{MatchOptions};
+use glob::MatchOptions;
 
 /// `libclang` directory patterns for FreeBSD and Linux.
 const DIRECTORIES_LINUX: &[&str] = &[
@@ -70,22 +70,27 @@ pub fn run_llvm_config(arguments: &[&str]) -> Result<String, String> {
 /// the supplied directory.
 fn search_directory(directory: &Path, filenames: &[String]) -> Vec<(PathBuf, String)> {
     // Join the directory to the filename patterns to obtain the path patterns.
-    let paths = filenames.iter().filter_map(|f| directory.join(f).to_str().map(ToOwned::to_owned));
+    let paths = filenames
+        .iter()
+        .filter_map(|f| directory.join(f).to_str().map(ToOwned::to_owned));
 
     // Prevent wildcards from matching path separators.
     let mut options = MatchOptions::new();
     options.require_literal_separator = true;
 
-    paths.flat_map(|p| {
-        if let Ok(paths) = glob::glob_with(&p, options) {
-            paths.filter_map(Result::ok).collect()
-        } else {
-            vec![]
-        }
-    }).filter_map(|p| {
-        let filename = p.file_name().and_then(|f| f.to_str())?;
-        Some((directory.to_owned(), filename.into()))
-    }).collect::<Vec<_>>()
+    paths
+        .flat_map(|p| {
+            if let Ok(paths) = glob::glob_with(&p, options) {
+                paths.filter_map(Result::ok).collect()
+            } else {
+                vec![]
+            }
+        })
+        .filter_map(|p| {
+            let filename = p.file_name().and_then(|f| f.to_str())?;
+            Some((directory.to_owned(), filename.into()))
+        })
+        .collect::<Vec<_>>()
 }
 
 /// Returns the paths to and the filenames of the files matching the supplied filename patterns in
@@ -97,7 +102,7 @@ fn search_directories(directory: &Path, filenames: &[String]) -> Vec<(PathBuf, S
     // `libclang.lib` is usually found in the LLVM `lib` directory. To keep things
     // consistent with other platforms, only LLVM `lib` directories are included in the
     // backup search directory globs so we need to search the LLVM `bin` directory here.
-    if cfg!(target_os="windows") && directory.ends_with("lib") {
+    if cfg!(target_os = "windows") && directory.ends_with("lib") {
         let sibling = directory.parent().unwrap().join("bin");
         results.extend(search_directory(&sibling, filenames).into_iter());
     }
@@ -124,7 +129,7 @@ pub fn search_libclang_directories(files: &[String], variable: &str) -> Vec<(Pat
     }
 
     // Search the toolchain directory in the directory provided by `xcode-select --print-path`.
-    if cfg!(target_os="macos") {
+    if cfg!(target_os = "macos") {
         if let Some(output) = run_command("xcode-select", &["--print-path"]) {
             let directory = Path::new(output.lines().next().unwrap()).to_path_buf();
             let directory = directory.join("Toolchains/XcodeDefault.xctoolchain/usr/lib");
@@ -140,11 +145,11 @@ pub fn search_libclang_directories(files: &[String], variable: &str) -> Vec<(Pat
     }
 
     // Determine the `libclang` directory patterns.
-    let directories = if cfg!(any(target_os="freebsd", target_os="linux")) {
+    let directories = if cfg!(any(target_os = "freebsd", target_os = "linux")) {
         DIRECTORIES_LINUX
-    } else if cfg!(target_os="macos") {
+    } else if cfg!(target_os = "macos") {
         DIRECTORIES_MACOS
-    } else if cfg!(target_os="windows") {
+    } else if cfg!(target_os = "windows") {
         DIRECTORIES_WINDOWS
     } else {
         &[]

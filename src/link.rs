@@ -18,7 +18,7 @@
 
 // link! _________________________________________
 
-#[cfg(feature="runtime")]
+#[cfg(feature = "runtime")]
 macro_rules! link {
     (@LOAD: #[cfg($cfg:meta)] fn $name:ident($($pname:ident: $pty:ty), *) $(-> $ret:ty)*) => (
         #[cfg($cfg)]
@@ -189,7 +189,7 @@ macro_rules! link {
     )
 }
 
-#[cfg(not(feature="runtime"))]
+#[cfg(not(feature = "runtime"))]
 macro_rules! link {
     ($($(#[cfg($cfg:meta)])* pub fn $name:ident($($pname:ident: $pty:ty), *) $(-> $ret:ty)*;)+) => (
         extern { $($(#[cfg($cfg)])* pub fn $name($($pname: $pty), *) $(-> $ret)*;)+ }
