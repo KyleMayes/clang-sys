@@ -147,9 +147,18 @@ fn search_directories(directory: &Path, filenames: &[String]) -> Vec<(PathBuf, S
 /// Returns the paths to and the filenames of the `libclang` static or dynamic
 /// libraries matching the supplied filename patterns.
 pub fn search_libclang_directories(files: &[String], variable: &str) -> Vec<(PathBuf, String)> {
-    // Search the directory provided by the relevant environment variable.
-    if let Ok(directory) = env::var(variable).map(|d| Path::new(&d).to_path_buf()) {
-        return search_directories(&directory, files);
+    // Use the path provided by the relevant environment variable.
+    if let Ok(path) = env::var(variable).map(|d| Path::new(&d).to_path_buf()) {
+        // Check if the path is referring to a matching file already.
+        if let Some(parent) = path.parent() {
+            let filename = path.file_name().unwrap().to_str().unwrap();
+            let libraries = search_directories(parent, files);
+            if libraries.iter().any(|(_, f)| f == filename) {
+                return vec![(parent.into(), filename.into())];
+            }
+        }
+
+        return search_directories(&path, files);
     }
 
     let mut found = vec![];

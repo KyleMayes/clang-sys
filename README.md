@@ -83,7 +83,7 @@ and executables:
 
 * `LLVM_CONFIG_PATH` **(compiletime)** - provides a path to an `llvm-config` executable
 * `LIBCLANG_PATH` **(compiletime)** - provides a path to a directory containing a `libclang` shared
-  library
+  library or a path to a specific `libclang` shared library
 * `LIBCLANG_STATIC_PATH` **(compiletime)** - provides a path to a directory containing LLVM and
   Clang static libraries
 * `CLANG_PATH` **(runtime)** - provides a path to a `clang` executable

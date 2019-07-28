@@ -3,6 +3,8 @@
 ### Changed
 - Bumped `glob` version to `0.3.0`
 - Improved error message when an invocation of an executable is not successful
+- Allowed `LIBCLANG_PATH` to refer to a specific `libclang` instance (e.g.,
+  `/usr/local/lib/libclang.so.10`)
 
 ### Fixed
 - Fixed

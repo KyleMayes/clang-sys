@@ -16,12 +16,14 @@
 //!
 //! # Environment Variables
 //!
-//! This build script can make use of several environment variables to help it find the required
-//! static or dynamic libraries.
+//! This build script can make use of several environment variables to help it
+//! find the required static or dynamic libraries.
 //!
 //! * `LLVM_CONFIG_PATH` - provides a path to an `llvm-config` executable
-//! * `LIBCLANG_PATH` - provides a path to a directory containing a `libclang` shared library
-//! * `LIBCLANG_STATIC_PATH` - provides a path to a directory containing LLVM and Clang static libraries
+//! * `LIBCLANG_PATH` - provides a path to a directory containing a `libclang`
+//!    shared library or a path to a specific `libclang` shared library
+//! * `LIBCLANG_STATIC_PATH` - provides a path to a directory containing LLVM
+//!    and Clang static libraries
 
 #![allow(unused_attributes)]
 
