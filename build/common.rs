@@ -31,8 +31,8 @@ const DIRECTORIES_LINUX: &[&str] = &[
     "/usr/local/llvm*/lib*",
 ];
 
-/// `libclang` directory patterns for OS X.
-const DIRECTORIES_OSX: &[&str] = &[
+/// `libclang` directory patterns for macOS.
+const DIRECTORIES_MACOS: &[&str] = &[
     "/usr/local/opt/llvm*/lib",
     "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib",
     "/Library/Developer/CommandLineTools/usr/lib",
@@ -143,7 +143,7 @@ pub fn search_libclang_directories(files: &[String], variable: &str) -> Vec<(Pat
     let directories = if cfg!(any(target_os="freebsd", target_os="linux")) {
         DIRECTORIES_LINUX
     } else if cfg!(target_os="macos") {
-        DIRECTORIES_OSX
+        DIRECTORIES_MACOS
     } else if cfg!(target_os="windows") {
         DIRECTORIES_WINDOWS
     } else {

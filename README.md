@@ -44,7 +44,7 @@ default.
 ## Dependencies
 
 By default, this crate will attempt to link to `libclang` dynamically. In this case, this crate
-depends on the `libclang` shared library (`libclang.so` on Linux, `libclang.dylib` on OS X,
+depends on the `libclang` shared library (`libclang.so` on Linux, `libclang.dylib` on macOS,
 `libclang.dll` on Windows). If you want to link to `libclang` statically instead, enable the
 `static` Cargo feature. In this case, this crate depends on the LLVM and Clang static libraries. If
 you don't want to link to `libclang` at compiletime but instead want to load it at runtime, enable

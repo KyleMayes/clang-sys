@@ -71,7 +71,7 @@ impl Clang {
     /// If the `CLANG_PATH` environment variable is set, that is the instance of `clang` used.
     /// Otherwise, a series of directories are searched. First, If a path is supplied, that is the
     /// first directory searched. Then, the directory returned by `llvm-config --bindir` is
-    /// searched. On OS X systems, `xcodebuild -find clang` will next be queried. Last, the
+    /// searched. On macOS systems, `xcodebuild -find clang` will next be queried. Last, the
     /// directories in the system's `PATH` are searched.
     pub fn find(path: Option<&Path>, args: &[String]) -> Option<Clang> {
         if let Ok(path) = env::var("CLANG_PATH") {

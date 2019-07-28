@@ -177,7 +177,7 @@
 ## [0.10.1] - 2016-08-21
 
 ### Changed
-- Changed static linking on FreeBSD and OS X to link against `libc++` instead of `libstd++`
+- Changed static linking on FreeBSD and macOS to link against `libc++` instead of `libstd++`
 
 ## [0.10.0] - 2016-08-01
 
@@ -197,7 +197,7 @@
 ### Changed
 - Added `CLANG_PATH` environment variable for providing a path to `clang` executable
 - Added usage of `llvm-config` to search for `clang`
-- Added usage of `xcodebuild` to search for `clang` on OS X
+- Added usage of `xcodebuild` to search for `clang` on macOS
 
 ## [0.8.0] - 2016-07-18
 
@@ -209,9 +209,9 @@
 
 ### Fixed
 - Fixed `LIBCLANG_PATH` usage on Windows to search both the `bin` and `lib` directories
-- Fixed search path parsing on OS X
+- Fixed search path parsing on macOS
 - Fixed search path parsing on Windows
-- Fixed default search path ordering on OS X
+- Fixed default search path ordering on macOS
 
 ## [0.7.2] - 2016-06-17
 
@@ -260,7 +260,7 @@
 ## [0.5.1] - 2016-05-10
 
 ### Fixed
-- Fixed `libclang` linking on OS X
+- Fixed `libclang` linking on macOS
 - Fixed `libclang` linking on Windows
 
 ## [0.5.0] - 2016-05-10
