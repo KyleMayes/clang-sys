@@ -81,9 +81,10 @@ order of preference:
 The following environment variables, if set, are used by this crate to find the required libraries
 and executables:
 
-* `LLVM_CONFIG_PATH` **(compiletime)** - provides a path to an `llvm-config` executable
+* `LLVM_CONFIG_PATH` **(compiletime)** - provides a full path to an `llvm-config` executable
+  (including the executable itself [i.e., `/usr/local/bin/llvm-config-8.0`])
 * `LIBCLANG_PATH` **(compiletime)** - provides a path to a directory containing a `libclang` shared
-  library or a path to a specific `libclang` shared library
+  library or a full path to a specific `libclang` shared library
 * `LIBCLANG_STATIC_PATH` **(compiletime)** - provides a path to a directory containing LLVM and
   Clang static libraries
 * `CLANG_PATH` **(runtime)** - provides a path to a `clang` executable
