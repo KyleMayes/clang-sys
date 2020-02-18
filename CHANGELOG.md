@@ -1,5 +1,11 @@
 ## [0.29.0] - UNRELEASED
 
+### Changed
+- Wrapped function pointer fields in `Option` in the `CXCursorAndRangeVisitor`
+and `IndexerCallbacks` structs (to permit nullability and to avoid undefined
+behavior caused by `Default` implementations for these structs which returns a
+zeroed value)
+
 ### Added
 - Added support for `clang` 9.0.x
 - Added missing `CXCallingConv_AArch64VectorCall` variant to `CXCallingConv` enum

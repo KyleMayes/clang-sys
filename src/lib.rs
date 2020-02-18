@@ -1294,7 +1294,7 @@ default!(CXCursor);
 #[repr(C)]
 pub struct CXCursorAndRangeVisitor {
     pub context: *mut c_void,
-    pub visit: extern "C" fn(*mut c_void, CXCursor, CXSourceRange) -> CXVisitorResult,
+    pub visit: Option<extern "C" fn(*mut c_void, CXCursor, CXSourceRange) -> CXVisitorResult>,
 }
 
 default!(CXCursorAndRangeVisitor);
@@ -1621,14 +1621,14 @@ default!(CXVersion);
 #[repr(C)]
 #[rustfmt::skip]
 pub struct IndexerCallbacks {
-    pub abortQuery: extern "C" fn(CXClientData, *mut c_void) -> c_int,
-    pub diagnostic: extern "C" fn(CXClientData, CXDiagnosticSet, *mut c_void),
-    pub enteredMainFile: extern "C" fn(CXClientData, CXFile, *mut c_void) -> CXIdxClientFile,
-    pub ppIncludedFile: extern "C" fn(CXClientData, *const CXIdxIncludedFileInfo) -> CXIdxClientFile,
-    pub importedASTFile: extern "C" fn(CXClientData, *const CXIdxImportedASTFileInfo) -> CXIdxClientASTFile,
-    pub startedTranslationUnit: extern "C" fn(CXClientData, *mut c_void) -> CXIdxClientContainer,
-    pub indexDeclaration: extern "C" fn(CXClientData, *const CXIdxDeclInfo),
-    pub indexEntityReference: extern "C" fn(CXClientData, *const CXIdxEntityRefInfo),
+    pub abortQuery: Option<extern "C" fn(CXClientData, *mut c_void) -> c_int>,
+    pub diagnostic: Option<extern "C" fn(CXClientData, CXDiagnosticSet, *mut c_void)>,
+    pub enteredMainFile: Option<extern "C" fn(CXClientData, CXFile, *mut c_void) -> CXIdxClientFile>,
+    pub ppIncludedFile: Option<extern "C" fn(CXClientData, *const CXIdxIncludedFileInfo) -> CXIdxClientFile>,
+    pub importedASTFile: Option<extern "C" fn(CXClientData, *const CXIdxImportedASTFileInfo) -> CXIdxClientASTFile>,
+    pub startedTranslationUnit: Option<extern "C" fn(CXClientData, *mut c_void) -> CXIdxClientContainer>,
+    pub indexDeclaration: Option<extern "C" fn(CXClientData, *const CXIdxDeclInfo)>,
+    pub indexEntityReference: Option<extern "C" fn(CXClientData, *const CXIdxEntityRefInfo)>,
 }
 
 default!(IndexerCallbacks);
