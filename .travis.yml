@@ -10,7 +10,9 @@ addons:
 os:
   - linux
 
-rust: stable
+rust:
+  - 1.36.0
+  - stable
 
 env:
   - LLVM_VERSION=3.5 CLANG_VERSION=clang_3_5

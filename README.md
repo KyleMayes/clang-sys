@@ -9,7 +9,8 @@ Rust bindings for `libclang`.
 If you are interested in a Rust wrapper for these bindings, see
 [clang-rs](https://github.com/KyleMayes/clang-rs).
 
-Supported on the stable, beta, and nightly Rust channels.
+Supported on the stable, beta, and nightly Rust channels.<br/>
+Minimum supported Rust version: **1.36.0**
 
 Released under the Apache License 2.0.
 
