@@ -1,3 +1,10 @@
+## [0.29.0] - UNRELEASED
+
+### Added
+- Added support for `clang` 9.0.x
+- Added missing `CXCallingConv_AArch64VectorCall` variant to `CXCallingConv` enum
+- Added missing `clang_CompileCommand_getNumMappedSources` function
+
 ## [0.28.1] - 2019-07-28
 
 ### Changed
