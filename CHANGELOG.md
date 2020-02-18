@@ -1,4 +1,4 @@
-## [0.29.0] - UNRELEASED
+## [0.29.0] - 2020-02-17
 
 ### Changed
 - Wrapped function pointer fields in `Option` in the `CXCursorAndRangeVisitor`
