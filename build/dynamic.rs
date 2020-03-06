@@ -122,6 +122,7 @@ fn search_libclang_directories(runtime: bool) -> Result<Vec<(PathBuf, String, Ve
         // runtime.
         if runtime {
             files.push("libclang.so.*".into());
+            files.push("libclang-*.so.*".into());
         }
     }
 
