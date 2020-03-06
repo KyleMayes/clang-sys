@@ -1,4 +1,4 @@
-## [0.29.1] - UNRELEASED
+## [0.29.1] - 2020-03-06
 
 ### Added
 - Added support for finding instances of `libclang` matching `libclang-*.so.*`
