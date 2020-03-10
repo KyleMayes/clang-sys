@@ -47,8 +47,8 @@ static = []
 [dependencies]
 
 glob = "0.3"
-libc = { version = "0.2.66", default-features = false }
-libloading = { version = "0.5.2", optional = true }
+libc = { version = "0.2.39", default-features = false }
+libloading = { version = "0.5", optional = true }
 
 [build-dependencies]
 
