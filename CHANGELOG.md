@@ -1,3 +1,8 @@
+## [0.29.2] - 2020-03-09
+
+### Added
+- Revert unnecessary increase of minimum version of `libc` and `libloading`
+
 ## [0.29.1] - 2020-03-06
 
 ### Added
