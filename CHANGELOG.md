@@ -1,4 +1,4 @@
-## [0.29.3] - UNRELEASED
+## [0.29.3] - 2020-03-31
 
 ### Added
 - Added ability to determine version of runtime-linked instance of `libclang`
