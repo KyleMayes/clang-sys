@@ -33,7 +33,7 @@ macro_rules! link {
     );
 
     (@LOAD: fn $name:ident($($pname:ident: $pty:ty), *) $(-> $ret:ty)*) => (
-        link!(@LOAD: #[cfg(feature="runtime")] fn $name($($pname: $pty), *) $(-> $ret)*);
+        link!(@LOAD: #[cfg(feature = "runtime")] fn $name($($pname: $pty), *) $(-> $ret)*);
     );
 
     ($($(#[cfg($cfg:meta)])* pub fn $name:ident($($pname:ident: $pty:ty), *) $(-> $ret:ty)*;)+) => (
