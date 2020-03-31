@@ -14,32 +14,36 @@ Minimum supported Rust version: **1.36.0**
 
 Released under the Apache License 2.0.
 
+## Documentation
+
+There are two versions of the documentation, one for the API exposed when
+linking dynamically or statically and one for the API exposed when linking at
+runtime (see the
+[Dependencies](https://github.com/KyleMayes/clang-sys#dependencies) section
+of the README for more information on the linking options).
+
+The only difference between the APIs exposed is that when linking at runtime a
+few additional types and functions are exposed to manage the loaded `libclang`
+shared library.
+
+* Runtime - [Documentation](https://kylemayes.github.io/clang-sys/runtime/clang_sys)
+* Dynamic / Static - [Documentation](https://kylemayes.github.io/clang-sys/default/clang_sys)
+
 ## Supported Versions
 
 To target a version of `libclang`, enable one of the following Cargo features:
 
 * `clang_3_5` - requires `libclang` 3.5 or later
-  ([Documentation](https://kylemayes.github.io/clang-sys/3_5/clang_sys))
 * `clang_3_6` - requires `libclang` 3.6 or later
-  ([Documentation](https://kylemayes.github.io/clang-sys/3_6/clang_sys))
 * `clang_3_7` - requires `libclang` 3.7 or later
-  ([Documentation](https://kylemayes.github.io/clang-sys/3_7/clang_sys))
 * `clang_3_8` - requires `libclang` 3.8 or later
-  ([Documentation](https://kylemayes.github.io/clang-sys/3_8/clang_sys))
 * `clang_3_9` - requires `libclang` 3.9 or later
-  ([Documentation](https://kylemayes.github.io/clang-sys/3_9/clang_sys))
 * `clang_4_0` - requires `libclang` 4.0 or later
-  ([Documentation](https://kylemayes.github.io/clang-sys/4_0/clang_sys))
 * `clang_5_0` - requires `libclang` 5.0 or later
-  ([Documentation](https://kylemayes.github.io/clang-sys/5_0/clang_sys))
 * `clang_6_0` - requires `libclang` 6.0 or later
-  ([Documentation](https://kylemayes.github.io/clang-sys/6_0/clang_sys))
 * `clang_7_0` - requires `libclang` 7.0 or later
-  ([Documentation](https://kylemayes.github.io/clang-sys/7_0/clang_sys))
 * `clang_8_0` - requires `libclang` 8.0 or later
-  ([Documentation](https://kylemayes.github.io/clang-sys/8_0/clang_sys))
 * `clang_9_0` - requires `libclang` 9.0 or later
-  ([Documentation](https://kylemayes.github.io/clang-sys/9_0/clang_sys))
 
 If you do not enable one of these features, the API provided by `libclang` 3.5 will be available by
 default.

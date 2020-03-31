@@ -10,7 +10,7 @@ license = "Apache-2.0"
 
 description = "Rust bindings for libclang."
 
-documentation = "https://kylemayes.github.io/clang-sys/3_5/clang_sys"
+documentation = "https://kylemayes.github.io/clang-sys/runtime/clang_sys"
 repository = "https://github.com/KyleMayes/clang-sys"
 
 links = "clang"
@@ -53,3 +53,7 @@ libloading = { version = "0.5", optional = true }
 [build-dependencies]
 
 glob = "0.3"
+
+[package.metadata.docs.rs]
+
+features = ["clang_9_0", "runtime"]

@@ -14,19 +14,20 @@
 
 //! Rust bindings for `libclang`.
 //!
-//! ## Supported Versions
+//! ## Documentation
 //!
-//! * 3.5 - [Documentation](https://kylemayes.github.io/clang-sys/3_5/clang_sys)
-//! * 3.6 - [Documentation](https://kylemayes.github.io/clang-sys/3_6/clang_sys)
-//! * 3.7 - [Documentation](https://kylemayes.github.io/clang-sys/3_7/clang_sys)
-//! * 3.8 - [Documentation](https://kylemayes.github.io/clang-sys/3_8/clang_sys)
-//! * 3.9 - [Documentation](https://kylemayes.github.io/clang-sys/3_9/clang_sys)
-//! * 4.0 - [Documentation](https://kylemayes.github.io/clang-sys/4_0/clang_sys)
-//! * 5.0 - [Documentation](https://kylemayes.github.io/clang-sys/5_0/clang_sys)
-//! * 6.0 - [Documentation](https://kylemayes.github.io/clang-sys/6_0/clang_sys)
-//! * 7.0 - [Documentation](https://kylemayes.github.io/clang-sys/7_0/clang_sys)
-//! * 8.0 - [Documentation](https://kylemayes.github.io/clang-sys/8_0/clang_sys)
-//! * 9.0 - [Documentation](https://kylemayes.github.io/clang-sys/9_0/clang_sys)
+//! There are two versions of the documentation, one for the API exposed when
+//! linking dynamically or statically and one for the API exposed when linking
+//! at runtime (see the
+//! [Dependencies](https://github.com/KyleMayes/clang-sys#dependencies) section
+//! of the README for more information on the linking options).
+//!
+//! The only difference between the APIs exposed is that when linking at runtime
+//! a few additional types and functions are exposed to manage the loaded
+//! `libclang` shared library.
+//!
+//! * Runtime - [Documentation](https://kylemayes.github.io/clang-sys/runtime/clang_sys)
+//! * Dynamic / Static - [Documentation](https://kylemayes.github.io/clang-sys/default/clang_sys)
 
 #![allow(non_camel_case_types, non_snake_case, non_upper_case_globals)]
 #![cfg_attr(feature = "cargo-clippy", allow(clippy::unreadable_literal))]
