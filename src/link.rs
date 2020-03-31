@@ -18,7 +18,13 @@
 
 #[cfg(feature = "runtime")]
 macro_rules! link {
-    (@LOAD: #[cfg($cfg:meta)] fn $name:ident($($pname:ident: $pty:ty), *) $(-> $ret:ty)*) => (
+    (
+        @LOAD:
+        $(#[doc=$doc:expr])*
+        #[cfg($cfg:meta)]
+        fn $name:ident($($pname:ident: $pty:ty), *) $(-> $ret:ty)*
+    ) => (
+        $(#[doc=$doc])*
         #[cfg($cfg)]
         pub fn $name(library: &mut super::SharedLibrary) {
             let symbol = unsafe { library.library.get(stringify!($name).as_bytes()) }.ok();
@@ -32,11 +38,19 @@ macro_rules! link {
         pub fn $name(_: &mut super::SharedLibrary) {}
     );
 
-    (@LOAD: fn $name:ident($($pname:ident: $pty:ty), *) $(-> $ret:ty)*) => (
+    (
+        @LOAD:
+        fn $name:ident($($pname:ident: $pty:ty), *) $(-> $ret:ty)*
+    ) => (
         link!(@LOAD: #[cfg(feature = "runtime")] fn $name($($pname: $pty), *) $(-> $ret)*);
     );
 
-    ($($(#[cfg($cfg:meta)])* pub fn $name:ident($($pname:ident: $pty:ty), *) $(-> $ret:ty)*;)+) => (
+    (
+        $(
+            $(#[doc=$doc:expr] #[cfg($cfg:meta)])*
+            pub fn $name:ident($($pname:ident: $pty:ty), *) $(-> $ret:ty)*;
+        )+
+    ) => (
         use std::cell::{RefCell};
         use std::sync::{Arc};
         use std::path::{Path, PathBuf};
@@ -61,7 +75,10 @@ macro_rules! link {
         /// The set of functions loaded dynamically.
         #[derive(Debug, Default)]
         pub struct Functions {
-            $($(#[cfg($cfg)])* pub $name: Option<unsafe extern fn($($pname: $pty), *) $(-> $ret)*>,)+
+            $(
+                $(#[doc=$doc] #[cfg($cfg)])*
+                pub $name: Option<unsafe extern fn($($pname: $pty), *) $(-> $ret)*>,
+            )+
         }
 
         /// A dynamically loaded instance of the `libclang` library.
@@ -134,7 +151,7 @@ macro_rules! link {
 
         $(
             #[cfg_attr(feature="cargo-clippy", allow(too_many_arguments))]
-            $(#[cfg($cfg)])*
+            $(#[doc=$doc] #[cfg($cfg)])*
             pub unsafe fn $name($($pname: $pty), *) $(-> $ret)* {
                 let f = with_library(|l| {
                     match l.functions.$name {
@@ -145,7 +162,7 @@ macro_rules! link {
                 f($($pname), *)
             }
 
-            $(#[cfg($cfg)])*
+            $(#[doc=$doc] #[cfg($cfg)])*
             pub mod $name {
                 pub fn is_loaded() -> bool {
                     super::with_library(|l| l.functions.$name.is_some()).unwrap_or(false)
@@ -238,12 +255,24 @@ macro_rules! link {
 
 #[cfg(not(feature = "runtime"))]
 macro_rules! link {
-    ($($(#[cfg($cfg:meta)])* pub fn $name:ident($($pname:ident: $pty:ty), *) $(-> $ret:ty)*;)+) => (
-        extern { $($(#[cfg($cfg)])* pub fn $name($($pname: $pty), *) $(-> $ret)*;)+ }
+    (
+        $(
+            $(#[doc=$doc:expr] #[cfg($cfg:meta)])*
+            pub fn $name:ident($($pname:ident: $pty:ty), *) $(-> $ret:ty)*;
+        )+
+    ) => (
+        extern {
+            $(
+                $(#[doc=$doc] #[cfg($cfg)])*
+                pub fn $name($($pname: $pty), *) $(-> $ret)*;
+            )+
+        }
 
-        $($(#[cfg($cfg)])*
-        pub mod $name {
-            pub fn is_loaded() -> bool { true }
-        })+
+        $(
+            $(#[doc=$doc] #[cfg($cfg)])*
+            pub mod $name {
+                pub fn is_loaded() -> bool { true }
+            }
+        )+
     )
 }
