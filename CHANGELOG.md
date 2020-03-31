@@ -1,3 +1,13 @@
+## [0.29.3] - UNRELEASED
+
+### Added
+- Added ability to determine version of runtime-linked instance of `libclang`
+
+## [0.29.2] - 2020-03-09
+
+### Added
+- Revert unnecessary increase of minimum version of `libc` and `libloading`
+
 ## [0.29.2] - 2020-03-09
 
 ### Added

@@ -41,6 +41,23 @@ macro_rules! link {
         use std::sync::{Arc};
         use std::path::{Path, PathBuf};
 
+        /// The (minimum) version of a `libclang` shared library.
+        #[allow(missing_docs)]
+        #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+        pub enum Version {
+            V3_5 = 35,
+            V3_6 = 36,
+            V3_7 = 37,
+            V3_8 = 38,
+            V3_9 = 39,
+            V4_0 = 40,
+            V5_0 = 50,
+            V6_0 = 60,
+            V7_0 = 70,
+            V8_0 = 80,
+            V9_0 = 90,
+        }
+
         /// The set of functions loaded dynamically.
         #[derive(Debug, Default)]
         pub struct Functions {
@@ -60,8 +77,42 @@ macro_rules! link {
                 Self { library, path, functions: Functions::default() }
             }
 
+            /// Returns the path to this `libclang` shared library.
             pub fn path(&self) -> &Path {
                 &self.path
+            }
+
+            /// Returns the (minimum) version of this `libclang` shared library.
+            ///
+            /// If this returns `None`, it indicates that the version is too old
+            /// to be supported by this crate (i.e., `3.4` or earlier). If the
+            /// version of this shared library is more recent than that fully
+            /// supported by this crate, the most recent fully supported version
+            /// will be returned.
+            pub fn version(&self) -> Option<Version> {
+                macro_rules! check {
+                    ($fn:expr, $version:ident) => {
+                        if self.library.get::<unsafe extern fn()>($fn).is_ok() {
+                            return Some(Version::$version);
+                        }
+                    };
+                }
+
+                unsafe {
+                    check!(b"clang_Cursor_isAnonymousRecordDecl", V9_0);
+                    check!(b"clang_Cursor_getObjCPropertyGetterName", V8_0);
+                    check!(b"clang_File_tryGetRealPathName", V7_0);
+                    check!(b"clang_CXIndex_setInvocationEmissionPathOption", V6_0);
+                    check!(b"clang_Cursor_isExternalSymbol", V5_0);
+                    check!(b"clang_EvalResult_getAsLongLong", V4_0);
+                    check!(b"clang_CXXConstructor_isConvertingConstructor", V3_9);
+                    check!(b"clang_CXXField_isMutable", V3_8);
+                    check!(b"clang_Cursor_getOffsetOfField", V3_7);
+                    check!(b"clang_Cursor_getStorageClass", V3_6);
+                    check!(b"clang_Type_getNumTemplateArguments", V3_5);
+                }
+
+                None
             }
         }
 
