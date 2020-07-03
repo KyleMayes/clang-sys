@@ -1,8 +1,8 @@
 # clang-sys
 
-[![crates.io](https://img.shields.io/crates/v/clang-sys.svg)](https://crates.io/crates/clang-sys)
-[![Travis CI](https://travis-ci.org/KyleMayes/clang-sys.svg?branch=master)](https://travis-ci.org/KyleMayes/clang-sys)
-[![AppVeyor](https://ci.appveyor.com/api/projects/status/7tv5mjyg55rof356/branch/master?svg=true)](https://ci.appveyor.com/project/KyleMayes/clang-sys-vtvy5/branch/master)
+![Crate](https://img.shields.io/crates/v/clang-sys.svg)
+![Documentation](https://docs.rs/clang-sys/badge.svg)
+![CI](https://github.com/KyleMayes/clang-sys/workflows/CI/badge.svg?branch=master)
 
 Rust bindings for `libclang`.
 
