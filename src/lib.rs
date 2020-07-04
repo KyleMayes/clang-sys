@@ -438,6 +438,16 @@ cenum! {
         const CXCursor_OMPTargetTeamsDistributeSimdDirective = 279,
         /// Only produced by 'libclang' 9.0 and later.
         const CXCursor_BuiltinBitCastExpr = 280,
+        /// Only produced by `libclang` 10.0 and later.
+        const CXCursor_OMPMasterTaskLoopDirective = 281,
+        /// Only produced by `libclang` 10.0 and later.
+        const CXCursor_OMPParallelMasterTaskLoopDirective = 282,
+        /// Only produced by `libclang` 10.0 and later.
+        const CXCursor_OMPMasterTaskLoopSimdDirective = 283,
+        /// Only produced by `libclang` 10.0 and later.
+        const CXCursor_OMPParallelMasterTaskLoopSimdDirective = 284,
+        /// Only produced by `libclang` 10.0 and later.
+        const CXCursor_OMPParallelMasterDirective = 285,
         const CXCursor_TranslationUnit = 300,
         const CXCursor_UnexposedAttr = 400,
         const CXCursor_IBActionAttr = 401,
@@ -1230,6 +1240,9 @@ cenum! {
         /// Only available on `libclang` 9.0 and later.
         #[cfg(feature = "clang_9_0")]
         const CXTranslationUnit_IgnoreNonErrorsFromIncludedFiles = 16384;
+        /// Only available on `libclang` 10.0 and later.
+        #[cfg(feature = "clang_10_0")]
+        const CXTranslationUnit_RetainExcludedConditionalBlocks = 32768;
     }
 }
 

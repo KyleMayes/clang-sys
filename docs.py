@@ -5,7 +5,7 @@ import shutil
 import subprocess
 
 TARGET = ".docs"
-VERSION = "clang_9_0"
+VERSION = "clang_10_0"
 
 if os.path.isdir(TARGET):
     shutil.rmtree(TARGET)

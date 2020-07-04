@@ -29,6 +29,7 @@ clang_6_0 = ["clang_5_0"]
 clang_7_0 = ["clang_6_0"]
 clang_8_0 = ["clang_7_0"]
 clang_9_0 = ["clang_8_0"]
+clang_10_0 = ["clang_9_0"]
 
 runtime = ["libloading"]
 static = []
@@ -45,4 +46,4 @@ glob = "0.3"
 
 [package.metadata.docs.rs]
 
-features = ["clang_9_0", "runtime"]
+features = ["clang_10_0", "runtime"]
