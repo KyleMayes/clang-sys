@@ -1,3 +1,8 @@
+## [0.29.4] - UNRELEASED
+
+### Added
+- Added support for `clang` 10.0.x
+
 ## [0.29.3] - 2020-03-31
 
 ### Added
