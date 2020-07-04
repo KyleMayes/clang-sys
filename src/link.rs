@@ -150,7 +150,8 @@ macro_rules! link {
         }
 
         $(
-            #[cfg_attr(feature="cargo-clippy", allow(too_many_arguments))]
+            #[cfg_attr(feature="cargo-clippy", allow(clippy::missing_safety_doc))]
+            #[cfg_attr(feature="cargo-clippy", allow(clippy::too_many_arguments))]
             $(#[doc=$doc] #[cfg($cfg)])*
             pub unsafe fn $name($($pname: $pty), *) $(-> $ret)* {
                 let f = with_library(|l| {
@@ -189,7 +190,7 @@ macro_rules! link {
                 pub mod dynamic { include!(concat!(env!("OUT_DIR"), "/dynamic.rs")); }
             }
 
-            let (directory, filename) = try!(build::dynamic::find(true));
+            let (directory, filename) = build::dynamic::find(true)?;
             let path = directory.join(filename);
 
             let library = libloading::Library::new(&path).map_err(|e| {
@@ -200,7 +201,7 @@ macro_rules! link {
                 )
             });
 
-            let mut library = SharedLibrary::new(try!(library), path);
+            let mut library = SharedLibrary::new(library?, path);
             $(load::$name(&mut library);)+
             Ok(library)
         }
@@ -218,7 +219,7 @@ macro_rules! link {
         /// * the `libclang` shared library could not be opened
         #[allow(dead_code)]
         pub fn load() -> Result<(), String> {
-            let library = Arc::new(try!(load_manually()));
+            let library = Arc::new(load_manually()?);
             LIBRARY.with(|l| *l.borrow_mut() = Some(library));
             Ok(())
         }
