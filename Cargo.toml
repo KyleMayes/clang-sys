@@ -13,9 +13,6 @@ description = "Rust bindings for libclang."
 documentation = "https://kylemayes.github.io/clang-sys/3_5/clang_sys"
 repository = "https://github.com/KyleMayes/clang-sys"
 
-links = "clang"
-build = "build.rs"
-
 [features]
 
 clang_3_5 = []
@@ -38,16 +35,13 @@ gte_clang_6_0 = []
 gte_clang_7_0 = []
 
 assert-minimum = []
-runtime = ["libloading"]
-static = []
+runtime = ["clang-sys-linkage/runtime"]
+static = ["clang-sys-linkage/static", ]
 
 [dependencies]
 
-glob = "0.2.11"
-libc = { version = "0.2.39", default-features = false }
-libloading = { version = "0.5.0", optional = true }
+clang-sys-linkage = { version = "1" }
 
-[build-dependencies]
+[dev-dependencies]
 
-glob = "0.2.11"
-libloading = "0.5.0"
+libc = "0.2.39"
