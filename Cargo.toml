@@ -13,22 +13,19 @@ description = "Rust bindings for libclang."
 documentation = "https://kylemayes.github.io/clang-sys/runtime/clang_sys"
 repository = "https://github.com/KyleMayes/clang-sys"
 
-links = "clang"
-build = "build.rs"
-
 [features]
 
-clang_3_5 = []
-clang_3_6 = ["gte_clang_3_6"]
-clang_3_7 = ["gte_clang_3_6", "gte_clang_3_7"]
-clang_3_8 = ["gte_clang_3_6", "gte_clang_3_7", "gte_clang_3_8"]
-clang_3_9 = ["gte_clang_3_6", "gte_clang_3_7", "gte_clang_3_8", "gte_clang_3_9"]
-clang_4_0 = ["gte_clang_3_6", "gte_clang_3_7", "gte_clang_3_8", "gte_clang_3_9", "gte_clang_4_0"]
-clang_5_0 = ["gte_clang_3_6", "gte_clang_3_7", "gte_clang_3_8", "gte_clang_3_9", "gte_clang_4_0", "gte_clang_5_0"]
-clang_6_0 = ["gte_clang_3_6", "gte_clang_3_7", "gte_clang_3_8", "gte_clang_3_9", "gte_clang_4_0", "gte_clang_5_0", "gte_clang_6_0"]
-clang_7_0 = ["gte_clang_3_6", "gte_clang_3_7", "gte_clang_3_8", "gte_clang_3_9", "gte_clang_4_0", "gte_clang_5_0", "gte_clang_6_0", "gte_clang_7_0"]
-clang_8_0 = ["gte_clang_3_6", "gte_clang_3_7", "gte_clang_3_8", "gte_clang_3_9", "gte_clang_4_0", "gte_clang_5_0", "gte_clang_6_0", "gte_clang_7_0", "gte_clang_8_0"]
-clang_9_0 = ["gte_clang_3_6", "gte_clang_3_7", "gte_clang_3_8", "gte_clang_3_9", "gte_clang_4_0", "gte_clang_5_0", "gte_clang_6_0", "gte_clang_7_0", "gte_clang_8_0", "gte_clang_9_0"]
+clang_3_5 = ["clang-sys-linkage/clang_3_5", ]
+clang_3_6 = ["clang-sys-linkage/clang_3_6", "gte_clang_3_6"]
+clang_3_7 = ["clang-sys-linkage/clang_3_7", "gte_clang_3_6", "gte_clang_3_7"]
+clang_3_8 = ["clang-sys-linkage/clang_3_8", "gte_clang_3_6", "gte_clang_3_7", "gte_clang_3_8"]
+clang_3_9 = ["clang-sys-linkage/clang_3_9", "gte_clang_3_6", "gte_clang_3_7", "gte_clang_3_8", "gte_clang_3_9"]
+clang_4_0 = ["clang-sys-linkage/clang_4_0", "gte_clang_3_6", "gte_clang_3_7", "gte_clang_3_8", "gte_clang_3_9", "gte_clang_4_0"]
+clang_5_0 = ["clang-sys-linkage/clang_5_0", "gte_clang_3_6", "gte_clang_3_7", "gte_clang_3_8", "gte_clang_3_9", "gte_clang_4_0", "gte_clang_5_0"]
+clang_6_0 = ["clang-sys-linkage/clang_6_0", "gte_clang_3_6", "gte_clang_3_7", "gte_clang_3_8", "gte_clang_3_9", "gte_clang_4_0", "gte_clang_5_0", "gte_clang_6_0"]
+clang_7_0 = ["clang-sys-linkage/clang_7_0", "gte_clang_3_6", "gte_clang_3_7", "gte_clang_3_8", "gte_clang_3_9", "gte_clang_4_0", "gte_clang_5_0", "gte_clang_6_0", "gte_clang_7_0"]
+clang_8_0 = ["clang-sys-linkage/clang_8_0", "gte_clang_3_6", "gte_clang_3_7", "gte_clang_3_8", "gte_clang_3_9", "gte_clang_4_0", "gte_clang_5_0", "gte_clang_6_0", "gte_clang_7_0", "gte_clang_8_0"]
+clang_9_0 = ["clang-sys-linkage/clang_9_0", "gte_clang_3_6", "gte_clang_3_7", "gte_clang_3_8", "gte_clang_3_9", "gte_clang_4_0", "gte_clang_5_0", "gte_clang_6_0", "gte_clang_7_0", "gte_clang_8_0", "gte_clang_9_0"]
 
 gte_clang_3_6 = []
 gte_clang_3_7 = []
@@ -41,18 +38,16 @@ gte_clang_7_0 = []
 gte_clang_8_0 = []
 gte_clang_9_0 = []
 
-runtime = ["libloading"]
-static = []
+runtime = ["clang-sys-linkage/runtime"]
+static = ["clang-sys-linkage/static", ]
 
 [dependencies]
 
-glob = "0.3"
-libc = { version = "0.2.39", default-features = false }
-libloading = { version = "0.5", optional = true }
+clang-sys-linkage = { version = "1", path = "../clang-sys-linkage" }
 
-[build-dependencies]
+[dev-dependencies]
 
-glob = "0.3"
+libc = "0.2.39"
 
 [package.metadata.docs.rs]
 
