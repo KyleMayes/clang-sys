@@ -1,7 +1,13 @@
-## [0.29.4] - UNRELEASED
+## [1.0.0] - UNRELEASED
+
+### Changed
+- Bumped `libloading` version to `0.6.0`
 
 ### Added
 - Added support for `clang` 10.0.x
+
+### Removed
+- Removed `gte_clang_*` Cargo features (these were an implementation detail)
 
 ## [0.29.3] - 2020-03-31
 
