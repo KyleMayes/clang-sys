@@ -99,6 +99,8 @@ fn find() -> PathBuf {
 
 /// Find and link to `libclang` statically.
 pub fn link() {
+    let cep = common::CommandErrorPrinter::default();
+
     let directory = find();
 
     // Specify required Clang static libraries.
@@ -133,4 +135,6 @@ pub fn link() {
     } else if cfg!(target_os = "macos") {
         println!("cargo:rustc-flags=-l ffi -l ncurses -l c++ -l z");
     }
+
+    cep.discard();
 }

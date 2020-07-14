@@ -2,6 +2,8 @@
 
 ### Changed
 - Bumped `libloading` version to `0.6.0`
+- Updated build script to not print warnings about failures to execute
+`llvm-config` and `xcode-select` unless an instance of `libclang` is not found
 
 ### Added
 - Added support for `clang` 10.0.x

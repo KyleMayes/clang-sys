@@ -190,6 +190,8 @@ pub fn find(runtime: bool) -> Result<(PathBuf, String), String> {
 /// Find and link to `libclang` dynamically.
 #[cfg(not(feature = "runtime"))]
 pub fn link() {
+    let cep = common::CommandErrorPrinter::default();
+
     use std::fs;
 
     let (directory, filename) = find(false).unwrap();
@@ -241,4 +243,6 @@ pub fn link() {
 
         println!("cargo:rustc-link-lib=dylib={}", name);
     }
+
+    cep.discard();
 }
