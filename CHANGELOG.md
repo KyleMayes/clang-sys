@@ -1,4 +1,4 @@
-## [0.29.4] - UNRELEASED
+## [0.29.4] - 2020-07-13
 
 ### Changed
 - Offloaded implementation of crate to `clang-sys-linkage` crate
