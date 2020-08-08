@@ -1,8 +1,8 @@
 # clang-sys
 
-![Crate](https://img.shields.io/crates/v/clang-sys.svg)
-![Documentation](https://docs.rs/clang-sys/badge.svg)
-![CI](https://github.com/KyleMayes/clang-sys/workflows/CI/badge.svg?branch=master)
+[![Crate](https://img.shields.io/crates/v/clang-sys.svg)](https://crates.io/clang-sys)
+[![Documentation](https://docs.rs/clang-sys/badge.svg)](https://docs.rs/clang-sys)
+[![CI](https://github.com/KyleMayes/clang-sys/workflows/CI/badge.svg?branch=master)](https://github.com/KyleMayes/clang-sys/actions?query=workflow%3ACI)
 
 Rust bindings for `libclang`.
 
