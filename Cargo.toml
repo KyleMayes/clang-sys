@@ -10,7 +10,7 @@ license = "Apache-2.0"
 
 description = "Rust bindings for libclang."
 
-documentation = "https://kylemayes.github.io/clang-sys/runtime/clang_sys"
+documentation = "https://docs.rs/clang-sys"
 repository = "https://github.com/KyleMayes/clang-sys"
 
 links = "clang"
