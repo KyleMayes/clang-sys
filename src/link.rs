@@ -155,10 +155,12 @@ macro_rules! link {
             $(#[doc=$doc] #[cfg($cfg)])*
             pub unsafe fn $name($($pname: $pty), *) $(-> $ret)* {
                 let f = with_library(|l| {
-                    match l.functions.$name {
-                        Some(f) => f,
-                        _ => panic!(concat!("function not loaded: ", stringify!($name))),
-                    }
+                    l.functions.$name.expect(concat!(
+                        "`libclang` function not loaded: `",
+                        stringify!($name),
+                        "`. This crate requires that `libclang` 3.9 or later be installed on your ",
+                        "system. For more information on how to accomplish this, see here: ",
+                        "https://rust-lang.github.io/rust-bindgen/requirements.html#installing-clang-39"))
                 }).expect("a `libclang` shared library is not loaded on this thread");
                 f($($pname), *)
             }
