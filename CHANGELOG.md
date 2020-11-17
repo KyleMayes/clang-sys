@@ -1,4 +1,4 @@
-## [1.0.2] - UNRELEASED
+## [1.0.2] - 2020-11-17
 
 ### Fixed
 - Fixed `Clang::find` to properly search directories returned by the
