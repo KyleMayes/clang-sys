@@ -84,11 +84,11 @@ impl Clang {
             paths.push(path.into());
         }
         if let Ok(path) = run_llvm_config(&["--bindir"]) {
-            paths.push(path.into());
+            paths.push(path.lines().next().unwrap().into());
         }
         if cfg!(target_os = "macos") {
             if let Ok((path, _)) = run("xcodebuild", &["-find", "clang"]) {
-                paths.push(path.into());
+                paths.push(path.lines().next().unwrap().into());
             }
         }
         paths.extend(env::split_paths(&env::var("PATH").unwrap()));

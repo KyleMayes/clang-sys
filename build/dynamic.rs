@@ -181,6 +181,7 @@ fn search_libclang_directories(runtime: bool) -> Result<Vec<(PathBuf, String, Ve
 pub fn find(runtime: bool) -> Result<(PathBuf, String), String> {
     search_libclang_directories(runtime)?
         .iter()
+        .rev() // `max_by_key` picks the last one but we want the first.
         .max_by_key(|f| &f.2)
         .cloned()
         .map(|(path, filename, _)| (path, filename))
