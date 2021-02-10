@@ -4,6 +4,9 @@
 - Added Visual Studio LLVM component directory to search paths on Windows
 ([#121](https://github.com/KyleMayes/clang-sys/issues/121))
 
+### Added
+- Added support for `clang` 11.0.x
+
 ## [1.0.3] - 2020-11-19
 
 ### Fixed
