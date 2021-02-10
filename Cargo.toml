@@ -3,7 +3,7 @@
 name = "clang-sys"
 authors = ["Kyle Mayes <kyle@mayeses.com>"]
 
-version = "1.1.0"
+version = "1.1.1"
 
 readme = "README.md"
 license = "Apache-2.0"
@@ -39,7 +39,7 @@ static = []
 
 glob = "0.3"
 libc = { version = "0.2.39", default-features = false }
-libloading = { version = "0.6", optional = true }
+libloading = { version = "0.7", optional = true }
 
 [build-dependencies]
 
