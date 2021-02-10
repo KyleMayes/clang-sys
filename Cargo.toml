@@ -3,7 +3,7 @@
 name = "clang-sys"
 authors = ["Kyle Mayes <kyle@mayeses.com>"]
 
-version = "1.0.3"
+version = "1.1.0"
 
 readme = "README.md"
 license = "Apache-2.0"
@@ -30,6 +30,7 @@ clang_7_0 = ["clang_6_0"]
 clang_8_0 = ["clang_7_0"]
 clang_9_0 = ["clang_8_0"]
 clang_10_0 = ["clang_9_0"]
+clang_11_0 = ["clang_10_0"]
 
 runtime = ["libloading"]
 static = []

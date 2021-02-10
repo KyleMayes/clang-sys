@@ -448,6 +448,10 @@ cenum! {
         const CXCursor_OMPParallelMasterTaskLoopSimdDirective = 284,
         /// Only produced by `libclang` 10.0 and later.
         const CXCursor_OMPParallelMasterDirective = 285,
+        /// Only produced by `libclang` 11.0 and later.
+        const CXCursor_OMPDepobjDirective = 286,
+        /// Only produced by `libclang` 11.0 and later.
+        const CXCursor_OMPScanDirective = 287,
         const CXCursor_TranslationUnit = 300,
         const CXCursor_UnexposedAttr = 400,
         const CXCursor_IBActionAttr = 401,
@@ -853,6 +857,8 @@ cenum! {
         const CXType_UAccum = 37,
         /// Only produced by `libclang` 7.0 and later.
         const CXType_ULongAccum = 38,
+        /// Only produced by `libclang` 11.0 and later.
+        const CXType_BFloat16 = 39,
         const CXType_Complex = 100,
         const CXType_Pointer = 101,
         const CXType_BlockPointer = 102,
@@ -989,6 +995,8 @@ cenum! {
         const CXType_OCLIntelSubgroupAVCImeDualRefStreamin = 175,
         /// Only produced by `libclang` 9.0 and later.
         const CXType_ExtVector = 176,
+        /// Only produced by `libclang` 11.0 and later.
+        const CXType_Atomic = 177,
     }
 }
 
@@ -1894,14 +1902,17 @@ link! {
     /// Only available on `libclang` 8.0 and later.
     #[cfg(feature = "clang_8_0")]
     pub fn clang_Type_getModifiedType(type_: CXType) -> CXType;
-    pub fn clang_Type_getSizeOf(type_: CXType) -> c_longlong;
-    pub fn clang_Type_getTemplateArgumentAsType(type_: CXType, index: c_uint) -> CXType;
-    /// Only available on `libclang` 5.0 and later.
-    #[cfg(feature = "clang_5_0")]
-    pub fn clang_Type_isTransparentTagTypedef(type_: CXType) -> c_uint;
     /// Only available on `libclang` 8.0 and later.
     #[cfg(feature = "clang_8_0")]
     pub fn clang_Type_getNullability(type_: CXType) -> CXTypeNullabilityKind;
+    pub fn clang_Type_getSizeOf(type_: CXType) -> c_longlong;
+    pub fn clang_Type_getTemplateArgumentAsType(type_: CXType, index: c_uint) -> CXType;
+    /// Only available on `libclang` 11.0 and later.
+    #[cfg(feature = "clang_11_0")]
+    pub fn clang_Type_getValueType(type_: CXType) -> CXType;
+    /// Only available on `libclang` 5.0 and later.
+    #[cfg(feature = "clang_5_0")]
+    pub fn clang_Type_isTransparentTagTypedef(type_: CXType) -> c_uint;
     /// Only available on `libclang` 3.7 and later.
     #[cfg(feature = "clang_3_7")]
     pub fn clang_Type_visitFields(type_: CXType, visitor: CXFieldVisitor, data: CXClientData) -> CXVisitorResult;
