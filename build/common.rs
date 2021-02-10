@@ -46,6 +46,9 @@ const DIRECTORIES_WINDOWS: &[&str] = &[
     "C:\\LLVM\\lib",
     "C:\\Program Files*\\LLVM\\lib",
     "C:\\MSYS*\\MinGW*\\lib",
+    // LLVM + Clang can be installed as a component of Visual Studio.
+    // https://github.com/KyleMayes/clang-sys/issues/121
+    "C:\\Program Files*\\Microsoft Visual Studio\\*\\BuildTools\\VC\\Tools\\Llvm\\**\\bin",
 ];
 
 thread_local! {
