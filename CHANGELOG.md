@@ -1,4 +1,4 @@
-## [1.1.0] - UNRELEASED
+## [1.1.0] - 2021-02-09
 
 ### Changed
 - Added Visual Studio LLVM component directory to search paths on Windows
