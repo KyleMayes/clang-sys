@@ -1,3 +1,12 @@
+## [1.2.0] - UNRELEASED
+
+### Changed
+- Changed `Clang::find` to prefer target-prefixed binaries when a `-target`
+argument is provided (e.g., if the arguments `-target` and
+`x86_64-unknown-linux-gnu` are provided, a target-prefixed Clang executable
+such as `x86_64-unknown-linux-gnu-clang` will be preferred over a non-target
+prefixed Clang executable)
+
 ## [1.1.1] - 2021-02-19
 
 ### Changed
