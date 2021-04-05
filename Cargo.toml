@@ -47,4 +47,4 @@ glob = "0.3"
 
 [package.metadata.docs.rs]
 
-features = ["clang_10_0", "runtime"]
+features = ["clang_11_0", "runtime"]
