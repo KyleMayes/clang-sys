@@ -7,6 +7,11 @@ argument is provided (e.g., if the arguments `-target` and
 such as `x86_64-unknown-linux-gnu-clang` will be preferred over a non-target
 prefixed Clang executable)
 
+### Fixed
+- Fixed build script to split paths in environment variables (e.g.,
+`LD_LIBRARY_PATH`) using the appropriate separator for the platform (previously
+`:` was used as the separator but some platforms such as Windows use `;`)
+
 ## [1.1.1] - 2021-02-19
 
 ### Changed

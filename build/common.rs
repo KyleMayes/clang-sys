@@ -245,7 +245,7 @@ pub fn search_libclang_directories(files: &[String], variable: &str) -> Vec<(Pat
     // Search the directories provided by the `LD_LIBRARY_PATH` environment
     // variable.
     if let Ok(path) = env::var("LD_LIBRARY_PATH") {
-        for directory in path.split(':').map(Path::new) {
+        for directory in env::split_paths(&path) {
             found.extend(search_directories(&directory, files));
         }
     }
