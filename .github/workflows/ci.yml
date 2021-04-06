@@ -21,18 +21,11 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
       # LLVM and Clang
-      - name: Cache LLVM and Clang
-        id: cache-llvm
-        uses: actions/cache@v2
-        with:
-          path: ${{ runner.temp }}/llvm-${{ matrix.clang[0] }}
-          key: ${{ matrix.os }}-llvm-${{ matrix.clang[0] }}
       - name: Install LLVM and Clang
         uses: KyleMayes/install-llvm-action@v1
         with:
           version: ${{ matrix.clang[0] }}
           directory: ${{ runner.temp }}/llvm-${{ matrix.clang[0] }}
-          cached: ${{ steps.cache-llvm.outputs.cache-hit }}
       # Rust
       - name: Install Rust
         uses: actions-rs/toolchain@v1
@@ -41,17 +34,14 @@ jobs:
       # Test
       - name: Cargo Test (Dynamic)
         uses: actions-rs/cargo@v1
-        env:
-          LIBCLANG_PATH: ${{ runner.temp }}/llvm-${{ matrix.clang[0] }}/lib
-          LLVM_CONFIG_PATH: ${{ runner.temp }}/llvm-${{ matrix.clang[0] }}/bin/llvm-config
         with:
           command: test
           args: --verbose --features ${{ matrix.clang[1] }} -- --nocapture
       - name: Cargo Test (Runtime)
         uses: actions-rs/cargo@v1
         env:
+          # Needed to not find MinGW when loading at runtime
           LIBCLANG_PATH: ${{ runner.temp }}/llvm-${{ matrix.clang[0] }}/lib
-          LLVM_CONFIG_PATH: ${{ runner.temp }}/llvm-${{ matrix.clang[0] }}/bin/llvm-config
         with:
           command: test
           args: --verbose --features "${{ matrix.clang[1] }} runtime" -- --nocapture
