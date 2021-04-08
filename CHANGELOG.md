@@ -1,4 +1,4 @@
-## [1.2.0] - UNRELEASED
+## [1.2.0] - 2021-04-08
 
 ### Changed
 - Changed `Clang::find` to prefer target-prefixed binaries when a `-target`
