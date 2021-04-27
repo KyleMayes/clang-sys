@@ -49,6 +49,9 @@ const DIRECTORIES_WINDOWS: &[&str] = &[
     // LLVM + Clang can be installed as a component of Visual Studio.
     // https://github.com/KyleMayes/clang-sys/issues/121
     "C:\\Program Files*\\Microsoft Visual Studio\\*\\BuildTools\\VC\\Tools\\Llvm\\**\\bin",
+    // Scoop user installation https://scoop.sh/.
+    // Chocolatey, WinGet and other installers use to the system wide dir listed above
+    "C:\\Users\\*\\scoop\\apps\\llvm\\current\\bin",
 ];
 
 thread_local! {
