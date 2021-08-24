@@ -1,3 +1,13 @@
+## [1.2.1] - UNRELEASED
+
+### Changed
+- Updated build script to check the install location used by the
+[Scoop](https://scoop.sh/) command-line installer on Windows
+
+### Fixed
+- Updated build script to support environments where the `PATH` environment
+variable is not set
+
 ## [1.2.0] - 2021-04-08
 
 ### Changed
