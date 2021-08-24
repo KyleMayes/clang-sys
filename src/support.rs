@@ -117,7 +117,9 @@ impl Clang {
             }
         }
 
-        paths.extend(env::split_paths(&env::var("PATH").unwrap()));
+        if let Ok(path) = env::var("PATH") {
+            paths.extend(env::split_paths(&path));
+        }
 
         // First, look for a target-prefixed `clang` executable.
 
