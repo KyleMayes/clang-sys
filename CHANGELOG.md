@@ -1,4 +1,4 @@
-## [1.2.1] - UNRELEASED
+## [1.2.1] - 2021-08-24
 
 ### Changed
 - Updated build script to check the install location used by the
