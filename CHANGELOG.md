@@ -1,4 +1,4 @@
-## [1.2.2] - UNRELEASED
+## [1.2.2] - 2021-09-02
 
 ### Fixed
 - Fixed handling of paths that contain characters that have special meaning in
