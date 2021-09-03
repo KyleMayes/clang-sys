@@ -16,6 +16,8 @@ extern crate glob;
 
 use std::path::{Path, PathBuf};
 
+use glob::Pattern;
+
 use common;
 
 /// Returns the name of an LLVM or Clang library from a path to such a library.
@@ -67,11 +69,12 @@ const CLANG_LIBRARIES: &[&str] = &[
 
 /// Returns the Clang libraries required to link to `libclang` statically.
 fn get_clang_libraries<P: AsRef<Path>>(directory: P) -> Vec<String> {
-    let pattern = directory
-        .as_ref()
-        .join("libclang*.a")
-        .to_string_lossy()
-        .to_string();
+    // Escape the directory in case it contains characters that have special
+    // meaning in glob patterns (e.g., `[` or `]`).
+    let directory = Pattern::escape(directory.as_ref().to_str().unwrap());
+    let directory = Path::new(&directory);
+
+    let pattern = directory.join("libclang*.a").to_str().unwrap().to_owned();
     if let Ok(libraries) = glob::glob(&pattern) {
         libraries
             .filter_map(|l| l.ok().and_then(|l| get_library_name(&l)))

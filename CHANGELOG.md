@@ -1,3 +1,9 @@
+## [1.2.2] - UNRELEASED
+
+### Fixed
+- Fixed handling of paths that contain characters that have special meaning in
+glob patterns (e.g., `[` or `]`)
+
 ## [1.2.1] - 2021-08-24
 
 ### Changed

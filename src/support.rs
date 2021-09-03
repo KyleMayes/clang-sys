@@ -18,7 +18,7 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::{env, io};
 
-use glob;
+use glob::{self, Pattern};
 
 use libc::c_int;
 
@@ -156,6 +156,14 @@ impl Clang {
 /// Returns the first match to the supplied glob patterns in the supplied
 /// directory if there are any matches.
 fn find(directory: &Path, patterns: &[&str]) -> Option<PathBuf> {
+    // Escape the directory in case it contains characters that have special
+    // meaning in glob patterns (e.g., `[` or `]`).
+    let directory = if let Some(directory) = directory.to_str() {
+        Path::new(&Pattern::escape(directory)).to_owned()
+    } else {
+        return None;
+    };
+
     for pattern in patterns {
         let pattern = directory.join(pattern).to_string_lossy().into_owned();
         if let Some(path) = try_opt!(glob::glob(&pattern).ok())
