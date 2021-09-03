@@ -24,8 +24,8 @@ use common;
 fn get_library_name(path: &Path) -> Option<String> {
     path.file_stem().map(|p| {
         let string = p.to_string_lossy();
-        if string.starts_with("lib") {
-            string[3..].to_owned()
+        if let Some(name) = string.strip_prefix("lib") {
+            name.to_owned()
         } else {
             string.to_string()
         }
@@ -41,8 +41,8 @@ fn get_llvm_libraries() -> Vec<String> {
             // Depending on the version of `llvm-config` in use, listed
             // libraries may be in one of two forms, a full path to the library
             // or simply prefixed with `-l`.
-            if p.starts_with("-l") {
-                Some(p[2..].into())
+            if let Some(path) = p.strip_prefix("-l") {
+                Some(path.into())
             } else {
                 get_library_name(Path::new(p))
             }
