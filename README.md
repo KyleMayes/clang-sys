@@ -25,21 +25,11 @@ Due to the usage of the Cargo feature for the latest supported version of `libcl
 
 ## Supported Versions
 
-To target a version of `libclang`, enable one of the following Cargo features:
+To target a version of `libclang`, enable a Cargo features such as one of the following:
 
 * `clang_3_5` - requires `libclang` 3.5 or later
 * `clang_3_6` - requires `libclang` 3.6 or later
-* `clang_3_7` - requires `libclang` 3.7 or later
-* `clang_3_8` - requires `libclang` 3.8 or later
-* `clang_3_9` - requires `libclang` 3.9 or later
-* `clang_4_0` - requires `libclang` 4.0 or later
-* `clang_5_0` - requires `libclang` 5.0 or later
-* `clang_6_0` - requires `libclang` 6.0 or later
-* `clang_7_0` - requires `libclang` 7.0 or later
-* `clang_8_0` - requires `libclang` 8.0 or later
-* `clang_9_0` - requires `libclang` 9.0 or later
-* `clang_10_0` - requires `libclang` 10.0 or later
-* `clang_11_0` - requires `libclang` 11.0 or later
+* etc...
 * `clang_12_0` - requires `libclang` 12.0 or later
 * `clang_13_0` - requires `libclang` 13.0 or later
 
