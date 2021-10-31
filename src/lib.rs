@@ -325,6 +325,12 @@ cenum! {
         const CXCursor_ObjCAvailabilityCheckExpr = 148,
         /// Only produced by `libclang` 7.0 and later.
         const CXCursor_FixedPointLiteral = 149,
+        /// Only produced by `libclang` 12.0 and later.
+        const CXCursor_OMPArrayShapingExpr = 150,
+        /// Only produced by `libclang` 12.0 and later.
+        const CXCursor_OMPIteratorExpr = 151,
+        /// Only produced by `libclang` 12.0 and later.
+        const CXCursor_CXXAddrspaceCastExpr = 152,
         const CXCursor_UnexposedStmt = 200,
         const CXCursor_LabelStmt = 201,
         const CXCursor_CompoundStmt = 202,
@@ -1033,6 +1039,8 @@ cenum! {
         const CXTypeNullability_Nullable = 1,
         const CXTypeNullability_Unspecified = 2,
         const CXTypeNullability_Invalid = 3,
+        /// Only produced by `libclang` 12.0 and later.
+        const CXTypeNullability_NullableResult = 4,
     }
 }
 
@@ -1783,9 +1791,18 @@ link! {
     #[cfg(feature = "clang_3_6")]
     pub fn clang_Cursor_getTemplateArgumentValue(cursor: CXCursor, index: c_uint) -> c_longlong;
     pub fn clang_Cursor_getTranslationUnit(cursor: CXCursor) -> CXTranslationUnit;
+    /// Only available on `libclang` 12.0 and later.
+    #[cfg(feature = "clang_12_0")]
+    pub fn clang_Cursor_getVarDeclInitializer(cursor: CXCursor) -> CXCursor;
     /// Only available on `libclang` 3.9 and later.
     #[cfg(feature = "clang_3_9")]
     pub fn clang_Cursor_hasAttrs(cursor: CXCursor) -> c_uint;
+    /// Only available on `libclang` 12.0 and later.
+    #[cfg(feature = "clang_12_0")]
+    pub fn clang_Cursor_hasVarDeclGlobalStorage(cursor: CXCursor) -> c_uint;
+    /// Only available on `libclang` 12.0 and later.
+    #[cfg(feature = "clang_12_0")]
+    pub fn clang_Cursor_hasVarDeclExternalStorage(cursor: CXCursor) -> c_uint;
     /// Only available on `libclang` 3.7 and later.
     #[cfg(feature = "clang_3_7")]
     pub fn clang_Cursor_isAnonymous(cursor: CXCursor) -> c_uint;

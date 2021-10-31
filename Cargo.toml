@@ -31,6 +31,7 @@ clang_8_0 = ["clang_7_0"]
 clang_9_0 = ["clang_8_0"]
 clang_10_0 = ["clang_9_0"]
 clang_11_0 = ["clang_10_0"]
+clang_12_0 = ["clang_11_0"]
 
 runtime = ["libloading"]
 static = []
