@@ -137,6 +137,8 @@ cenum! {
         const CXCallingConv_AArch64VectorCall = 16,
         const CXCallingConv_Invalid = 100,
         const CXCallingConv_Unexposed = 200,
+        /// Only produced by `libclang` 13.0 and later.
+        const CXCallingConv_SwiftAsync = 17,
     }
 }
 
@@ -460,6 +462,18 @@ cenum! {
         const CXCursor_OMPDepobjDirective = 286,
         /// Only produced by `libclang` 11.0 and later.
         const CXCursor_OMPScanDirective = 287,
+        /// Only produced by `libclang` 13.0 and later.
+        const CXCursor_OMPTileDirective = 288,
+        /// Only produced by `libclang` 13.0 and later.
+        const CXCursor_OMPCanonicalLoop = 289,
+        /// Only produced by `libclang` 13.0 and later.
+        const CXCursor_OMPInteropDirective = 290,
+        /// Only produced by `libclang` 13.0 and later.
+        const CXCursor_OMPDispatchDirective = 291,
+        /// Only produced by `libclang` 13.0 and later.
+        const CXCursor_OMPMaskedDirective = 292,
+        /// Only produced by `libclang` 13.0 and later.
+        const CXCursor_OMPUnrollDirective = 293,
         const CXCursor_TranslationUnit = 300,
         const CXCursor_UnexposedAttr = 400,
         const CXCursor_IBActionAttr = 401,

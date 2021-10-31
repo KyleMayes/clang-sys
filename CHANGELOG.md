@@ -1,6 +1,7 @@
 ## [1.3.0] - UNRELEASED
 
 ### Added
+- Added support for `clang` 13.0.x
 - Added support for `clang` 12.0.x
 - Added support for the Haiku operating system
 
