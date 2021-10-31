@@ -1,3 +1,8 @@
+## [1.3.0] - UNRELEASED
+
+### Added
+- Added support for the Haiku operating system
+
 ## [1.2.2] - 2021-09-02
 
 ### Fixed
