@@ -54,6 +54,16 @@ const DIRECTORIES_WINDOWS: &[&str] = &[
     "C:\\Users\\*\\scoop\\apps\\llvm\\current\\bin",
 ];
 
+/// `libclang` directory patterns for Haiku.
+const DIRECTORIES_HAIKU: &[&str] = &[
+    "/boot/system/lib",
+    "/boot/system/develop/lib",
+    "/boot/system/non-packaged/lib",
+    "/boot/system/non-packaged/develop/lib",
+    "/boot/home/config/non-packaged/lib",
+    "/boot/home/config/non-packaged/develop/lib",
+];
+
 thread_local! {
     /// The errors encountered when attempting to execute console commands.
     static COMMAND_ERRORS: RefCell<HashMap<String, Vec<String>>> = RefCell::default();
@@ -265,6 +275,8 @@ pub fn search_libclang_directories(files: &[String], variable: &str) -> Vec<(Pat
         DIRECTORIES_MACOS
     } else if cfg!(target_os = "windows") {
         DIRECTORIES_WINDOWS
+    } else if cfg!(target_os = "haiku") {
+        DIRECTORIES_HAIKU
     } else {
         &[]
     };
