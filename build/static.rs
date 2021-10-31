@@ -137,6 +137,8 @@ pub fn link() {
         println!("cargo:rustc-flags=-l ffi -l ncursesw -l stdc++ -l z");
     } else if cfg!(target_os = "macos") {
         println!("cargo:rustc-flags=-l ffi -l ncurses -l c++ -l z");
+    } else if cfg!(target_os = "haiku") {
+        println!("cargo:rustc-flags=-l ffi -l ncursesw -l stdc++ -l z");
     }
 
     cep.discard();

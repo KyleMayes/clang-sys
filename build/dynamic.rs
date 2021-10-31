@@ -129,7 +129,8 @@ fn search_libclang_directories(runtime: bool) -> Result<Vec<(PathBuf, String, Ve
     if cfg!(any(
         target_os = "openbsd",
         target_os = "freebsd",
-        target_os = "netbsd"
+        target_os = "netbsd",
+        target_os = "haiku"
     )) {
         // Some BSD distributions don't create a `libclang.so` symlink either,
         // but use a different naming scheme for versioned files (e.g.,
