@@ -1,4 +1,4 @@
-## [1.3.0] - UNRELEASED
+## [1.3.0] - 2021-10-31
 
 ### Added
 - Added support for `clang` 13.0.x
