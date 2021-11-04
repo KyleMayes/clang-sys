@@ -7,6 +7,12 @@ on:
   pull_request:
     branches:
       - master
+  workflow_dispatch:
+    inputs:
+      debug:
+        description: "Run the action with SSH debugging enabled."
+        required: false
+        default: false
 
 jobs:
   ci:
@@ -31,6 +37,10 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: ${{ matrix.rust }}
+      # Debug
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug }}
       # Test
       - name: Cargo Test (Dynamic)
         uses: actions-rs/cargo@v1
