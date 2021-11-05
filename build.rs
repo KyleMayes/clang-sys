@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
-//! Finds `libclang` static or dynamic libraries and links to them.
+//! Finds `libclang` static or shared libraries and links to them.
 //!
 //! # Environment Variables
 //!
 //! This build script can make use of several environment variables to help it
-//! find the required static or dynamic libraries.
+//! find the required static or shared libraries.
 //!
 //! * `LLVM_CONFIG_PATH` - provides a path to an `llvm-config` executable
 //! * `LIBCLANG_PATH` - provides a path to a directory containing a `libclang`
@@ -24,9 +24,9 @@ pub mod common;
 #[path = "build/dynamic.rs"]
 pub mod dynamic;
 #[path = "build/static.rs"]
-pub mod static_;
+pub mod r#static;
 
-/// Copy the file from the supplied source to the supplied destination.
+/// Copies a file.
 #[cfg(feature = "runtime")]
 fn copy(source: &str, destination: &Path) {
     use std::fs::File;
@@ -43,7 +43,8 @@ fn copy(source: &str, destination: &Path) {
         .unwrap();
 }
 
-/// Generates the finding and linking code so that it may be used at runtime.
+/// Copies the code used to find and link to `libclang` shared libraries into
+/// the build output directory so that it may be used when linking at runtime.
 #[cfg(feature = "runtime")]
 fn main() {
     use std::env;
@@ -57,11 +58,11 @@ fn main() {
     copy("build/dynamic.rs", &Path::new(&out).join("dynamic.rs"));
 }
 
-/// Finds and links to the required libraries.
+/// Finds and links to the required libraries dynamically or statically.
 #[cfg(not(feature = "runtime"))]
 fn main() {
     if cfg!(feature = "static") {
-        static_::link();
+        r#static::link();
     } else {
         dynamic::link();
     }

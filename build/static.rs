@@ -8,7 +8,28 @@ use glob::Pattern;
 
 use common;
 
-/// Returns the name of an LLVM or Clang library from a path to such a library.
+//================================================
+// Searching
+//================================================
+
+/// Clang static libraries required to link to `libclang` 3.5 and later.
+const CLANG_LIBRARIES: &[&str] = &[
+    "clang",
+    "clangAST",
+    "clangAnalysis",
+    "clangBasic",
+    "clangDriver",
+    "clangEdit",
+    "clangFrontend",
+    "clangIndex",
+    "clangLex",
+    "clangParse",
+    "clangRewrite",
+    "clangSema",
+    "clangSerialization",
+];
+
+/// Gets the name of an LLVM or Clang static library from a path.
 fn get_library_name(path: &Path) -> Option<String> {
     path.file_stem().map(|p| {
         let string = p.to_string_lossy();
@@ -20,7 +41,7 @@ fn get_library_name(path: &Path) -> Option<String> {
     })
 }
 
-/// Returns the LLVM libraries required to link to `libclang` statically.
+/// Gets the LLVM static libraries required to link to `libclang`.
 fn get_llvm_libraries() -> Vec<String> {
     common::run_llvm_config(&["--libs"])
         .unwrap()
@@ -38,24 +59,7 @@ fn get_llvm_libraries() -> Vec<String> {
         .collect()
 }
 
-/// Clang libraries required to link to `libclang` 3.5 and later statically.
-const CLANG_LIBRARIES: &[&str] = &[
-    "clang",
-    "clangAST",
-    "clangAnalysis",
-    "clangBasic",
-    "clangDriver",
-    "clangEdit",
-    "clangFrontend",
-    "clangIndex",
-    "clangLex",
-    "clangParse",
-    "clangRewrite",
-    "clangSema",
-    "clangSerialization",
-];
-
-/// Returns the Clang libraries required to link to `libclang` statically.
+/// Gets the Clang static libraries required to link to `libclang`.
 fn get_clang_libraries<P: AsRef<Path>>(directory: P) -> Vec<String> {
     // Escape the directory in case it contains characters that have special
     // meaning in glob patterns (e.g., `[` or `]`).
@@ -72,7 +76,8 @@ fn get_clang_libraries<P: AsRef<Path>>(directory: P) -> Vec<String> {
     }
 }
 
-/// Returns a directory containing `libclang` static libraries.
+/// Finds a directory containing LLVM and Clang static libraries and returns the
+/// path to that directory.
 fn find() -> PathBuf {
     let name = if cfg!(target_os = "windows") {
         "libclang.lib"
@@ -88,7 +93,11 @@ fn find() -> PathBuf {
     }
 }
 
-/// Find and link to `libclang` statically.
+//================================================
+// Linking
+//================================================
+
+/// Finds and links to `libclang` static libraries.
 pub fn link() {
     let cep = common::CommandErrorPrinter::default();
 
@@ -121,12 +130,10 @@ pub fn link() {
     // MSVC doesn't need this, as it tracks dependencies inside `.lib` files.
     if cfg!(target_os = "freebsd") {
         println!("cargo:rustc-flags=-l ffi -l ncursesw -l c++ -l z");
-    } else if cfg!(target_os = "linux") {
+    } else if cfg!(any(target_os = "haiku", target_os = "linux")) {
         println!("cargo:rustc-flags=-l ffi -l ncursesw -l stdc++ -l z");
     } else if cfg!(target_os = "macos") {
         println!("cargo:rustc-flags=-l ffi -l ncurses -l c++ -l z");
-    } else if cfg!(target_os = "haiku") {
-        println!("cargo:rustc-flags=-l ffi -l ncursesw -l stdc++ -l z");
     }
 
     cep.discard();
