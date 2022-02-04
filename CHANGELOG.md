@@ -1,4 +1,4 @@
-## [1.3.1] - UNRELEASED
+## [1.3.1] - 2022-02-03
 
 ### Added
 - Added missing `clang_getToken` function
