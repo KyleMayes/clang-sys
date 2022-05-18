@@ -1,4 +1,4 @@
-## [1.3.2] - UNRELEASED
+## [1.3.2] - 2022-05-18
 
 ### Added
 - Added support for illumos and derivatives
