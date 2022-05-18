@@ -172,6 +172,12 @@ const DIRECTORIES_WINDOWS: &[&str] = &[
     "C:\\Users\\*\\scoop\\apps\\llvm\\current\\bin",
 ];
 
+/// `libclang` directory patterns for illumos
+const DIRECTORIES_ILLUMOS: &[&str] = &[
+    "/opt/ooce/clang-*/lib",
+    "/opt/ooce/llvm-*/lib",
+];
+
 //================================================
 // Searching
 //================================================
@@ -291,6 +297,8 @@ pub fn search_libclang_directories(filenames: &[String], variable: &str) -> Vec<
         DIRECTORIES_MACOS
     } else if cfg!(target_os = "windows") {
         DIRECTORIES_WINDOWS
+    } else if cfg!(target_os = "illumos") {
+        DIRECTORIES_ILLUMOS
     } else {
         &[]
     };
