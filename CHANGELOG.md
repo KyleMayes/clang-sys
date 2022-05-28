@@ -1,4 +1,4 @@
-## [1.3.3] - UNRELEASED
+## [1.3.3] - 2022-05-28
 
 ### Fixed
 - Fixed `Clang::find` to check that `CLANG_PATH` is an executable file before
