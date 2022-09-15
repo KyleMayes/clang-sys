@@ -462,6 +462,10 @@ cenum! {
         const CXCursor_OMPMaskedDirective = 292,
         /// Only produced by `libclang` 13.0 and later.
         const CXCursor_OMPUnrollDirective = 293,
+        /// Only produced by `libclang` 14.0 and later.
+        const CXCursor_OMPMetaDirective = 294,
+        /// Only produced by `libclang` 14.0 and later.
+        const CXCursor_OMPGenericLoopDirective = 295,
         const CXCursor_TranslationUnit = 300,
         const CXCursor_UnexposedAttr = 400,
         const CXCursor_IBActionAttr = 401,
@@ -869,6 +873,8 @@ cenum! {
         const CXType_ULongAccum = 38,
         /// Only produced by `libclang` 11.0 and later.
         const CXType_BFloat16 = 39,
+        /// Only produced by `libclang` 14.0 and later.
+        const CXType_Ibm128 = 40,
         const CXType_Complex = 100,
         const CXType_Pointer = 101,
         const CXType_BlockPointer = 102,
