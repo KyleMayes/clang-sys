@@ -40,7 +40,7 @@ macro_rules! link {
         )+
     ) => (
         use std::cell::{RefCell};
-        use std::sync::{Arc};
+        use std::rc::{Rc};
         use std::path::{Path, PathBuf};
 
         /// The (minimum) version of a `libclang` shared library.
@@ -121,7 +121,7 @@ macro_rules! link {
             }
         }
 
-        thread_local!(static LIBRARY: RefCell<Option<Arc<SharedLibrary>>> = RefCell::new(None));
+        thread_local!(static LIBRARY: RefCell<Option<Rc<SharedLibrary>>> = RefCell::new(None));
 
         /// Returns whether a `libclang` shared library is loaded on this thread.
         pub fn is_loaded() -> bool {
@@ -174,7 +174,11 @@ macro_rules! link {
         ///
         /// * a `libclang` shared library could not be found
         /// * the `libclang` shared library could not be opened
-        pub fn load_manually() -> Result<SharedLibrary, String> {
+        ///
+        /// # Safety
+        ///
+        /// `libclang` must be loaded at most once per thread.
+        pub unsafe fn load_manually() -> Result<SharedLibrary, String> {
             mod build {
                 pub mod common { include!(concat!(env!("OUT_DIR"), "/common.rs")); }
                 pub mod dynamic { include!(concat!(env!("OUT_DIR"), "/dynamic.rs")); }
@@ -210,38 +214,42 @@ macro_rules! link {
         /// * a `libclang` shared library could not be found
         /// * the `libclang` shared library could not be opened
         #[allow(dead_code)]
-        pub fn load() -> Result<(), String> {
-            let library = Arc::new(load_manually()?);
-            LIBRARY.with(|l| *l.borrow_mut() = Some(library));
-            Ok(())
+        pub fn load() -> Result<Rc<SharedLibrary>, String> {
+            LIBRARY.with(|l| {
+                if let Some(library) = l.borrow().as_ref() {
+                    // Already loaded.
+                    return Ok(library.clone())
+                }
+
+                let library = Rc::new(unsafe {
+                  load_manually()?
+                });
+                *l.borrow_mut() = Some(library.clone());
+                Ok(library)
+            })
         }
 
         /// Unloads the `libclang` shared library in use in the current thread.
         ///
         /// # Failures
         ///
-        /// * a `libclang` shared library is not in use in the current thread
+        /// * the `libclang` library is still referenced by the current thread
+        /// * the `libclang` shared library is not in use in the current thread
         pub fn unload() -> Result<(), String> {
-            let library = set_library(None);
-            if library.is_some() {
-                Ok(())
-            } else {
-                Err("a `libclang` shared library is not in use in the current thread".into())
-            }
-        }
-
-        /// Returns the library instance stored in TLS.
-        ///
-        /// This functions allows for sharing library instances between threads.
-        pub fn get_library() -> Option<Arc<SharedLibrary>> {
-            LIBRARY.with(|l| l.borrow_mut().clone())
-        }
-
-        /// Sets the library instance stored in TLS and returns the previous library.
-        ///
-        /// This functions allows for sharing library instances between threads.
-        pub fn set_library(library: Option<Arc<SharedLibrary>>) -> Option<Arc<SharedLibrary>> {
-            LIBRARY.with(|l| mem::replace(&mut *l.borrow_mut(), library))
+            LIBRARY.with(|l| {
+                let mut l = l.borrow_mut();
+                if let Some(library) = l.as_ref() {
+                    let strong_count = Rc::strong_count(library);
+                    if strong_count == 1 {
+                        *l = None;
+                        Ok(())
+                    } else {
+                        Err("the `libclang` shared library is still referenced by the current thread".into())
+                    }
+                } else {
+                    Err("the `libclang` shared library is not in use in the current thread".into())
+                }
+            })
         }
     )
 }

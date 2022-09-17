@@ -28,10 +28,10 @@ fn parse() {
 #[cfg(feature = "runtime")]
 #[test]
 fn test() {
-    load().unwrap();
-    let library = get_library().unwrap();
+    let library = load().unwrap();
     println!("{:?} ({:?})", library.version(), library.path());
     parse();
+    drop(library);
     unload().unwrap();
 }
 
