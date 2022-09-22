@@ -1,3 +1,10 @@
+## [1.4.0] - UNRELEASED
+
+### Added
+- Added support for `clang` 16.0.x
+- Added support for `clang` 15.0.x
+- Added support for `clang` 14.0.x
+
 ## [1.3.3] - 2022-05-28
 
 ### Fixed
