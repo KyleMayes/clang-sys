@@ -490,9 +490,9 @@ cenum! {
         const CXCursor_OMPParallelMaskedTaskLoopDirective = 303,
         /// Only produced by `libclang` 15.0 and later.
         const CXCursor_OMPParallelMaskedTaskLoopSimdDirective = 304,
-        #[cfg(not(any(feature="clang_15_0", feature="clang_16_0")))]
+        #[cfg(not(feature="clang_15_0"))]
         const CXCursor_TranslationUnit = 300,
-        #[cfg(any(feature="clang_15_0", feature="clang_16_0"))]
+        #[cfg(feature="clang_15_0")]
         const CXCursor_TranslationUnit = 350,
         const CXCursor_UnexposedAttr = 400,
         const CXCursor_IBActionAttr = 401,
