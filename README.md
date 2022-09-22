@@ -31,6 +31,8 @@ To target a version of `libclang`, enable a Cargo features such as one of the fo
 
 If you do not enable one of these features, the API provided by `libclang` 3.5 will be available by default.
 
+**Note:** If you are using Clang 15.0 or later, you should enable the `clang_15_0` feature or a more recent version feature. Clang 15.0 introduced [a breaking change to the `EntityKind` enum](https://github.com/llvm/llvm-project/commit/bb83f8e70bd1d56152f02307adacd718cd67e312#diff-674613a0e47f4e66cc19061e28e3296d39be2d124dceefb68237b30b8e241e7c) which resulted in a mismatch between the values returned by `libclang` and the values for `EntityKind` defined by this crate in previous versions.
+
 ## Dependencies
 
 By default, this crate will attempt to link to `libclang` dynamically. In this case, this crate depends on the `libclang` shared library (`libclang.so` on Linux, `libclang.dylib` on macOS, `libclang.dll` on Windows). If you want to link to `libclang` statically instead, enable the `static` Cargo feature. In this case, this crate depends on the LLVM and Clang static libraries. If you don't want to link to `libclang` at compiletime but instead want to load it at runtime, enable the `runtime` Cargo feature.
