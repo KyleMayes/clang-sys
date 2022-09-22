@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
-        clang: [["16.0", "clang_16_0"]]
+        clang: [["14.0", "clang_14_0"]]
         rust: ["1.40.0"]
     steps:
       - name: Checkout Repository
