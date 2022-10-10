@@ -1724,6 +1724,18 @@ pub struct IndexerCallbacks {
 
 default!(IndexerCallbacks);
 
+#[cfg(feature = "clang_16_0")]
+#[derive(Copy, Clone, Debug)]
+#[repr(C)]
+pub struct CXCXXMethodIterator {
+    pub cur: *mut c_void,
+    pub end: *mut c_void,
+    pub tu: CXTranslationUnit,
+}
+
+#[cfg(feature = "clang_16_0")]
+default!(CXCXXMethodIterator);
+
 //================================================
 // Functions
 //================================================
@@ -1764,6 +1776,33 @@ link! {
     /// Only available on `libclang` 6.0 and later.
     #[cfg(feature = "clang_6_0")]
     pub fn clang_CXXRecord_isAbstract(cursor: CXCursor) -> c_uint;
+    /// Only available on `libclang` 16.0 and later.
+    #[cfg(feature = "clang_16_0")]
+    pub fn clang_CXXRecord_defaultedCopyConstructorIsDeleted(cursor: CXCursor) -> c_uint;
+    /// Only available on `libclang` 16.0 and later.
+    #[cfg(feature = "clang_16_0")]
+    pub fn clang_CXXRecord_defaultedMoveConstructorIsDeleted(cursor: CXCursor) -> c_uint;
+    /// Only available on `libclang` 16.0 and later.
+    #[cfg(feature = "clang_16_0")]
+    pub fn clang_CXXRecord_defaultedDestructorIsDeleted(cursor: CXCursor) -> c_uint;
+    /// Only available on `libclang` 16.0 and later.
+    #[cfg(feature = "clang_16_0")]
+    pub fn clang_CXXRecord_needsImplicitDefaultConstructor(cursor: CXCursor) -> c_uint;
+    /// Only available on `libclang` 16.0 and later.
+    #[cfg(feature = "clang_16_0")]
+    pub fn clang_CXXRecord_needsImplicitCopyConstructor(cursor: CXCursor) -> c_uint;
+    /// Only available on `libclang` 16.0 and later.
+    #[cfg(feature = "clang_16_0")]
+    pub fn clang_CXXRecord_needsImplicitMoveConstructor(cursor: CXCursor) -> c_uint;
+    /// Only available on `libclang` 16.0 and later.
+    #[cfg(feature = "clang_16_0")]
+    pub fn clang_CXXRecord_needsImplicitCopyAssignment(cursor: CXCursor) -> c_uint;
+    /// Only available on `libclang` 16.0 and later.
+    #[cfg(feature = "clang_16_0")]
+    pub fn clang_CXXRecord_needsImplicitMoveAssignment(cursor: CXCursor) -> c_uint;
+    /// Only available on `libclang` 16.0 and later.
+    #[cfg(feature = "clang_16_0")]
+    pub fn clang_CXXRecord_needsImplicitDestructor(cursor: CXCursor) -> c_uint;
     pub fn clang_CompilationDatabase_dispose(database: CXCompilationDatabase);
     pub fn clang_CompilationDatabase_fromDirectory(directory: *const c_char, error: *mut CXCompilationDatabase_Error) -> CXCompilationDatabase;
     pub fn clang_CompilationDatabase_getAllCompileCommands(database: CXCompilationDatabase) -> CXCompileCommands;
