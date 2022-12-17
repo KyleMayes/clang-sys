@@ -2,7 +2,7 @@
 
 [![Crate](https://img.shields.io/crates/v/clang-sys.svg)](https://crates.io/crates/clang-sys)
 [![Documentation](https://docs.rs/clang-sys/badge.svg)](https://docs.rs/clang-sys)
-[![CI](https://img.shields.io/github/workflow/status/KyleMayes/clang-sys/CI/master)](https://github.com/KyleMayes/vulkanalia/actions?query=workflow%3ACI)
+[![CI](https://img.shields.io/github/actions/workflow/status/KyleMayes/clang-sys/ci.yml?branch=master)](https://github.com/KyleMayes/clang-sys/actions?query=workflow%3ACI)
 ![MSRV](https://img.shields.io/badge/MSRV-1.40.0-blue)
 
 Rust bindings for `libclang`.
