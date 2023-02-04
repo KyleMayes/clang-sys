@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 
 extern crate glob;
+extern crate serial_test;
 extern crate tempdir;
 
 use std::collections::HashMap;
@@ -10,6 +11,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::Mutex;
 
+use serial_test::serial;
 use tempdir::TempDir;
 
 #[macro_use]
@@ -170,6 +172,7 @@ impl Drop for Env {
 // Windows ---------------------------------------
 
 #[test]
+#[serial]
 fn test_windows_bin_sibling() {
     let _env = Env::new("windows", "64")
         .dir("Program Files\\LLVM\\lib")
