@@ -138,54 +138,61 @@ pub fn run_xcode_select(arguments: &[&str]) -> Option<String> {
 //================================================
 // Search Directories
 //================================================
+// These search directories are listed in order of
+// preference, so if multiple `libclang` instances
+// are found when searching matching directories,
+// the `libclang` instances from earlier
+// directories will be preferred (though version
+// takes precedence over location).
+//================================================
 
 /// `libclang` directory patterns for Haiku.
 const DIRECTORIES_HAIKU: &[&str] = &[
-    "/boot/system/lib",
-    "/boot/system/develop/lib",
-    "/boot/system/non-packaged/lib",
-    "/boot/system/non-packaged/develop/lib",
-    "/boot/home/config/non-packaged/lib",
     "/boot/home/config/non-packaged/develop/lib",
+    "/boot/home/config/non-packaged/lib",
+    "/boot/system/non-packaged/develop/lib",
+    "/boot/system/non-packaged/lib",
+    "/boot/system/develop/lib",
+    "/boot/system/lib",
 ];
 
 /// `libclang` directory patterns for Linux (and FreeBSD).
 const DIRECTORIES_LINUX: &[&str] = &[
-    "/usr/lib*",
-    "/usr/lib*/*",
-    "/usr/lib*/*/*",
-    "/usr/local/lib*",
-    "/usr/local/lib*/*",
-    "/usr/local/lib*/*/*",
     "/usr/local/llvm*/lib*",
+    "/usr/local/lib*/*/*",
+    "/usr/local/lib*/*",
+    "/usr/local/lib*",
+    "/usr/lib*/*/*",
+    "/usr/lib*/*",
+    "/usr/lib*",
 ];
 
 /// `libclang` directory patterns for macOS.
 const DIRECTORIES_MACOS: &[&str] = &[
-    "/usr/local/opt/llvm*/lib",
-    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib",
-    "/Library/Developer/CommandLineTools/usr/lib",
     "/usr/local/opt/llvm*/lib/llvm*/lib",
+    "/Library/Developer/CommandLineTools/usr/lib",
+    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib",
+    "/usr/local/opt/llvm*/lib",
 ];
 
 /// `libclang` directory patterns for Windows.
 const DIRECTORIES_WINDOWS: &[&str] = &[
-    "C:\\LLVM\\lib",
-    "C:\\Program Files*\\LLVM\\lib",
-    "C:\\MSYS*\\MinGW*\\lib",
-    // LLVM + Clang can be installed as a component of Visual Studio.
-    // https://github.com/KyleMayes/clang-sys/issues/121
-    "C:\\Program Files*\\Microsoft Visual Studio\\*\\BuildTools\\VC\\Tools\\Llvm\\**\\lib",
     // LLVM + Clang can be installed using Scoop (https://scoop.sh).
     // Other Windows package managers install LLVM + Clang to previously listed
     // system-wide directories.
     "C:\\Users\\*\\scoop\\apps\\llvm\\current\\lib",
+    // LLVM + Clang can be installed as a component of Visual Studio.
+    // https://github.com/KyleMayes/clang-sys/issues/121
+    "C:\\Program Files*\\Microsoft Visual Studio\\*\\BuildTools\\VC\\Tools\\Llvm\\**\\lib",
+    "C:\\MSYS*\\MinGW*\\lib",
+    "C:\\Program Files*\\LLVM\\lib",
+    "C:\\LLVM\\lib",
 ];
 
 /// `libclang` directory patterns for illumos
 const DIRECTORIES_ILLUMOS: &[&str] = &[
-    "/opt/ooce/clang-*/lib",
     "/opt/ooce/llvm-*/lib",
+    "/opt/ooce/clang-*/lib",
 ];
 
 //================================================
@@ -328,7 +335,7 @@ pub fn search_libclang_directories(filenames: &[String], variable: &str) -> Vec<
     let mut options = MatchOptions::new();
     options.case_sensitive = false;
     options.require_literal_separator = true;
-    for directory in directories.iter().rev() {
+    for directory in directories.iter() {
         if let Ok(directories) = glob::glob_with(directory, options) {
             for directory in directories.filter_map(Result::ok).filter(|p| p.is_dir()) {
                 found.extend(search_directories(&directory, filenames));

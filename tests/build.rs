@@ -169,6 +169,52 @@ impl Drop for Env {
 // Dynamic
 //================================================
 
+// Linux -----------------------------------------
+
+#[test]
+#[serial]
+fn test_linux_directory_preference() {
+    let _env = Env::new("linux", "64")
+        .so("usr/lib/libclang.so.1", "64")
+        .so("usr/local/lib/libclang.so.1", "64")
+        .enable();
+
+    assert_eq!(
+        dynamic::find(true),
+        Ok(("usr/local/lib".into(), "libclang.so.1".into())),
+    );
+}
+
+#[test]
+#[serial]
+fn test_linux_version_preference() {
+    let _env = Env::new("linux", "64")
+        .so("usr/lib/libclang-3.so", "64")
+        .so("usr/lib/libclang-3.5.so", "64")
+        .so("usr/lib/libclang-3.5.0.so", "64")
+        .enable();
+
+    assert_eq!(
+        dynamic::find(true),
+        Ok(("usr/lib".into(), "libclang-3.5.0.so".into())),
+    );
+}
+
+#[test]
+#[serial]
+fn test_linux_directory_and_version_preference() {
+    let _env = Env::new("linux", "64")
+        .so("usr/local/llvm/lib/libclang-3.so", "64")
+        .so("usr/local/lib/libclang-3.5.so", "64")
+        .so("usr/lib/libclang-3.5.0.so", "64")
+        .enable();
+
+    assert_eq!(
+        dynamic::find(true),
+        Ok(("usr/lib".into(), "libclang-3.5.0.so".into())),
+    );
+}
+
 // Windows ---------------------------------------
 
 #[test]
