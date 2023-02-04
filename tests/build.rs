@@ -217,6 +217,7 @@ fn test_linux_directory_and_version_preference() {
 
 // Windows ---------------------------------------
 
+#[cfg(target_os = "windows")]
 #[test]
 #[serial]
 fn test_windows_bin_sibling() {
