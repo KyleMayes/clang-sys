@@ -1,5 +1,9 @@
 ## [1.4.1] - UNRELEASED
 
+### Changed
+- Bumped minimum supported Rust version (MSRV) to 1.51.0
+
+### Added
 - Added additional support for `clang` 16.0.x
 
 ## [1.4.0] - 2022-09-22
