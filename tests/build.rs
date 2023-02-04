@@ -162,3 +162,22 @@ impl Drop for Env {
         }
     }
 }
+
+//================================================
+// Dynamic
+//================================================
+
+// Windows ---------------------------------------
+
+#[test]
+fn test_windows_bin_sibling() {
+    let _env = Env::new("windows", "64")
+        .dir("Program Files\\LLVM\\lib")
+        .dll("Program Files\\LLVM\\bin\\libclang.dll", "64")
+        .enable();
+
+    assert_eq!(
+        dynamic::find(true),
+        Ok(("Program Files\\LLVM\\bin".into(), "libclang.dll".into())),
+    );
+}

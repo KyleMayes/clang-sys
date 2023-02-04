@@ -175,11 +175,11 @@ const DIRECTORIES_WINDOWS: &[&str] = &[
     "C:\\MSYS*\\MinGW*\\lib",
     // LLVM + Clang can be installed as a component of Visual Studio.
     // https://github.com/KyleMayes/clang-sys/issues/121
-    "C:\\Program Files*\\Microsoft Visual Studio\\*\\BuildTools\\VC\\Tools\\Llvm\\**\\bin",
+    "C:\\Program Files*\\Microsoft Visual Studio\\*\\BuildTools\\VC\\Tools\\Llvm\\**\\lib",
     // LLVM + Clang can be installed using Scoop (https://scoop.sh).
     // Other Windows package managers install LLVM + Clang to previously listed
     // system-wide directories.
-    "C:\\Users\\*\\scoop\\apps\\llvm\\current\\bin",
+    "C:\\Users\\*\\scoop\\apps\\llvm\\current\\lib",
 ];
 
 /// `libclang` directory patterns for illumos
