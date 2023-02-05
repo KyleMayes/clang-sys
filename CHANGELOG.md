@@ -1,4 +1,4 @@
-## [1.4.1] - UNRELEASED
+## [1.5.0] - 2023-02-05
 
 ### Changed
 - Bumped minimum supported Rust version (MSRV) to 1.51.0
