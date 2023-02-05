@@ -50,6 +50,12 @@ libloading = { version = "0.7", optional = true }
 
 glob = "0.3"
 
+[dev-dependencies]
+
+glob = "0.3"
+serial_test = "1"
+tempdir = "0.3"
+
 [package.metadata.docs.rs]
 
 features = ["clang_16_0", "runtime"]

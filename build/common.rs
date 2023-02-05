@@ -91,9 +91,19 @@ impl Drop for CommandErrorPrinter {
     }
 }
 
+#[cfg(test)]
+pub static RUN_COMMAND_MOCK: std::sync::Mutex<
+    Option<Box<dyn Fn(&str, &str, &[&str]) -> Option<String> + Send + Sync + 'static>>,
+> = std::sync::Mutex::new(None);
+
 /// Executes a command and returns the `stdout` output if the command was
 /// successfully executed (errors are added to `COMMAND_ERRORS`).
 fn run_command(name: &str, path: &str, arguments: &[&str]) -> Option<String> {
+    #[cfg(test)]
+    if let Some(command) = &*RUN_COMMAND_MOCK.lock().unwrap() {
+        return command(name, path, arguments);
+    }
+
     let output = match Command::new(path).args(arguments).output() {
         Ok(output) => output,
         Err(error) => {
@@ -128,54 +138,61 @@ pub fn run_xcode_select(arguments: &[&str]) -> Option<String> {
 //================================================
 // Search Directories
 //================================================
+// These search directories are listed in order of
+// preference, so if multiple `libclang` instances
+// are found when searching matching directories,
+// the `libclang` instances from earlier
+// directories will be preferred (though version
+// takes precedence over location).
+//================================================
 
 /// `libclang` directory patterns for Haiku.
 const DIRECTORIES_HAIKU: &[&str] = &[
-    "/boot/system/lib",
-    "/boot/system/develop/lib",
-    "/boot/system/non-packaged/lib",
-    "/boot/system/non-packaged/develop/lib",
-    "/boot/home/config/non-packaged/lib",
     "/boot/home/config/non-packaged/develop/lib",
+    "/boot/home/config/non-packaged/lib",
+    "/boot/system/non-packaged/develop/lib",
+    "/boot/system/non-packaged/lib",
+    "/boot/system/develop/lib",
+    "/boot/system/lib",
 ];
 
 /// `libclang` directory patterns for Linux (and FreeBSD).
 const DIRECTORIES_LINUX: &[&str] = &[
-    "/usr/lib*",
-    "/usr/lib*/*",
-    "/usr/lib*/*/*",
-    "/usr/local/lib*",
-    "/usr/local/lib*/*",
-    "/usr/local/lib*/*/*",
     "/usr/local/llvm*/lib*",
+    "/usr/local/lib*/*/*",
+    "/usr/local/lib*/*",
+    "/usr/local/lib*",
+    "/usr/lib*/*/*",
+    "/usr/lib*/*",
+    "/usr/lib*",
 ];
 
 /// `libclang` directory patterns for macOS.
 const DIRECTORIES_MACOS: &[&str] = &[
-    "/usr/local/opt/llvm*/lib",
-    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib",
-    "/Library/Developer/CommandLineTools/usr/lib",
     "/usr/local/opt/llvm*/lib/llvm*/lib",
+    "/Library/Developer/CommandLineTools/usr/lib",
+    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib",
+    "/usr/local/opt/llvm*/lib",
 ];
 
 /// `libclang` directory patterns for Windows.
 const DIRECTORIES_WINDOWS: &[&str] = &[
-    "C:\\LLVM\\lib",
-    "C:\\Program Files*\\LLVM\\lib",
-    "C:\\MSYS*\\MinGW*\\lib",
-    // LLVM + Clang can be installed as a component of Visual Studio.
-    // https://github.com/KyleMayes/clang-sys/issues/121
-    "C:\\Program Files*\\Microsoft Visual Studio\\*\\BuildTools\\VC\\Tools\\Llvm\\**\\bin",
     // LLVM + Clang can be installed using Scoop (https://scoop.sh).
     // Other Windows package managers install LLVM + Clang to previously listed
     // system-wide directories.
-    "C:\\Users\\*\\scoop\\apps\\llvm\\current\\bin",
+    "C:\\Users\\*\\scoop\\apps\\llvm\\current\\lib",
+    "C:\\MSYS*\\MinGW*\\lib",
+    "C:\\Program Files*\\LLVM\\lib",
+    "C:\\LLVM\\lib",
+    // LLVM + Clang can be installed as a component of Visual Studio.
+    // https://github.com/KyleMayes/clang-sys/issues/121
+    "C:\\Program Files*\\Microsoft Visual Studio\\*\\BuildTools\\VC\\Tools\\Llvm\\**\\lib",
 ];
 
 /// `libclang` directory patterns for illumos
 const DIRECTORIES_ILLUMOS: &[&str] = &[
-    "/opt/ooce/clang-*/lib",
     "/opt/ooce/llvm-*/lib",
+    "/opt/ooce/clang-*/lib",
 ];
 
 //================================================
@@ -233,7 +250,7 @@ fn search_directories(directory: &Path, filenames: &[String]) -> Vec<(PathBuf, S
     // keep things consistent with other platforms, only LLVM `lib` directories
     // are included in the backup search directory globs so we need to search
     // the LLVM `bin` directory here.
-    if cfg!(target_os = "windows") && directory.ends_with("lib") {
+    if os!("windows") && directory.ends_with("lib") {
         let sibling = directory.parent().unwrap().join("bin");
         results.extend(search_directory(&sibling, filenames).into_iter());
     }
@@ -273,7 +290,7 @@ pub fn search_libclang_directories(filenames: &[String], variable: &str) -> Vec<
 
     // Search the toolchain directory in the directory returned by
     // `xcode-select --print-path`.
-    if cfg!(target_os = "macos") {
+    if os!("macos") {
         if let Some(output) = run_xcode_select(&["--print-path"]) {
             let directory = Path::new(output.lines().next().unwrap()).to_path_buf();
             let directory = directory.join("Toolchains/XcodeDefault.xctoolchain/usr/lib");
@@ -289,25 +306,36 @@ pub fn search_libclang_directories(filenames: &[String], variable: &str) -> Vec<
     }
 
     // Determine the `libclang` directory patterns.
-    let directories = if cfg!(target_os = "haiku") {
+    let directories = if os!("haiku") {
         DIRECTORIES_HAIKU
-    } else if cfg!(any(target_os = "linux", target_os = "freebsd")) {
+    } else if os!("linux") || os!("freebsd") {
         DIRECTORIES_LINUX
-    } else if cfg!(target_os = "macos") {
+    } else if os!("macos") {
         DIRECTORIES_MACOS
-    } else if cfg!(target_os = "windows") {
+    } else if os!("windows") {
         DIRECTORIES_WINDOWS
-    } else if cfg!(target_os = "illumos") {
+    } else if os!("illumos") {
         DIRECTORIES_ILLUMOS
     } else {
         &[]
+    };
+
+    // We use temporary directories when testing the build script so we'll
+    // remove the prefixes that make the directories absolute.
+    let directories = if test!() {
+        directories
+            .iter()
+            .map(|d| d.strip_prefix('/').or_else(|| d.strip_prefix("C:\\")).unwrap_or(d))
+            .collect::<Vec<_>>()
+    } else {
+        directories.into()
     };
 
     // Search the directories provided by the `libclang` directory patterns.
     let mut options = MatchOptions::new();
     options.case_sensitive = false;
     options.require_literal_separator = true;
-    for directory in directories.iter().rev() {
+    for directory in directories.iter() {
         if let Ok(directories) = glob::glob_with(directory, options) {
             for directory in directories.filter_map(Result::ok).filter(|p| p.is_dir()) {
                 found.extend(search_directories(&directory, filenames));
