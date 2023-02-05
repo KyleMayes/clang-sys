@@ -4,7 +4,7 @@ macro_rules! test {
     () => (cfg!(test) && ::std::env::var("_CLANG_SYS_TEST").is_ok());
 }
 
-macro_rules! os {
+macro_rules! target_os {
     ($os:expr) => {
         if cfg!(test) && ::std::env::var("_CLANG_SYS_TEST").is_ok() {
             let var = ::std::env::var("_CLANG_SYS_TEST_OS");
@@ -15,7 +15,7 @@ macro_rules! os {
     };
 }
 
-macro_rules! pointer_width {
+macro_rules! target_pointer_width {
     ($pointer_width:expr) => {
         if cfg!(test) && ::std::env::var("_CLANG_SYS_TEST").is_ok() {
             let var = ::std::env::var("_CLANG_SYS_TEST_POINTER_WIDTH");

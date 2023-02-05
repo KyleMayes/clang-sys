@@ -79,7 +79,7 @@ fn get_clang_libraries<P: AsRef<Path>>(directory: P) -> Vec<String> {
 /// Finds a directory containing LLVM and Clang static libraries and returns the
 /// path to that directory.
 fn find() -> PathBuf {
-    let name = if os!("windows") {
+    let name = if target_os!("windows") {
         "libclang.lib"
     } else {
         "libclang.a"

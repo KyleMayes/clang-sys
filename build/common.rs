@@ -250,7 +250,7 @@ fn search_directories(directory: &Path, filenames: &[String]) -> Vec<(PathBuf, S
     // keep things consistent with other platforms, only LLVM `lib` directories
     // are included in the backup search directory globs so we need to search
     // the LLVM `bin` directory here.
-    if os!("windows") && directory.ends_with("lib") {
+    if target_os!("windows") && directory.ends_with("lib") {
         let sibling = directory.parent().unwrap().join("bin");
         results.extend(search_directory(&sibling, filenames).into_iter());
     }
@@ -290,7 +290,7 @@ pub fn search_libclang_directories(filenames: &[String], variable: &str) -> Vec<
 
     // Search the toolchain directory in the directory returned by
     // `xcode-select --print-path`.
-    if os!("macos") {
+    if target_os!("macos") {
         if let Some(output) = run_xcode_select(&["--print-path"]) {
             let directory = Path::new(output.lines().next().unwrap()).to_path_buf();
             let directory = directory.join("Toolchains/XcodeDefault.xctoolchain/usr/lib");
@@ -306,15 +306,15 @@ pub fn search_libclang_directories(filenames: &[String], variable: &str) -> Vec<
     }
 
     // Determine the `libclang` directory patterns.
-    let directories = if os!("haiku") {
+    let directories = if target_os!("haiku") {
         DIRECTORIES_HAIKU
-    } else if os!("linux") || os!("freebsd") {
+    } else if target_os!("linux") || target_os!("freebsd") {
         DIRECTORIES_LINUX
-    } else if os!("macos") {
+    } else if target_os!("macos") {
         DIRECTORIES_MACOS
-    } else if os!("windows") {
+    } else if target_os!("windows") {
         DIRECTORIES_WINDOWS
-    } else if os!("illumos") {
+    } else if target_os!("illumos") {
         DIRECTORIES_ILLUMOS
     } else {
         &[]
