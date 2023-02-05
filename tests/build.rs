@@ -35,6 +35,7 @@ struct RunCommandMock {
 struct Env {
     os: String,
     pointer_width: String,
+    env: Option<String>,
     vars: HashMap<String, (Option<String>, Option<String>)>,
     cwd: PathBuf,
     tmp: TempDir,
@@ -47,6 +48,7 @@ impl Env {
         Env {
             os: os.into(),
             pointer_width: pointer_width.into(),
+            env: None,
             vars: HashMap::new(),
             cwd: env::current_dir().unwrap(),
             tmp: TempDir::new("clang_sys_test").unwrap(),
@@ -59,6 +61,11 @@ impl Env {
         .var("LIBCLANG_STATIC_PATH", None)
         .var("LLVM_CONFIG_PATH", None)
         .var("PATH", None)
+    }
+
+    fn env(mut self, env: &str) -> Self {
+        self.env = Some(env.into());
+        self
     }
 
     fn var(mut self, name: &str, value: Option<&str>) -> Self {
@@ -116,6 +123,9 @@ impl Env {
         env::set_var("_CLANG_SYS_TEST", "yep");
         env::set_var("_CLANG_SYS_TEST_OS", &self.os);
         env::set_var("_CLANG_SYS_TEST_POINTER_WIDTH", &self.pointer_width);
+        if let Some(env) = &self.env {
+            env::set_var("_CLANG_SYS_TEST_ENV", env);
+        }
 
         for (name, (value, _)) in &self.vars {
             if let Some(value) = value {
@@ -150,6 +160,8 @@ impl Drop for Env {
     fn drop(&mut self) {
         env::remove_var("_CLANG_SYS_TEST");
         env::remove_var("_CLANG_SYS_TEST_OS");
+        env::remove_var("_CLANG_SYS_TEST_POINTER_WIDTH");
+        env::remove_var("_CLANG_SYS_TEST_ENV");
 
         for (name, (_, previous)) in &self.vars {
             if let Some(previous) = previous {

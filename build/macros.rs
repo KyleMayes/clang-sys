@@ -25,3 +25,14 @@ macro_rules! target_pointer_width {
         }
     };
 }
+
+macro_rules! target_env {
+    ($env:expr) => {
+        if cfg!(test) && ::std::env::var("_CLANG_SYS_TEST").is_ok() {
+            let var = ::std::env::var("_CLANG_SYS_TEST_ENV");
+            var.map_or(false, |v| v == $env)
+        } else {
+            cfg!(target_env = $env)
+        }
+    };
+}
