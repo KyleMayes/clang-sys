@@ -243,3 +243,39 @@ fn test_windows_bin_sibling() {
         Ok(("Program Files\\LLVM\\bin".into(), "libclang.dll".into())),
     );
 }
+
+#[cfg(target_os = "windows")]
+#[test]
+#[serial]
+fn test_windows_mingw_gnu() {
+    let _env = Env::new("windows", "64")
+        .env("gnu")
+        .dir("MSYS\\MinGW\\lib")
+        .dll("MSYS\\MinGW\\bin\\clang.dll", "64")
+        .dir("Program Files\\LLVM\\lib")
+        .dll("Program Files\\LLVM\\bin\\libclang.dll", "64")
+        .enable();
+
+    assert_eq!(
+        dynamic::find(true),
+        Ok(("MSYS\\MinGW\\bin".into(), "clang.dll".into())),
+    );
+}
+
+#[cfg(target_os = "windows")]
+#[test]
+#[serial]
+fn test_windows_mingw_msvc() {
+    let _env = Env::new("windows", "64")
+        .env("msvc")
+        .dir("MSYS\\MinGW\\lib")
+        .dll("MSYS\\MinGW\\bin\\clang.dll", "64")
+        .dir("Program Files\\LLVM\\lib")
+        .dll("Program Files\\LLVM\\bin\\libclang.dll", "64")
+        .enable();
+
+    assert_eq!(
+        dynamic::find(true),
+        Ok(("Program Files\\LLVM\\bin".into(), "libclang.dll".into())),
+    );
+}

@@ -1,3 +1,9 @@
+## [1.5.1] - UNRELEASED
+
+### Changed
+- MinGW directories are not searched for `libclang` instances on Windows when
+compiling for an MSVC target
+
 ## [1.5.0] - 2023-02-05
 
 ### Changed

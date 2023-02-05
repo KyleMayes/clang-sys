@@ -176,17 +176,20 @@ const DIRECTORIES_MACOS: &[&str] = &[
 ];
 
 /// `libclang` directory patterns for Windows.
-const DIRECTORIES_WINDOWS: &[&str] = &[
+///
+/// The boolean indicates whether the directory pattern should be used when
+/// compiling for an MSVC target environment.
+const DIRECTORIES_WINDOWS: &[(&str, bool)] = &[
     // LLVM + Clang can be installed using Scoop (https://scoop.sh).
-    // Other Windows package managers install LLVM + Clang to previously listed
+    // Other Windows package managers install LLVM + Clang to other listed
     // system-wide directories.
-    "C:\\Users\\*\\scoop\\apps\\llvm\\current\\lib",
-    "C:\\MSYS*\\MinGW*\\lib",
-    "C:\\Program Files*\\LLVM\\lib",
-    "C:\\LLVM\\lib",
+    ("C:\\Users\\*\\scoop\\apps\\llvm\\current\\lib", true),
+    ("C:\\MSYS*\\MinGW*\\lib", false),
+    ("C:\\Program Files*\\LLVM\\lib", true),
+    ("C:\\LLVM\\lib", true),
     // LLVM + Clang can be installed as a component of Visual Studio.
     // https://github.com/KyleMayes/clang-sys/issues/121
-    "C:\\Program Files*\\Microsoft Visual Studio\\*\\BuildTools\\VC\\Tools\\Llvm\\**\\lib",
+    ("C:\\Program Files*\\Microsoft Visual Studio\\*\\BuildTools\\VC\\Tools\\Llvm\\**\\lib", true),
 ];
 
 /// `libclang` directory patterns for illumos
@@ -306,18 +309,23 @@ pub fn search_libclang_directories(filenames: &[String], variable: &str) -> Vec<
     }
 
     // Determine the `libclang` directory patterns.
-    let directories = if target_os!("haiku") {
-        DIRECTORIES_HAIKU
+    let directories: Vec<&str> = if target_os!("haiku") {
+        DIRECTORIES_HAIKU.into()
     } else if target_os!("linux") || target_os!("freebsd") {
-        DIRECTORIES_LINUX
+        DIRECTORIES_LINUX.into()
     } else if target_os!("macos") {
-        DIRECTORIES_MACOS
+        DIRECTORIES_MACOS.into()
     } else if target_os!("windows") {
+        let msvc = target_env!("msvc");
         DIRECTORIES_WINDOWS
+            .iter()
+            .filter(|d| d.1 || !msvc)
+            .map(|d| d.0)
+            .collect()
     } else if target_os!("illumos") {
-        DIRECTORIES_ILLUMOS
+        DIRECTORIES_ILLUMOS.into()
     } else {
-        &[]
+        vec![]
     };
 
     // We use temporary directories when testing the build script so we'll
