@@ -1,4 +1,4 @@
-## [1.5.1] - UNRELEASED
+## [1.5.1] - 2023-02-05
 
 ### Changed
 - MinGW directories are not searched for `libclang` instances on Windows when
