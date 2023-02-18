@@ -1770,6 +1770,7 @@ link! {
     pub fn clang_CXXMethod_isMoveAssignmentOperator(cursor: CXCursor) -> c_uint;
     pub fn clang_CXXMethod_isPureVirtual(cursor: CXCursor) -> c_uint;
     pub fn clang_CXXMethod_isStatic(cursor: CXCursor) -> c_uint;
+    pub fn clang_CXXMethod_isVirtual(cursor: CXCursor) -> c_uint;
     /// Only available on `libclang` 6.0 and later.
     #[cfg(feature = "clang_6_0")]
     pub fn clang_CXXRecord_isAbstract(cursor: CXCursor) -> c_uint;
