@@ -42,3 +42,8 @@ jobs:
         with:
           command: test
           args: --verbose --features "${{ matrix.clang[1] }} runtime" -- --nocapture
+      - name: Cargo Run (bindgen-test)
+        uses: actions-rs/cargo@v1
+        with:
+          command: run
+          args: --manifest-path bindgen-test/Cargo.toml
