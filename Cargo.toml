@@ -54,7 +54,7 @@ glob = "0.3"
 
 glob = "0.3"
 serial_test = "1"
-tempdir = "0.3"
+tempfile = "3"
 
 [package.metadata.docs.rs]
 
