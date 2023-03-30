@@ -1,4 +1,4 @@
-## [1.6.1] - UNRELEASED
+## [1.6.1] - 2023-03-29
 
 ### Fixed
 - Improved error message when calling a `libclang` function that is not supported by the loaded `libclang` instance (https://github.com/rust-lang/rust-bindgen/issues/2446)
