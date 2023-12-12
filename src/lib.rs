@@ -48,6 +48,20 @@ pub type CXInclusionVisitor = extern "C" fn(CXFile, *mut CXSourceLocation, c_uin
 
 /// Defines a C enum as a series of constants.
 macro_rules! cenum {
+    (#[repr($ty:ty)] $(#[$meta:meta])* enum $name:ident {
+        $($(#[$vmeta:meta])* const $variant:ident = $value:expr), +,
+    }) => (
+        pub type $name = $ty;
+
+        $($(#[$vmeta])* pub const $variant: $name = $value;)+
+    );
+    (#[repr($ty:ty)] $(#[$meta:meta])* enum $name:ident {
+        $($(#[$vmeta:meta])* const $variant:ident = $value:expr); +;
+    }) => (
+        pub type $name = $ty;
+
+        $($(#[$vmeta])* pub const $variant: $name = $value;)+
+    );
     ($(#[$meta:meta])* enum $name:ident {
         $($(#[$vmeta:meta])* const $variant:ident = $value:expr), +,
     }) => (
@@ -182,6 +196,7 @@ cenum! {
 }
 
 cenum! {
+    #[repr(c_uchar)]
     /// Only available on `libclang` 17.0 and later.
     #[cfg(feature = "clang_17_0")]
     enum CXChoice {
@@ -765,22 +780,6 @@ cenum! {
     }
 }
 
-/// Only available on `libclang` 17.0 and later.
-#[cfg(feature = "clang_17_0")]
-pub type CXIndexOptions_Flags = c_ushort;
-
-/// Only available on `libclang` 17.0 and later.
-#[cfg(feature = "clang_17_0")]
-pub const CXIndexOptions_ExcludeDeclarationsFromPCH: CXIndexOptions_Flags = 1;
-
-/// Only available on `libclang` 17.0 and later.
-#[cfg(feature = "clang_17_0")]
-pub const CXIndexOptions_DisplayDiagnostics: CXIndexOptions_Flags = 2;
-
-/// Only available on `libclang` 17.0 and later.
-#[cfg(feature = "clang_17_0")]
-pub const CXIndexOptions_StorePreamblesInMemory: CXIndexOptions_Flags = 4;
-
 cenum! {
     enum CXLanguageKind {
         const CXLanguage_Invalid = 0,
@@ -1286,6 +1285,17 @@ cenum! {
         const CXIndexOptIndexImplicitTemplateInstantiations = 4;
         const CXIndexOptSuppressWarnings = 8;
         const CXIndexOptSkipParsedBodiesInSession = 16;
+    }
+}
+
+cenum! {
+    #[repr(c_ushort)]
+    /// Only available on `libclang` 17.0 and later.
+    #[cfg(feature = "clang_17_0")]
+    enum CXIndexOptions_Flags {
+        const CXIndexOptions_ExcludeDeclarationsFromPCH = 0;
+        const CXIndexOptions_DisplayDiagnostics = 1;
+        const CXIndexOptions_StorePreamblesInMemory = 2;
     }
 }
 
