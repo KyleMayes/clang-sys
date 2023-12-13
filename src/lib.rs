@@ -1288,16 +1288,27 @@ cenum! {
     }
 }
 
-cenum! {
-    #[repr(c_ushort)]
-    /// Only available on `libclang` 17.0 and later.
-    #[cfg(feature = "clang_17_0")]
-    enum CXIndexOptions_Flags {
-        const CXIndexOptions_ExcludeDeclarationsFromPCH = 0;
-        const CXIndexOptions_DisplayDiagnostics = 1;
-        const CXIndexOptions_StorePreamblesInMemory = 2;
-    }
-}
+/// Only available on `libclang` 17.0 and later.
+#[cfg(feature = "clang_17_0")]
+#[cfg(not(target_os = "windows"))]
+pub type CXIndexOptions_Flags = c_ushort;
+
+/// Only available on `libclang` 17.0 and later.
+#[cfg(feature = "clang_17_0")]
+#[cfg(target_os = "windows")]
+pub type CXIndexOptions_Flags = c_uint;
+
+/// Only available on `libclang` 17.0 and later.
+#[cfg(feature = "clang_17_0")]
+pub const CXIndexOptions_ExcludeDeclarationsFromPCH: CXIndexOptions_Flags = 1;
+
+/// Only available on `libclang` 17.0 and later.
+#[cfg(feature = "clang_17_0")]
+pub const CXIndexOptions_DisplayDiagnostics: CXIndexOptions_Flags = 2;
+
+/// Only available on `libclang` 17.0 and later.
+#[cfg(feature = "clang_17_0")]
+pub const CXIndexOptions_StorePreamblesInMemory: CXIndexOptions_Flags = 4;
 
 cenum! {
     enum CXNameRefFlags {
