@@ -62,6 +62,7 @@ macro_rules! link {
             V11_0 = 110,
             V12_0 = 120,
             V16_0 = 160,
+            V17_0 = 170,
         }
 
         impl fmt::Display for Version {
@@ -81,7 +82,8 @@ macro_rules! link {
                     V9_0 => write!(f, "9.0.x - 10.0.x"),
                     V11_0 => write!(f, "11.0.x"),
                     V12_0 => write!(f, "12.0.x - 15.0.x"),
-                    V16_0 => write!(f, "16.0.x or later"),
+                    V16_0 => write!(f, "16.0.x"),
+                    V17_0 => write!(f, "17.0.x or later"),
                 }
             }
         }
@@ -130,6 +132,7 @@ macro_rules! link {
                 }
 
                 unsafe {
+                    check!(b"clang_CXXMethod_isExplicit", V17_0);
                     check!(b"clang_CXXMethod_isCopyAssignmentOperator", V16_0);
                     check!(b"clang_Cursor_getVarDeclInitializer", V12_0);
                     check!(b"clang_Type_getValueType", V11_0);
