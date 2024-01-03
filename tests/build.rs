@@ -1,7 +1,6 @@
 #![allow(dead_code)]
 
 extern crate glob;
-extern crate serial_test;
 extern crate tempfile;
 
 use std::collections::HashMap;
@@ -11,7 +10,6 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::Mutex;
 
-use serial_test::serial;
 use tempfile::TempDir;
 
 #[macro_use]
@@ -177,14 +175,28 @@ impl Drop for Env {
     }
 }
 
+#[test]
+fn test_all() {
+    // Run tests serially since they alter the environment.
+    
+    test_linux_directory_preference();
+    test_linux_version_preference();
+    test_linux_directory_and_version_preference();
+
+    #[cfg(target_os = "windows")]
+    {
+        test_windows_bin_sibling();
+        test_windows_mingw_gnu();
+        test_windows_mingw_msvc();
+    }
+}
+
 //================================================
 // Dynamic
 //================================================
 
 // Linux -----------------------------------------
 
-#[test]
-#[serial]
 fn test_linux_directory_preference() {
     let _env = Env::new("linux", "64")
         .so("usr/lib/libclang.so.1", "64")
@@ -197,8 +209,6 @@ fn test_linux_directory_preference() {
     );
 }
 
-#[test]
-#[serial]
 fn test_linux_version_preference() {
     let _env = Env::new("linux", "64")
         .so("usr/lib/libclang-3.so", "64")
@@ -212,8 +222,6 @@ fn test_linux_version_preference() {
     );
 }
 
-#[test]
-#[serial]
 fn test_linux_directory_and_version_preference() {
     let _env = Env::new("linux", "64")
         .so("usr/local/llvm/lib/libclang-3.so", "64")
@@ -230,8 +238,6 @@ fn test_linux_directory_and_version_preference() {
 // Windows ---------------------------------------
 
 #[cfg(target_os = "windows")]
-#[test]
-#[serial]
 fn test_windows_bin_sibling() {
     let _env = Env::new("windows", "64")
         .dir("Program Files\\LLVM\\lib")
@@ -245,8 +251,6 @@ fn test_windows_bin_sibling() {
 }
 
 #[cfg(target_os = "windows")]
-#[test]
-#[serial]
 fn test_windows_mingw_gnu() {
     let _env = Env::new("windows", "64")
         .env("gnu")
@@ -263,8 +267,6 @@ fn test_windows_mingw_gnu() {
 }
 
 #[cfg(target_os = "windows")]
-#[test]
-#[serial]
 fn test_windows_mingw_msvc() {
     let _env = Env::new("windows", "64")
         .env("msvc")
