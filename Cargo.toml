@@ -1,5 +1,7 @@
 [package]
 
+edition = "2021"
+
 name = "clang-sys"
 authors = ["Kyle Mayes <kyle@mayeses.com>"]
 
