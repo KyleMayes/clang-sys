@@ -1,6 +1,3 @@
-extern crate clang_sys;
-extern crate libc;
-
 use std::ptr;
 
 use clang_sys::*;

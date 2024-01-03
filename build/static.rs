@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
 
-extern crate glob;
-
 use std::path::{Path, PathBuf};
 
 use glob::Pattern;

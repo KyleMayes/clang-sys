@@ -1,8 +1,5 @@
 #![allow(dead_code)]
 
-extern crate glob;
-extern crate tempfile;
-
 use std::collections::HashMap;
 use std::env;
 use std::fs;
