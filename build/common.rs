@@ -90,9 +90,11 @@ impl Drop for CommandErrorPrinter {
 }
 
 #[cfg(test)]
-pub static RUN_COMMAND_MOCK: std::sync::Mutex<
-    Option<Box<dyn Fn(&str, &str, &[&str]) -> Option<String> + Send + Sync + 'static>>,
-> = std::sync::Mutex::new(None);
+lazy_static::lazy_static! {
+    pub static ref RUN_COMMAND_MOCK: std::sync::Mutex<
+        Option<Box<dyn Fn(&str, &str, &[&str]) -> Option<String> + Send + Sync + 'static>>,
+    > = std::sync::Mutex::new(None);
+}
 
 /// Executes a command and returns the `stdout` output if the command was
 /// successfully executed (errors are added to `COMMAND_ERRORS`).
