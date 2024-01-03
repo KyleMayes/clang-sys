@@ -1,3 +1,8 @@
+## [1.8.0] - UNRELEASED
+
+### Changed
+- Bumped minimum supported Rust version (MSRV) to 1.60.0
+
 ## [1.7.0] - 2023-12-31
 
 ### Added
