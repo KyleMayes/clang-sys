@@ -30,7 +30,7 @@ jobs:
           directory: ${{ runner.temp }}/llvm-${{ matrix.clang[0] }}
       # Rust
       - name: Install Rust
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         if: github.event.inputs.os == matrix.os
         with:
           toolchain: ${{ matrix.rust }}

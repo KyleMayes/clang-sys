@@ -19,7 +19,7 @@ jobs:
         rust: ["1.60.0"]
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       # LLVM and Clang
       - name: Install LLVM and Clang
         uses: KyleMayes/install-llvm-action@v1
@@ -28,22 +28,13 @@ jobs:
           directory: ${{ runner.temp }}/llvm-${{ matrix.clang[0] }}
       # Rust
       - name: Install Rust
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: ${{ matrix.rust }}
       # Test
       - name: Cargo Test (Dynamic)
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --verbose --features ${{ matrix.clang[1] }} -- --nocapture
+        run: cargo test --verbose --features ${{ matrix.clang[1] }} -- --nocapture
       - name: Cargo Test (Runtime)
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --verbose --features "${{ matrix.clang[1] }} runtime" -- --nocapture
+        run: cargo test --verbose --features "${{ matrix.clang[1] }} runtime" -- --nocapture
       - name: Cargo Run (bindgen-test)
-        uses: actions-rs/cargo@v1
-        with:
-          command: run
-          args: --manifest-path bindgen-test/Cargo.toml
+        run: cargo run --manifest-path bindgen-test/Cargo.toml
