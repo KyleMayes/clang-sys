@@ -15,8 +15,6 @@
 
 #![allow(unused_attributes)]
 
-extern crate glob;
-
 use std::path::Path;
 
 #[macro_use]

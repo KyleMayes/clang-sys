@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
 
-extern crate glob;
-
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::env;
