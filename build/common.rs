@@ -24,7 +24,7 @@ fn add_command_error(name: &str, path: &str, arguments: &[&str], message: String
     COMMAND_ERRORS.with(|e| {
         e.borrow_mut()
             .entry(name.into())
-            .or_insert_with(Vec::new)
+            .or_default()
             .push(format!(
                 "couldn't execute `{} {}` (path={}) ({})",
                 name,
@@ -255,7 +255,7 @@ fn search_directories(directory: &Path, filenames: &[String]) -> Vec<(PathBuf, S
     // the LLVM `bin` directory here.
     if target_os!("windows") && directory.ends_with("lib") {
         let sibling = directory.parent().unwrap().join("bin");
-        results.extend(search_directory(&sibling, filenames).into_iter());
+        results.extend(search_directory(&sibling, filenames));
     }
 
     results
