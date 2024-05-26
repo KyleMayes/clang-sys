@@ -237,7 +237,7 @@ fn search_directory(directory: &Path, filenames: &[String]) -> Vec<(PathBuf, Str
                 return None;
             }
 
-            Some((directory.to_owned(), filename.into()))
+            Some((path.parent().unwrap().to_owned(), filename.into()))
         })
         .collect::<Vec<_>>()
 }
