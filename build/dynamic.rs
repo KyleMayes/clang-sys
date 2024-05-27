@@ -23,8 +23,8 @@ fn parse_elf_header(path: &Path) -> io::Result<u8> {
     }
 }
 
-/// Extracts the magic number from the PE header in a shared library.
-fn parse_pe_header(path: &Path) -> io::Result<u16> {
+/// Extracts the magic number and machine type from the PE header in a shared library.
+fn parse_pe_header(path: &Path) -> io::Result<(u16, u16)> {
     let mut file = File::open(path)?;
 
     // Extract the header offset.
@@ -45,7 +45,15 @@ fn parse_pe_header(path: &Path) -> io::Result<u16> {
     let mut buffer = [0; 2];
     file.seek(SeekFrom::Current(20))?;
     file.read_exact(&mut buffer)?;
-    Ok(u16::from_le_bytes(buffer))
+    let magic_number = u16::from_le_bytes(buffer);
+
+    // Extract the machine type.
+    let mut buffer = [0; 2];
+    file.seek(SeekFrom::Current(-22))?;
+    file.read_exact(&mut buffer)?;
+    let machine_type = u16::from_le_bytes(buffer);
+
+    return Ok((magic_number, machine_type));
 }
 
 /// Checks that a `libclang` shared library matches the target platform.
@@ -63,7 +71,7 @@ fn validate_library(path: &Path) -> Result<(), String> {
 
         Ok(())
     } else if target_os!("windows") {
-        let magic = parse_pe_header(path).map_err(|e| e.to_string())?;
+        let (magic, machine_type) = parse_pe_header(path).map_err(|e| e.to_string())?;
 
         if target_pointer_width!("32") && magic != 267 {
             return Err("invalid DLL (64-bit)".into());
@@ -73,7 +81,18 @@ fn validate_library(path: &Path) -> Result<(), String> {
             return Err("invalid DLL (32-bit)".into());
         }
 
-        Ok(())
+        let arch_mismatch = match machine_type {
+            0x014C if !target_arch!("x86") => Some("x86"),
+            0x8664 if !target_arch!("x86_64") => Some("x86-64"),
+            0xAA64 if !target_arch!("aarch64") => Some("ARM64"),
+            _ => None,
+        };
+
+        if let Some(arch) = arch_mismatch {
+            Err(format!("invalid DLL ({arch})"))
+        } else {
+            Ok(())
+        }
     } else {
         Ok(())
     }
