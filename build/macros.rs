@@ -15,6 +15,17 @@ macro_rules! target_os {
     };
 }
 
+macro_rules! target_arch {
+    ($arch:expr) => {
+        if cfg!(test) && ::std::env::var("_CLANG_SYS_TEST").is_ok() {
+            let var = ::std::env::var("_CLANG_SYS_TEST_ARCH");
+            var.map_or(false, |v| v == $arch)
+        } else {
+            cfg!(target_arch = $arch)
+        }
+    };
+}
+
 macro_rules! target_pointer_width {
     ($pointer_width:expr) => {
         if cfg!(test) && ::std::env::var("_CLANG_SYS_TEST").is_ok() {

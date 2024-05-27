@@ -1,3 +1,8 @@
+## [1.8.1] - UNRELEASED
+
+### Fixed
+- Improve DLL search on Windows to take target architecture into account (e.g., ARM64 vs x86-64)
+
 ## [1.8.0] - 2024-05-26
 
 ### Changed
