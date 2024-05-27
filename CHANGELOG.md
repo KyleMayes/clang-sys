@@ -5,6 +5,9 @@
 - Added error logging when `CLANG_PATH` set but it isn't a full path to an executable
 - Removed reference to `libclang` 3.5 in error message for attempting to call an unsupported function
 
+### Added
+- Added `libcpp` Cargo feature which enables linking to `libc++` instead of `libstdc++` when linking to `libclang` statically on Linux or Haiku
+
 ### Fixed
 - Fixed handling of paths that contain characters that have special meaning in
 glob patterns (e.g., `[` or `]`)

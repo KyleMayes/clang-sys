@@ -84,6 +84,8 @@ On Windows, running an executable that has been dynamically linked to `libclang`
 
 The availability of `llvm-config` is not optional for static linking. Ensure that an instance of this executable can be found on your system's path or set the `LLVM_CONFIG_PATH` environment variable. The required LLVM and Clang static libraries will be searched for in the same way as shared libraries are searched for, except the `LIBCLANG_STATIC_PATH` environment variable is used in place of the `LIBCLANG_PATH` environment variable.
 
+**Note:** The `libcpp` Cargo feature can be used to enable linking to `libc++` instead of `libstd++` when linking to `libclang` statically on Linux or Haiku.
+
 ### Runtime
 
 The `clang_sys::load` function is used to load a `libclang` shared library for use in the thread in which it is called. The `clang_sys::unload` function will unload the `libclang` shared library. `clang_sys::load` searches for a `libclang` shared library in the same way one is searched for when linking to `libclang` dynamically at compiletime.
