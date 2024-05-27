@@ -43,6 +43,8 @@ clang_17_0 = ["clang_16_0"]
 runtime = ["libloading"]
 static = []
 
+libcpp = []
+
 [dependencies]
 
 glob = "0.3"
