@@ -2,6 +2,7 @@
 
 ### Changed
 - Bumped minimum supported Rust version (MSRV) to 1.60.0
+- Added error logging when `CLANG_PATH` set but it isn't a full path to an executable
 
 ### Fixed
 - Fixed handling of paths that contain characters that have special meaning in
