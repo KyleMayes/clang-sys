@@ -23,7 +23,7 @@ jobs:
         if: github.event.inputs.os == matrix.os
       # LLVM and Clang
       - name: Install LLVM and Clang
-        uses: KyleMayes/install-llvm-action@v2
+        uses: KyleMayes/install-llvm-action@v2.0.3
         if: github.event.inputs.os == matrix.os
         with:
           version: ${{ matrix.clang[0] }}
