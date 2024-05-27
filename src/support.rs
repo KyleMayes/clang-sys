@@ -61,6 +61,8 @@ impl Clang {
             let p = Path::new(&path);
             if p.is_file() && is_executable(p).unwrap_or(false) {
                 return Some(Clang::new(p, args));
+            } else {
+                eprintln!("`CLANG_PATH` env var set but is not a full path to an executable");
             }
         }
 
