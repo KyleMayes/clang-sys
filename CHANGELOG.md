@@ -3,6 +3,10 @@
 ### Changed
 - Bumped minimum supported Rust version (MSRV) to 1.60.0
 
+### Fixed
+- Fixed handling of paths that contain characters that have special meaning in
+glob patterns (e.g., `[` or `]`)
+
 ## [1.7.0] - 2023-12-31
 
 ### Added
