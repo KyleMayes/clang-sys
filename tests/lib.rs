@@ -46,7 +46,7 @@ fn test_support() {
 
 #[test]
 fn test_support_target() {
-    let args = &["-target".into(), "x86_64-unknown-linux-gnu".into()];
+    let args = &["--target".into(), "x86_64-unknown-linux-gnu".into()];
     let clang = support::Clang::find(None, args).unwrap();
     println!("{:?}", clang);
 }

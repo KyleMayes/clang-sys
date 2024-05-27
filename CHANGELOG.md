@@ -6,6 +6,8 @@
 ### Fixed
 - Fixed handling of paths that contain characters that have special meaning in
 glob patterns (e.g., `[` or `]`)
+- Fixed `Clang::find` to support both the `-target` and `--target` arguments
+when using target-prefixed `clang` binaries
 
 ## [1.7.0] - 2023-12-31
 

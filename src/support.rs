@@ -52,7 +52,7 @@ impl Clang {
     ///
     /// ## Cross-compilation
     ///
-    /// If target arguments are provided (e.g., `-target` followed by a target
+    /// If target arguments are provided (e.g., `--target` followed by a target
     /// like `x86_64-unknown-linux-gnu`) then this method will prefer a
     /// target-prefixed instance of `clang` (e.g.,
     /// `x86_64-unknown-linux-gnu-clang` for the above example).
@@ -68,7 +68,7 @@ impl Clang {
 
         let mut target = None;
         for i in 0..args.len() {
-            if args[i] == "-target" && i + 1 < args.len() {
+            if (args[i] == "-target" || args[i] == "-target") && i + 1 < args.len() {
                 target = Some(&args[i + 1]);
             }
         }
