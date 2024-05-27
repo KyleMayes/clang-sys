@@ -185,7 +185,6 @@ A `libclang` function was called that is not supported by the loaded `libclang` 
     called function = `{0}`
     loaded `libclang` instance = {1}
 
-This crate only supports `libclang` 3.5 and later.
 The minimum `libclang` requirement for this particular function can be found here:
 https://docs.rs/clang-sys/latest/clang_sys/{0}/index.html
 
