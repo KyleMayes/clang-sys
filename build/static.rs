@@ -87,7 +87,11 @@ fn find() -> PathBuf {
     if let Some((directory, _)) = files.into_iter().next() {
         directory
     } else {
-        panic!("could not find any static libraries");
+        panic!(
+            "could not find the required `{name}` static library, see the \
+            README for more information on how to link to `libclang` statically: \
+            https://github.com/KyleMayes/clang-sys?tab=readme-ov-file#static"
+        );
     }
 }
 

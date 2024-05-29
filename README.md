@@ -86,6 +86,31 @@ The availability of `llvm-config` is not optional for static linking. Ensure tha
 
 **Note:** The `libcpp` Cargo feature can be used to enable linking to `libc++` instead of `libstd++` when linking to `libclang` statically on Linux or Haiku.
 
+#### Static Library Availability
+
+Linking to `libclang` statically on *nix systems requires that the `libclang.a` static library be available.  
+This library is usually *not* included in most distributions of LLVM and Clang (e.g., `libclang-dev` on Debian-based systems).  
+If you need to link to `libclang` statically then most likely the only consistent way to get your hands on `libclang.a` is to build it yourself.
+
+Here's an example of building the required static libraries and using them with `clang-sys`:
+
+```text
+git clone git@github.com:llvm/llvm-project.git
+cd llvm-project
+
+cmake -S llvm -B build -G Ninja -DLLVM_ENABLE_PROJECTS=clang -DLIBCLANG_BUILD_STATIC=ON
+ninja -C build
+
+cd ..
+git clone git@github.com:KyleMayes/clang-sys.git
+cd clang-sys
+
+LLVM_CONFIG_PATH=../llvm-project/build/bin/llvm-config cargo test --features static
+```
+
+Linking to `libclang` statically requires linking a large number of big static libraries.  
+Using [`rust-lld` as a linker](https://blog.rust-lang.org/2024/05/17/enabling-rust-lld-on-linux.html) can greatly reduce linking times.
+
 ### Runtime
 
 The `clang_sys::load` function is used to load a `libclang` shared library for use in the thread in which it is called. The `clang_sys::unload` function will unload the `libclang` shared library. `clang_sys::load` searches for a `libclang` shared library in the same way one is searched for when linking to `libclang` dynamically at compiletime.
