@@ -2,6 +2,8 @@
 
 ### Fixed
 - Fixed linking to `libclang` on Windows with MSYS2
+- Fixed `Clang::find` to support both the `-target` and `--target` arguments
+when using target-prefixed `clang` binaries
 
 ## [1.8.1] - 2024-05-28
 
@@ -25,8 +27,6 @@
 ### Fixed
 - Fixed handling of paths that contain characters that have special meaning in
 glob patterns (e.g., `[` or `]`)
-- Fixed `Clang::find` to support both the `-target` and `--target` arguments
-when using target-prefixed `clang` binaries
 
 ## [1.7.0] - 2023-12-31
 
