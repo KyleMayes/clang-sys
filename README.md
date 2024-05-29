@@ -26,8 +26,8 @@ To target a version of `libclang`, enable a Cargo features such as one of the fo
 * `clang_3_5` - requires `libclang` 3.5 or later
 * `clang_3_6` - requires `libclang` 3.6 or later
 * etc...
-* `clang_15_0` - requires `libclang` 15.0 or later
-* `clang_16_0` - requires `libclang` 16.0 or later
+* `clang_17_0` - requires `libclang` 17.0 or later
+* `clang_18_0` - requires `libclang` 18.0 or later
 
 If you do not enable one of these features, the API provided by `libclang` 3.5 will be available by default.
 

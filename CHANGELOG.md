@@ -1,5 +1,8 @@
 ## [1.8.1] - UNRELEASED
 
+### Added
+- Added support for `clang` 18.0.x
+
 ### Fixed
 - Improve DLL search on Windows to take target architecture into account (e.g., ARM64 vs x86-64)
 - Improved detection of `libclang` installed with Visual Studio on Windows
