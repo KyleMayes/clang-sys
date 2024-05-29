@@ -189,7 +189,7 @@ const DIRECTORIES_WINDOWS: &[(&str, bool)] = &[
     ("C:\\LLVM\\lib", true),
     // LLVM + Clang can be installed as a component of Visual Studio.
     // https://github.com/KyleMayes/clang-sys/issues/121
-    ("C:\\Program Files*\\Microsoft Visual Studio\\*\\BuildTools\\VC\\Tools\\Llvm\\**\\lib", true),
+    ("C:\\Program Files*\\Microsoft Visual Studio\\*\\VC\\Tools\\Llvm\\**\\lib", true),
 ];
 
 /// `libclang` directory patterns for illumos
