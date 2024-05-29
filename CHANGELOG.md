@@ -1,4 +1,4 @@
-## [1.8.1] - UNRELEASED
+## [1.8.1] - 2024-05-28
 
 ### Added
 - Added support for `clang` 18.0.x
