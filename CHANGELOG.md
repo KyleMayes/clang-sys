@@ -1,5 +1,8 @@
 ## [1.8.2] - UNRELEASED
 
+### Changed
+- Improved `Clang::find` to first check directories related to the runtime-loaded `libclang` instance (if any)
+
 ### Fixed
 - Fixed linking to `libclang` on Windows with MSYS2
 - Fixed `Clang::find` to support both the `-target` and `--target` arguments

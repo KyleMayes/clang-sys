@@ -50,3 +50,14 @@ fn test_support_target() {
     let clang = support::Clang::find(None, args).unwrap();
     println!("{:?}", clang);
 }
+
+#[cfg(feature = "runtime")]
+#[test]
+fn test_support_runtime() {
+    load().unwrap();
+    let library = get_library().unwrap();
+    let clang = support::Clang::find(None, &[]).unwrap();
+    println!("Library path: {}", library.path().display());
+    println!("Clang path:   {}", clang.path.display());
+    unload().unwrap();
+}

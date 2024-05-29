@@ -44,11 +44,13 @@ impl Clang {
     /// Returns a `clang` executable if one can be found.
     ///
     /// If the `CLANG_PATH` environment variable is set, that is the instance of
-    /// `clang` used. Otherwise, a series of directories are searched. First, if
-    /// a path is supplied, that is the first directory searched. Then, the
-    /// directory returned by `llvm-config --bindir` is searched. On macOS
-    /// systems, `xcodebuild -find clang` will next be queried. Last, the
-    /// directories in the system's `PATH` are searched.
+    /// `clang` used. Otherwise, these directories are searched in order:
+    ///
+    ///   1. The supplied path (if provided)
+    ///   2. Sibling directories for the runtime-loaded `libclang` instance (if any)
+    ///   3. The directory returned by `llvm-config --bindir`
+    ///   4. The directory returned by `xcodebuild -find clang` (on macOS)
+    ///   5. The directories in the system's `PATH` environment variable
     ///
     /// ## Cross-compilation
     ///
@@ -81,6 +83,16 @@ impl Clang {
 
         if let Some(path) = path {
             paths.push(path.into());
+        }
+
+        #[cfg(feature = "runtime")]
+        if let Some(library) = crate::get_library() {
+            if let Some(directory) = library.path().parent() {
+                paths.push(directory.into());
+                if let Some(parent) = directory.parent() {
+                    paths.push(parent.join("bin"));
+                }
+            }
         }
 
         if let Ok(path) = run_llvm_config(&["--bindir"]) {
