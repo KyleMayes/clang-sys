@@ -263,8 +263,8 @@ pub fn link() {
         let name = filename.trim_start_matches("lib");
 
         // Strip extensions and trailing version numbers (e.g., the `.so.7.0` in
-        // `libclang.so.7.0`).
-        let name = match name.find(".dylib").or_else(|| name.find(".so")) {
+        // `libclang.so.7.0`) and also `.dll` for MinGW / MSYS.
+        let name = match name.find(".dylib").or_else(|| name.find(".so")).or_else(|| name.find(".dll")) {
             Some(index) => &name[0..index],
             None => name,
         };

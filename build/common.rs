@@ -185,6 +185,7 @@ const DIRECTORIES_WINDOWS: &[(&str, bool)] = &[
     // system-wide directories.
     ("C:\\Users\\*\\scoop\\apps\\llvm\\current\\lib", true),
     ("C:\\MSYS*\\MinGW*\\lib", false),
+    ("C:\\MSYS*\\clang*\\lib", false),
     ("C:\\Program Files*\\LLVM\\lib", true),
     ("C:\\LLVM\\lib", true),
     // LLVM + Clang can be installed as a component of Visual Studio.

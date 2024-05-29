@@ -1,3 +1,8 @@
+## [1.8.2] - UNRELEASED
+
+### Fixed
+- Fixed linking to `libclang` on Windows with MSYS2
+
 ## [1.8.1] - 2024-05-28
 
 ### Added
