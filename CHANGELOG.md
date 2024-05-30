@@ -1,4 +1,4 @@
-## [1.8.2] - UNRELEASED
+## [1.8.2] - 2024-05-29
 
 ### Changed
 - Improved `Clang::find` to first check directories related to the runtime-loaded `libclang` instance (if any)
