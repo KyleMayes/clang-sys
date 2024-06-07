@@ -22,6 +22,8 @@
 #![allow(non_camel_case_types, non_snake_case, non_upper_case_globals)]
 #![cfg_attr(feature = "cargo-clippy", allow(clippy::unreadable_literal))]
 
+// Keep all interactions with the clang executable in this module.
+#[cfg(feature = "support")]
 pub mod support;
 
 #[macro_use]

@@ -38,12 +38,14 @@ fn test() {
     parse();
 }
 
+#[cfg(feature = "support")]
 #[test]
 fn test_support() {
     let clang = support::Clang::find(None, &[]).unwrap();
     println!("{:?}", clang);
 }
 
+#[cfg(feature = "support")]
 #[test]
 fn test_support_target() {
     let args = &["--target".into(), "x86_64-unknown-linux-gnu".into()];
@@ -51,6 +53,7 @@ fn test_support_target() {
     println!("{:?}", clang);
 }
 
+#[cfg(feature = "support")]
 #[cfg(feature = "runtime")]
 #[test]
 fn test_support_runtime() {
