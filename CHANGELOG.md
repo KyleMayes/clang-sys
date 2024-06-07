@@ -1,3 +1,8 @@
+## [1.8.3] -  UNRELEASED
+### Changed
+- Introduce a feature "support" to guard all interactions with clang executable.
+Enabled by default, for backwards compatibility.
+
 ## [1.8.2] - 2024-05-29
 
 ### Changed

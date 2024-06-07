@@ -19,6 +19,7 @@ links = "clang"
 build = "build.rs"
 
 [features]
+default = ["support"]
 
 clang_3_5 = []
 clang_3_6 = ["clang_3_5"]
@@ -41,10 +42,12 @@ clang_16_0 = ["clang_15_0"]
 clang_17_0 = ["clang_16_0"]
 clang_18_0 = ["clang_17_0"]
 
-runtime = ["libloading"]
+runtime = ["libloading", "support"]
 static = []
 
 libcpp = []
+
+support = []
 
 [dependencies]
 
