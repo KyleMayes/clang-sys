@@ -20,16 +20,13 @@ thread_local! {
 /// Adds an error encountered by the build script while executing a command.
 fn add_command_error(name: &str, path: &str, arguments: &[&str], message: String) {
     COMMAND_ERRORS.with(|e| {
-        e.borrow_mut()
-            .entry(name.into())
-            .or_default()
-            .push(format!(
-                "couldn't execute `{} {}` (path={}) ({})",
-                name,
-                arguments.join(" "),
-                path,
-                message,
-            ))
+        e.borrow_mut().entry(name.into()).or_default().push(format!(
+            "couldn't execute `{} {}` (path={}) ({})",
+            name,
+            arguments.join(" "),
+            path,
+            message,
+        ))
     });
 }
 
@@ -190,14 +187,14 @@ const DIRECTORIES_WINDOWS: &[(&str, bool)] = &[
     ("C:\\LLVM\\lib", true),
     // LLVM + Clang can be installed as a component of Visual Studio.
     // https://github.com/KyleMayes/clang-sys/issues/121
-    ("C:\\Program Files*\\Microsoft Visual Studio\\*\\VC\\Tools\\Llvm\\**\\lib", true),
+    (
+        "C:\\Program Files*\\Microsoft Visual Studio\\**\\VC\\Tools\\Llvm\\**\\lib",
+        true,
+    ),
 ];
 
 /// `libclang` directory patterns for illumos
-const DIRECTORIES_ILLUMOS: &[&str] = &[
-    "/opt/ooce/llvm-*/lib",
-    "/opt/ooce/clang-*/lib",
-];
+const DIRECTORIES_ILLUMOS: &[&str] = &["/opt/ooce/llvm-*/lib", "/opt/ooce/clang-*/lib"];
 
 //================================================
 // Searching
@@ -334,7 +331,11 @@ pub fn search_libclang_directories(filenames: &[String], variable: &str) -> Vec<
     let directories = if test!() {
         directories
             .iter()
-            .map(|d| d.strip_prefix('/').or_else(|| d.strip_prefix("C:\\")).unwrap_or(d))
+            .map(|d| {
+                d.strip_prefix('/')
+                    .or_else(|| d.strip_prefix("C:\\"))
+                    .unwrap_or(d)
+            })
             .collect::<Vec<_>>()
     } else {
         directories
