@@ -235,7 +235,19 @@ https://rust-lang.github.io/rust-bindgen/requirements.html
             let path = directory.join(filename);
 
             unsafe {
-                let library = libloading::Library::new(&path).map_err(|e| {
+                #[cfg(target_os = "windows")]
+                // Prioritize loading dll in the directory containing libclang.dll
+                let library =
+                    libloading::os::windows::Library::load_with_flags(
+                        &path,
+                        libloading::os::windows::LOAD_LIBRARY_SEARCH_DEFAULT_DIRS |
+                        libloading::os::windows::LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR)
+                    .map(From::from);
+
+                #[cfg(not(target_os = "windows"))]
+                let library = libloading::Library::new(&path);
+
+                let library = library.map_err(|e| {
                     format!(
                         "the `libclang` shared library at {} could not be opened: {}",
                         path.display(),
