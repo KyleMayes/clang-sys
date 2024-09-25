@@ -1453,6 +1453,8 @@ opaque!(CXRemapping);
 #[cfg(feature = "clang_5_0")]
 opaque!(CXTargetInfo);
 opaque!(CXTranslationUnit);
+#[cfg(feature = "clang_12_0")]
+opaque!(CXRewriter);
 
 // Transparent ___________________________________
 
@@ -2394,6 +2396,27 @@ link! {
     pub fn clang_toggleCrashRecovery(recovery: c_uint);
     pub fn clang_tokenize(tu: CXTranslationUnit, range: CXSourceRange, tokens: *mut *mut CXToken, n_tokens: *mut c_uint);
     pub fn clang_visitChildren(cursor: CXCursor, visitor: CXCursorVisitor, data: CXClientData) -> c_uint;
+    /// Only available on `libclang` 12.0 and later.
+    #[cfg(feature = "clang_12_0")]
+    pub fn clang_CXRewriter_create(tu: CXTranslationUnit) -> CXRewriter;
+    /// Only available on `libclang` 12.0 and later.
+    #[cfg(feature = "clang_12_0")]
+    pub fn clang_CXRewriter_insertTextBefore(rew: CXRewriter, loc: CXSourceLocation, insert: *const c_char);
+    /// Only available on `libclang` 12.0 and later.
+    #[cfg(feature = "clang_12_0")]
+    pub fn clang_CXRewriter_replaceText(rew: CXRewriter, to_be_replaced: CXSourceRange, replacement: *const c_char);
+    /// Only available on `libclang` 12.0 and later.
+    #[cfg(feature = "clang_12_0")]
+    pub fn clang_CXRewriter_removeText(rew: CXRewriter, to_be_removed: CXSourceRange);
+    /// Only available on `libclang` 12.0 and later.
+    #[cfg(feature = "clang_12_0")]
+    pub fn clang_CXRewriter_overwriteChangedFiles(rew: CXRewriter) -> c_int;
+    /// Only available on `libclang` 12.0 and later.
+    #[cfg(feature = "clang_12_0")]
+    pub fn clang_CXRewriter_writeMainFileToStdOut(rew: CXRewriter);
+    /// Only available on `libclang` 12.0 and later.
+    #[cfg(feature = "clang_12_0")]
+    pub fn clang_CXRewriter_dispose(rew: CXRewriter);
 
     // Documentation
     pub fn clang_BlockCommandComment_getArgText(comment: CXComment, index: c_uint) -> CXString;
