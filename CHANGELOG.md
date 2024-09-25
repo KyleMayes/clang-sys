@@ -1,3 +1,8 @@
+## [1.9.0] - 2024-09-24
+
+### Changed
+- Added `--link-static` flag when listing static libraries to link to
+
 ## [1.8.2] - 2024-05-29
 
 ### Changed
