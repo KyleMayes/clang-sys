@@ -571,10 +571,32 @@ cenum! {
         const CXCursor_OMPReverseDirective = 307,
         /// Only produced by `libclang` 19.0 and later.
         const CXCursor_OMPInterchangeDirective = 308,
+        /// Only produced by `libclang` 20.0 and later.
+        const CXCursor_OMPAssumeDirective = 309,
         /// Only produced by `libclang` 19.0 and later.
         const CXCursor_OpenACCComputeConstruct = 320,
         /// Only produced by `libclang` 19.0 and later.
         const CXCursor_OpenACCLoopConstruct = 321,
+        /// Only produced by `libclang` 20.0 and later.
+        const CXCursor_OpenACCCombinedConstruct = 322,
+        /// Only produced by `libclang` 20.0 and later.
+        const CXCursor_OpenACCDataConstruct = 323,
+        /// Only produced by `libclang` 20.0 and later.
+        const CXCursor_OpenACCEnterDataConstruct = 324,
+        /// Only produced by `libclang` 20.0 and later.
+        const CXCursor_OpenACCExitDataConstruct = 325,
+        /// Only produced by `libclang` 20.0 and later.
+        const CXCursor_OpenACCHostDataConstruct = 326,
+        /// Only produced by `libclang` 20.0 and later.
+        const CXCursor_OpenACCWaitConstruct = 327,
+        /// Only produced by `libclang` 20.0 and later.
+        const CXCursor_OpenACCInitConstruct = 328,
+        /// Only produced by `libclang` 20.0 and later.
+        const CXCursor_OpenACCShutdownConstruct = 329,
+        /// Only produced by `libclang` 20.0 and later.
+        const CXCursor_OpenACCSetConstruct = 330,
+        /// Only produced by `libclang` 20.0 and later.
+        const CXCursor_OpenACCUpdateConstruct = 331,
         #[cfg(not(feature="clang_15_0"))]
         const CXCursor_TranslationUnit = 300,
         #[cfg(feature="clang_15_0")]
@@ -1133,6 +1155,8 @@ cenum! {
         const CXType_BTFTagAttributed = 178,
         /// Only produced by `libclang` 19.0 and later.
         const CXType_HLSLResource = 179,
+        /// Only produced by `libclang` 20.0 and later.
+        const CXType_HLSLAttributedResource = 180,
     }
 }
 
@@ -2181,6 +2205,9 @@ link! {
     /// Only available on `libclang` 3.7 and later.
     #[cfg(feature = "clang_3_7")]
     pub fn clang_Type_visitFields(type_: CXType, visitor: CXFieldVisitor, data: CXClientData) -> CXVisitorResult;
+    /// Only available on `libclang` 20.0 and later.
+    #[cfg(feature = "clang_20_0")]
+    pub fn clang_visitCXXBaseClasses(type_: CXType, visitor: CXFieldVisitor, data: CXClientData) -> CXVisitorResult;
     pub fn clang_annotateTokens(tu: CXTranslationUnit, tokens: *mut CXToken, n_tokens: c_uint, cursors: *mut CXCursor);
     pub fn clang_codeCompleteAt(tu: CXTranslationUnit, file: *const c_char, line: c_uint, column: c_uint, unsaved: *mut CXUnsavedFile, n_unsaved: c_uint, flags: CXCodeComplete_Flags) -> *mut CXCodeCompleteResults;
     pub fn clang_codeCompleteGetContainerKind(results: *mut CXCodeCompleteResults, incomplete: *mut c_uint) -> CXCursorKind;
@@ -2291,6 +2318,9 @@ link! {
     /// Only available on `libclang` 7.0 and later.
     #[cfg(feature = "clang_7_0")]
     pub fn clang_getCursorPrettyPrinted(cursor: CXCursor, policy: CXPrintingPolicy) -> CXString;
+    /// Only available on `libclang` 20.0 and later.
+    #[cfg(feature = "clang_20_0")]
+    pub fn clang_getTypePrettyPrinted(type_: CXType, cx_policy: CXPrintingPolicy) -> CXString;
     /// Only available on `libclang` 7.0 and later.
     #[cfg(feature = "clang_7_0")]
     pub fn clang_getCursorPrintingPolicy(cursor: CXCursor) -> CXPrintingPolicy;
@@ -2440,6 +2470,9 @@ link! {
     pub fn clang_isTranslationUnit(kind: CXCursorKind) -> c_uint;
     pub fn clang_isUnexposed(kind: CXCursorKind) -> c_uint;
     pub fn clang_isVirtualBase(cursor: CXCursor) -> c_uint;
+    /// Only available on `libclang` 20.0 and later.
+    #[cfg(feature = "clang_20_0")]
+    pub fn clang_getOffsetOfBase(parent: CXCursor, base: CXCursor) -> c_longlong;
     pub fn clang_isVolatileQualifiedType(type_: CXType) -> c_uint;
     pub fn clang_loadDiagnostics(file: *const c_char, error: *mut CXLoadDiag_Error, message: *mut CXString) -> CXDiagnosticSet;
     pub fn clang_parseTranslationUnit(index: CXIndex, file: *const c_char, arguments: *const *const c_char, n_arguments: c_int, unsaved: *mut CXUnsavedFile, n_unsaved: c_uint, flags: CXTranslationUnit_Flags) -> CXTranslationUnit;
