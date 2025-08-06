@@ -181,6 +181,10 @@ cenum! {
         const CXCallingConv_AArch64SVEPCS = 18,
         /// Only produced by `libclang` 18.0 and later.
         const CXCallingConv_M68kRTD = 19,
+        /// Only produced by `libclang` 19.0 and later.
+        const CXCallingConv_PreserveNone = 20,
+        /// Only produced by `libclang` 19.0 and later.
+        const CXCallingConv_RISCVVectorCall = 21,
     }
 }
 
@@ -375,7 +379,9 @@ cenum! {
         const CXCursor_ObjCBoolLiteralExpr = 145,
         const CXCursor_ObjCSelfExpr = 146,
         /// Only produced by `libclang` 3.8 and later.
-        const CXCursor_OMPArraySectionExpr = 147,
+        const CXCursor_ArraySectionExpr = 147,
+        #[deprecated = "renamed to CXCursor_ArraySectionExpr in clang 19.0"]
+        const CXCursor_OMPArraySectionExpr = CXCursor_ArraySectionExpr,
         /// Only produced by `libclang` 3.9 and later.
         const CXCursor_ObjCAvailabilityCheckExpr = 148,
         /// Only produced by `libclang` 7.0 and later.
@@ -392,6 +398,8 @@ cenum! {
         const CXCursor_RequiresExpr = 154,
         /// Only produced by `libclang` 16.0 and later.
         const CXCursor_CXXParenListInitExpr = 155,
+        /// Only produced by `libclang` 19.0 and later.
+        const CXCursor_PackIndexingExpr = 156,
         const CXCursor_UnexposedStmt = 200,
         const CXCursor_LabelStmt = 201,
         const CXCursor_CompoundStmt = 202,
@@ -559,6 +567,14 @@ cenum! {
         const CXCursor_OMPErrorDirective = 305,
         /// Only produced by `libclang` 18.0 and later.
         const CXCursor_OMPScopeDirective = 306,
+        /// Only produced by `libclang` 19.0 and later.
+        const CXCursor_OMPReverseDirective = 307,
+        /// Only produced by `libclang` 19.0 and later.
+        const CXCursor_OMPInterchangeDirective = 308,
+        /// Only produced by `libclang` 19.0 and later.
+        const CXCursor_OpenACCComputeConstruct = 320,
+        /// Only produced by `libclang` 19.0 and later.
+        const CXCursor_OpenACCLoopConstruct = 321,
         #[cfg(not(feature="clang_15_0"))]
         const CXCursor_TranslationUnit = 300,
         #[cfg(feature="clang_15_0")]
@@ -1114,7 +1130,9 @@ cenum! {
         /// Only produced by `libclang` 11.0 and later.
         const CXType_Atomic = 177,
         /// Only produced by `libclang` 15.0 and later.
-        const CXType_BTFTagAttributed = 178,        
+        const CXType_BTFTagAttributed = 178,
+        /// Only produced by `libclang` 19.0 and later.
+        const CXType_HLSLResource = 179,
     }
 }
 
@@ -1285,6 +1303,47 @@ cenum! {
         const CXIndexOptIndexImplicitTemplateInstantiations = 4;
         const CXIndexOptSuppressWarnings = 8;
         const CXIndexOptSkipParsedBodiesInSession = 16;
+    }
+}
+
+cenum! {
+    /// Only available on `libclang` 19.0 and later.
+    #[cfg(feature = "clang_19_0")]
+    enum CX_BinaryOperatorKind {
+        const CX_BO_Invalid = 0,
+        const CX_BO_PtrMemD = 1,
+        const CX_BO_PtrMemI = 2,
+        const CX_BO_Mul = 3,
+        const CX_BO_Div = 4,
+        const CX_BO_Rem = 5,
+        const CX_BO_Add = 6,
+        const CX_BO_Sub = 7,
+        const CX_BO_Shl = 8,
+        const CX_BO_Shr = 9,
+        const CX_BO_Cmp = 10,
+        const CX_BO_LT = 11,
+        const CX_BO_GT = 12,
+        const CX_BO_LE = 13,
+        const CX_BO_GE = 14,
+        const CX_BO_EQ = 15,
+        const CX_BO_NE = 16,
+        const CX_BO_And = 17,
+        const CX_BO_Xor = 18,
+        const CX_BO_Or = 19,
+        const CX_BO_LAnd = 20,
+        const CX_BO_LOr = 21,
+        const CX_BO_Assign = 22,
+        const CX_BO_MulAssign = 23,
+        const CX_BO_DivAssign = 24,
+        const CX_BO_RemAssign = 25,
+        const CX_BO_AddAssign = 26,
+        const CX_BO_SubAssign = 27,
+        const CX_BO_ShlAssign = 28,
+        const CX_BO_ShrAssign = 29,
+        const CX_BO_AndAssign = 30,
+        const CX_BO_XorAssign = 31,
+        const CX_BO_OrAssign = 32,
+        const CX_BO_Comma = 33,
     }
 }
 
@@ -2010,6 +2069,12 @@ link! {
     pub fn clang_Cursor_isNull(cursor: CXCursor) -> c_int;
     pub fn clang_Cursor_isObjCOptional(cursor: CXCursor) -> c_uint;
     pub fn clang_Cursor_isVariadic(cursor: CXCursor) -> c_uint;
+    /// Only available on `libclang` 19.0 and later.
+    #[cfg(feature = "clang_19_0")]
+    pub fn clang_Cursor_getBinaryOpcode(cursor: CXCursor) -> CX_BinaryOperatorKind;
+    /// Only available on `libclang` 19.0 and later.
+    #[cfg(feature = "clang_19_0")]
+    pub fn clang_Cursor_getBinaryOpcodeStr(op: CX_BinaryOperatorKind) -> CXString;
     /// Only available on `libclang` 5.0 and later.
     #[cfg(feature = "clang_5_0")]
     pub fn clang_EnumDecl_isScoped(cursor: CXCursor) -> c_uint;
