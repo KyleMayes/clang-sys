@@ -323,6 +323,9 @@ pub fn search_libclang_directories(filenames: &[String], variable: &str) -> Vec<
             .filter(|d| d.1 || !msvc)
             .map(|d| d.0)
             .collect()
+    } else if target_os!("cygwin") {
+        // For Cygwin/MSYS environments, the filesystem layout is Unix-like.
+        DIRECTORIES_LINUX.into()
     } else if target_os!("illumos") {
         DIRECTORIES_ILLUMOS.into()
     } else {
