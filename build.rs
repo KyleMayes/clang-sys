@@ -32,17 +32,9 @@ pub mod r#static;
 /// the build output directory so that it may be used when linking at runtime.
 #[cfg(feature = "runtime")]
 fn main() {
-    use std::env;
-    use std::fs::copy;
-
     if cfg!(feature = "static") {
         panic!("`runtime` and `static` features can't be combined");
     }
-
-    let out = env::var("OUT_DIR").unwrap();
-    copy("build/macros.rs", &Path::new(&out).join("macros.rs")).unwrap();
-    copy("build/common.rs", &Path::new(&out).join("common.rs")).unwrap();
-    copy("build/dynamic.rs", &Path::new(&out).join("dynamic.rs")).unwrap();
 }
 
 /// Finds and links to the required libraries dynamically or statically.
