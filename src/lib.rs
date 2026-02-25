@@ -1941,7 +1941,7 @@ default!(IndexerCallbacks);
 // Functions
 //================================================
 
-link! {
+link!(
     pub fn clang_CXCursorSet_contains(set: CXCursorSet, cursor: CXCursor) -> c_uint;
     pub fn clang_CXCursorSet_insert(set: CXCursorSet, cursor: CXCursor) -> c_uint;
     pub fn clang_CXIndex_getGlobalOptions(index: CXIndex) -> CXGlobalOptFlags;
@@ -2551,4 +2551,4 @@ link! {
     pub fn clang_TParamCommandComment_isParamPositionValid(comment: CXComment) -> c_uint;
     pub fn clang_VerbatimBlockLineComment_getText(comment: CXComment) -> CXString;
     pub fn clang_VerbatimLineComment_getText(comment: CXComment) -> CXString;
-}
+);
