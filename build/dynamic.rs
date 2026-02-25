@@ -140,7 +140,8 @@ fn search_libclang_directories(runtime: bool) -> Result<Vec<(PathBuf, String, Ve
         }
     }
 
-    if target_os!("freebsd") || target_os!("haiku") || target_os!("netbsd") || target_os!("openbsd") {
+    if target_os!("freebsd") || target_os!("haiku") || target_os!("netbsd") || target_os!("openbsd")
+    {
         // Some BSD distributions don't create a `libclang.so` symlink either,
         // but use a different naming scheme for versioned files (e.g.,
         // `libclang.so.7.0`).
@@ -267,7 +268,11 @@ pub fn link() {
 
         // Strip extensions and trailing version numbers (e.g., the `.so.7.0` in
         // `libclang.so.7.0`) and also `.dll` for MinGW / MSYS.
-        let name = match name.find(".dylib").or_else(|| name.find(".so")).or_else(|| name.find(".dll")) {
+        let name = match name
+            .find(".dylib")
+            .or_else(|| name.find(".so"))
+            .or_else(|| name.find(".dll"))
+        {
             Some(index) => &name[0..index],
             None => name,
         };
