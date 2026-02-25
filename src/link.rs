@@ -36,7 +36,7 @@ macro_rules! link {
     (
         $(
             $(#[doc=$doc:expr] #[cfg($cfg:meta)])*
-            pub fn $name:ident($($pname:ident: $pty:ty), *) $(-> $ret:ty)*;
+            pub fn $name:ident($($pname:ident: $pty:ty),* $(,)?) $(-> $ret:ty)*;
         )+
     ) => (
         use std::cell::{RefCell};
@@ -302,7 +302,7 @@ macro_rules! link {
     (
         $(
             $(#[doc=$doc:expr] #[cfg($cfg:meta)])*
-            pub fn $name:ident($($pname:ident: $pty:ty), *) $(-> $ret:ty)*;
+            pub fn $name:ident($($pname:ident: $pty:ty),* $(,)?) $(-> $ret:ty)*;
         )+
     ) => (
         extern {
