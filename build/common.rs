@@ -309,6 +309,14 @@ pub fn search_libclang_directories(filenames: &[String], variable: &str) -> Vec<
         }
     }
 
+    // Search the directories in the `LIBRARY_PATH` environment variable,
+    // used by GCC to find libraries to link.
+    if let Ok(path) = env::var("LIBRARY_PATH") {
+        for directory in env::split_paths(&path) {
+            found.extend(search_directories(&directory, filenames));
+        }
+    }
+
     // Determine the `libclang` directory patterns.
     let directories: Vec<&str> = if target_os!("haiku") {
         DIRECTORIES_HAIKU.into()
