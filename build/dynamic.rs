@@ -151,6 +151,9 @@ fn search_libclang_directories(runtime: bool) -> Result<Vec<(PathBuf, String, Ve
         // The official LLVM build uses `libclang.dll` on Windows instead of
         // `clang.dll`. However, unofficial builds such as MinGW use `clang.dll`.
         files.push("libclang.dll".into());
+    } else if target_os!("cygwin") {
+        files.push("msys-clang-*.dll".into());
+        files.push("cygclang-*.dll".into());
     }
 
     // Find and validate `libclang` shared libraries and collect the versions.
