@@ -52,7 +52,7 @@ libcpp = []
 
 glob = "0.3"
 libc = { version = "0.2.39", default-features = false }
-libloading = { version = "0.8", optional = true }
+libloading = { version = "0.9", optional = true }
 
 [build-dependencies]
 
