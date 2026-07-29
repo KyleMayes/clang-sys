@@ -100,8 +100,8 @@ macro_rules! link {
         /// A dynamically loaded instance of the `libclang` library.
         #[derive(Debug)]
         pub struct SharedLibrary {
-            pub(crate) library: libloading::Library,
-            pub(crate) path: PathBuf,
+            library: libloading::Library,
+            path: PathBuf,
             pub functions: Functions,
         }
 
