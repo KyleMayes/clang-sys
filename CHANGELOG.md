@@ -1,3 +1,8 @@
+## Unreleased
+
+### Changed
+- Bumped minimum supported Rust version (MSRV) to 1.71.0
+
 ## [1.9.1] - 2026-06-29
 
 ### Added
