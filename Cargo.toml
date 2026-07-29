@@ -18,6 +18,8 @@ repository = "https://github.com/KyleMayes/clang-sys"
 links = "clang"
 build = "build.rs"
 
+rust-version = "1.71"
+
 [features]
 
 clang_3_5 = []
@@ -62,7 +64,7 @@ glob = "0.3"
 
 glob = "0.3"
 lazy_static = "1"
-tempfile = ">=3.0.0, <3.7.0"
+tempfile = "3.6.0"
 
 [package.metadata.docs.rs]
 

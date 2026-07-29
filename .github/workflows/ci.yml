@@ -24,7 +24,7 @@ jobs:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
         clang: [["14.0", "clang_14_0"]]
-        rust: ["1.60.0"]
+        rust: ["1.71.0"]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -41,7 +41,7 @@ jobs:
           toolchain: ${{ matrix.rust }}
       # Cargo
       - name: Generate lockfile and pin dependencies for MSRV
-        run: cargo generate-lockfile && cargo update -p libc --precise 0.2.163 && cargo update -p glob --precise 0.3.2 && cargo update -p libloading --precise 0.8.8
+        run: cargo generate-lockfile && cargo update -p getrandom --precise 0.3.4
       # Test
       - name: Cargo Test (Dynamic)
         run: cargo test --verbose --features ${{ matrix.clang[1] }} -- --nocapture
