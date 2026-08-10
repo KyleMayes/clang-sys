@@ -5,6 +5,9 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/KyleMayes/clang-sys/ci.yml?branch=master)](https://github.com/KyleMayes/clang-sys/actions?query=workflow%3ACI)
 ![MSRV](https://img.shields.io/badge/MSRV-1.71.0-blue)
 
+> [!WARNING]
+> The contents of this repository has been merged into [`KyleMayes/clang-rs`](https://github.com/KyleMayes/clang-rs).
+
 Rust bindings for `libclang`.
 
 If you are interested in a somewhat idiomatic Rust wrapper for these bindings, see [`clang-rs`](https://github.com/KyleMayes/clang-rs).
