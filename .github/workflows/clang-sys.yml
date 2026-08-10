@@ -41,12 +41,12 @@ jobs:
           toolchain: ${{ matrix.rust }}
       # Cargo
       - name: Generate lockfile and pin dependencies for MSRV
-        run: cargo generate-lockfile && cargo update -p getrandom --precise 0.3.4
+        run: cargo generate-lockfile --manifest-path clang-sys/Cargo.toml && cargo update --manifest-path clang-sys/Cargo.toml -p getrandom --precise 0.3.4
       # Test
       - name: Cargo Test (Dynamic)
-        run: cargo test --verbose --features ${{ matrix.clang[1] }} -- --nocapture
+        run: cargo test --manifest-path clang-sys/Cargo.toml --verbose --features ${{ matrix.clang[1] }} -- --nocapture
       - name: Cargo Test (Runtime)
-        run: cargo test --verbose --features "${{ matrix.clang[1] }} runtime" -- --nocapture
+        run: cargo test --manifest-path clang-sys/Cargo.toml --verbose --features "${{ matrix.clang[1] }} runtime" -- --nocapture
   test-bindgen:
     name: Test (bindgen)
     runs-on: ubuntu-latest

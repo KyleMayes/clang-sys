@@ -21,4 +21,4 @@ bindgen = "*"
 
 [patch.crates-io]
 
-clang-sys = { path = ".." }
+clang-sys = { path = "../clang-sys" }
